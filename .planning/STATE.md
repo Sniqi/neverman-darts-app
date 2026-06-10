@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-06-PLAN.md
-last_updated: "2026-06-10T21:25:10Z"
+stopped_at: Completed 01-07-PLAN.md
+last_updated: "2026-06-10T23:40:00Z"
 last_activity: 2026-06-10 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 01 (playable-x01-match) — EXECUTING
-Plan: 2 of 9
+Plan: 8 of 9
 Status: Ready to execute
-Last activity: 2026-06-10 -- Phase 01 execution started
+Last activity: 2026-06-10 -- Completed 01-07 correction-window and numpad wiring fix
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -58,6 +58,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-playable-x01-match P04 | 14min | 2 tasks | 11 files |
 | Phase 01 P05 | 3min | 2 tasks | 4 files |
 | Phase 01 P06 | 2min | 2 tasks | 2 files |
+| Phase 01 P07 | 11min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,10 @@ Recent decisions affecting current work:
 - [Phase ?]: Fixes undo replay across matches
 - [Phase ?]: Fixes single-press undo after confirmed visit
 - [Phase ?]: Completes impossible-score guard for numpad
+- [Phase 01-07]: CorrectionWindow owns CONFIRM_VISIT dispatch; parent dismissCorrection() only clears pendingCorrection
+- [Phase 01-07]: Per-player visit counts use Record<string,number> keyed by player.id (replaces broken cross-player counter)
+- [Phase 01-07]: E2E overlay click via page.evaluate() DOM click — Playwright pointer click intercepted by panel-area in headless mode
+- [Phase 01-07]: Darts-at-double dialog suppressed for match-winning visits (win overlay owns screen)
 
 ### Pending Todos
 
@@ -99,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-10T21:25:10Z
-Stopped at: Completed 01-06-PLAN.md
+Last session: 2026-06-10T23:40:00Z
+Stopped at: Completed 01-07-PLAN.md
 Resume file: None

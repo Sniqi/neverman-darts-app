@@ -5,11 +5,11 @@
 
 /**
  * Set of visit totals that are impossible to score in three darts.
- * (Scores between 163–180 that cannot be reached with any combination of
- * three darts on a standard board.)
+ * (Scores that cannot be reached with any combination of three darts
+ * on a standard board: 163, 166, 169, 172, 173, 175, 176, 178, 179.)
  */
 export const IMPOSSIBLE_3DART = new Set<number>([
-	169, 172, 173, 175, 176, 178, 179
+	163, 166, 169, 172, 173, 175, 176, 178, 179
 ]);
 
 /**

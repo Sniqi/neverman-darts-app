@@ -31,12 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Success Criteria** (what must be TRUE):
 
   1. Player can configure a 301/401/501 match with Single Out or Double Out, set the number of legs/sets, add 1–4 named or guest players, and enter the bull-off result to set starting order
-  2. Player can enter each dart by tapping the on-screen dartboard (all segments reliably hittable by finger) or by typing a visit total on the numeric keypad; the visit auto-finalizes after 3 darts, a bust, or a leg win with a brief correction window
+  2. Player can enter each dart by tapping the on-screen dartboard (all segments reliably hittable by finger) or by typing a visit total on the numeric keypad; the visit auto-finalizes after 3 darts, a bust, or a leg win with a correction window
   3. A bust (all three conditions: score < 0, reaching 1 on double-out, finishing on non-double) reverts the full visit and passes the turn immediately
   4. Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts
   5. Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match
 
-**Plans:** 9/9 plans complete
+**Plans:** 9 base + 3 gap-closure plans (01-10..01-12) closing CR-01..CR-05 + WR-01
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
@@ -57,6 +57,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-07-PLAN.md — Correction window ondismiss + per-player visit tracking, Numpad onconfirm/darts-at-double, hardened E2E (CR-03/CR-04/CR-05, ENG-04 UI)
 - [x] 01-08-PLAN.md — Live mid-visit remaining + checkout suggestion (CR-06)
 - [x] 01-09-PLAN.md — Mount ProfileManager in setup so named profiles are reachable (CR-08)
+
+**Wave 5 — Gap closure (re-verification 2026-06-11)** *(closes the 5 new Critical issues + WR-01 from the 2026-06-11 review; repairs ENG-04, ENG-07, INP-03, INP-04, FLOW-01)*
+
+- [ ] 01-10-PLAN.md — Inner-bull encoding fixed to 50 pts: board.ts {multiplier:2,segment:25}, bust.ts dead-branch removal, board/bust tests, VisitStrip 'Bull' label (CR-01)
+- [ ] 01-11-PLAN.md — CorrectionWindow untrack(startTimer) so auto-dismiss fires once + escapable paused state ('Fertig' button + outside-click), real-timer test (CR-03/CR-04)
+- [ ] 01-12-PLAN.md — Live ScorePanel score (CR-02), 0-player bull-off guard + reducer hardening (CR-05), record darts-at-double on numpad finish (WR-01)
 
 ### Phase 2: Spectator Display
 
@@ -142,7 +148,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Playable X01 Match | 9/9 | Complete   | 2026-06-10 |
+| 1. Playable X01 Match | 9/12 | Gap closure | - |
 | 2. Spectator Display | 0/? | Not started | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |

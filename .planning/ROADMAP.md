@@ -13,7 +13,7 @@ Starting from an empty repo, six phases deliver a fully installable darts scorin
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Playable X01 Match** - Complete end-to-end X01 match playable in-browser with touch input, undo, checkout suggestions, and match setup (completed 2026-06-10)
+- [ ] **Phase 1: Playable X01 Match** - Complete end-to-end X01 match playable in-browser with touch input, undo, checkout suggestions, and match setup
 - [ ] **Phase 2: Spectator Display** - Live second-window and in-app fullscreen view showing all scores, readable at 3 m
 - [ ] **Phase 3: Persistence & Data** - Match survives reload/crash; player profiles and match history stored; JSON export/import
 - [ ] **Phase 4: Statistics & Achievements** - Full per-match and lifetime stats; personal records detected and celebrated live

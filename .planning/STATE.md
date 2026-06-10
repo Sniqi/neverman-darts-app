@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-06-10T16:45:35.920Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-06-10T17:03:05.561Z"
 last_activity: 2026-06-10 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 01 (playable-x01-match) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-06-10 -- Phase 01 execution started
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 14 min | 4 tasks | 19 files |
+| Phase 01-playable-x01-match P02 | 12min | 3 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,9 @@ Recent decisions affecting current work:
 - Engine approach: pure reducer (reduce(state, action) -> state) with exhaustive unit tests before UI
 - [Phase 01-01]: Vitest 4 browser provider is a factory import from @vitest/browser-playwright (string 'playwright' was the Vitest 2/3 API) — Vitest 4.1 type-checks reject the string form; provider package confirmed via vitest's bundled docs
 - [Phase 01-01]: Dexie liveQuery wrapped in svelte/store readable for reactive DB reads; fake-indexeddb backs the node unit project — No extra integration package needed; RESEARCH Pattern 6 adopted as-built
+- [Phase ?]: UNDO is pure log replay
+- [Phase ?]: [Phase 01-02]: start-of-visit remaining committed only at visit end — bust revert trivial, no special undo logic needed
+- [Phase ?]: [Phase 01-02]: MatchStore class getters (not dollar-derived) recompute on each access — sufficient for Svelte 5 live suggestion (D-10)
 
 ### Pending Todos
 
@@ -84,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-10T16:45:35.914Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-06-10T17:03:05.555Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

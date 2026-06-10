@@ -9,19 +9,19 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Game Engine
 
-- [ ] **ENG-01**: Player can play X01 matches with start scores 301, 401, or 501 and Single Out or Double Out finish rules
-- [ ] **ENG-02**: Player can configure legs and sets per match (first-to or best-of semantics)
-- [ ] **ENG-03**: Match supports 1–4 players with correct turn rotation and alternating leg/set starters
-- [ ] **ENG-04**: A bust (score below 0, exactly 1 remaining on double-out, or reaching 0 without a double on double-out) reverts the entire visit to the start-of-visit score and passes the turn
-- [ ] **ENG-05**: Player can undo any entered dart/visit, including reverting a leg- or set-winning throw without corrupting leg/set counts (reversible event-log state model)
-- [ ] **ENG-06**: Player can enter the bull-off result at match start to set the starting order (real throw happens at the board)
-- [ ] **ENG-07**: Player sees checkout suggestions for the next 1–3 darts when a finish is possible; bogey numbers (159, 162, 163, 165, 166, 168, 169) and scores above 170 show no suggestion; every suggested route ends on a double/bull in double-out
+- [x] **ENG-01**: Player can play X01 matches with start scores 301, 401, or 501 and Single Out or Double Out finish rules
+- [x] **ENG-02**: Player can configure legs and sets per match (first-to or best-of semantics)
+- [x] **ENG-03**: Match supports 1–4 players with correct turn rotation and alternating leg/set starters
+- [x] **ENG-04**: A bust (score below 0, exactly 1 remaining on double-out, or reaching 0 without a double on double-out) reverts the entire visit to the start-of-visit score and passes the turn
+- [x] **ENG-05**: Player can undo any entered dart/visit, including reverting a leg- or set-winning throw without corrupting leg/set counts (reversible event-log state model)
+- [x] **ENG-06**: Player can enter the bull-off result at match start to set the starting order (real throw happens at the board)
+- [x] **ENG-07**: Player sees checkout suggestions for the next 1–3 darts when a finish is possible; bogey numbers (159, 162, 163, 165, 166, 168, 169) and scores above 170 show no suggestion; every suggested route ends on a double/bull in double-out
 
 ### Input
 
 - [x] **INP-01**: Player can enter each dart by tapping an on-screen dartboard (Singles, Doubles, Triples 1–20, 25, Bull, Miss) with triple/double segments reliably hittable by finger on a tablet
-- [ ] **INP-02**: Player can alternatively enter the visit total via numeric keypad (e.g. "140")
-- [ ] **INP-03**: App tracks darts thrown at a double (from per-dart input, or via prompt on numpad-entered finishing visits) so checkout percentage can be computed
+- [x] **INP-02**: Player can alternatively enter the visit total via numeric keypad (e.g. "140")
+- [x] **INP-03**: App tracks darts thrown at a double (from per-dart input, or via prompt on numpad-entered finishing visits) so checkout percentage can be computed
 - [ ] **INP-04**: Visit auto-finalizes after 3 darts, bust, or leg win, with a brief correction window before the turn passes
 - [ ] **INP-05**: Screen stays awake during an active match (wake lock, re-acquired on visibility change)
 
@@ -53,7 +53,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Profiles & Data
 
 - [x] **PROF-01**: Player can create, edit, and delete persistent player profiles
-- [ ] **PROF-02**: Player can add guest players to a match without creating a profile (guest stats are not persisted)
+- [x] **PROF-02**: Player can add guest players to a match without creating a profile (guest stats are not persisted)
 - [ ] **PROF-03**: Player can export all data (profiles, history, stats) as a JSON file and import it again (backup / device transfer)
 
 ### Achievements
@@ -114,21 +114,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENG-01 | Phase 1 | Pending |
-| ENG-02 | Phase 1 | Pending |
-| ENG-03 | Phase 1 | Pending |
-| ENG-04 | Phase 1 | Pending |
-| ENG-05 | Phase 1 | Pending |
-| ENG-06 | Phase 1 | Pending |
-| ENG-07 | Phase 1 | Pending |
+| ENG-01 | Phase 1 | Complete |
+| ENG-02 | Phase 1 | Complete |
+| ENG-03 | Phase 1 | Complete |
+| ENG-04 | Phase 1 | Complete |
+| ENG-05 | Phase 1 | Complete |
+| ENG-06 | Phase 1 | Complete |
+| ENG-07 | Phase 1 | Complete |
 | INP-01 | Phase 1 | Complete |
-| INP-02 | Phase 1 | Pending |
-| INP-03 | Phase 1 | Pending |
+| INP-02 | Phase 1 | Complete |
+| INP-03 | Phase 1 | Complete |
 | INP-04 | Phase 1 | Pending |
 | INP-05 | Phase 1 | Pending |
 | FLOW-01 | Phase 1 | Pending |
 | PROF-01 | Phase 1 | Complete |
-| PROF-02 | Phase 1 | Pending |
+| PROF-02 | Phase 1 | Complete |
 | DISP-01 | Phase 2 | Pending |
 | DISP-02 | Phase 2 | Pending |
 | DISP-03 | Phase 2 | Pending |

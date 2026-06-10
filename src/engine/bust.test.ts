@@ -25,7 +25,7 @@ describe('isBust - double out', () => {
 		expect(isBust(21, d(1, 20), rule)).toBe(true);
 	});
 
-	it('newRemaining === 0 AND multiplier !== 2 AND segment !== 50 → bust (not a double finish)', () => {
+	it('newRemaining === 0 AND multiplier !== 2 → bust (not a double finish)', () => {
 		// remaining=20, S20 → 0 but not a double → bust
 		expect(isBust(20, d(1, 20), rule)).toBe(true);
 		// remaining=25, outer bull S25 → 0 but not a double → bust (Pitfall 1)
@@ -43,18 +43,10 @@ describe('isBust - double out', () => {
 		expect(isBust(32, d(2, 16), rule)).toBe(false);
 	});
 
-	it('newRemaining === 0 AND segment === 50 (inner bull) → valid finish (not bust)', () => {
-		// remaining=50, inner bull → finish (D-Bull)
-		expect(isBust(50, d(2, 25), rule)).toBe(false); // multiplier 2 segment 25 = inner bull = 50pts
-		// Actually inner bull is represented as { multiplier: 1, segment: 50 } per types.ts comment
-		// Wait - classifyHit returns { multiplier: 2, segment: 50 } for inner bull
-		// So isBust checks dart.segment === 50 which this covers
-	});
-
-	it('inner bull (segment 50, multiplier 2) → valid finish when remaining equals scored value', () => {
-		// classifyHit returns { multiplier: 2, segment: 50 } for inner bull = 100 pts
-		// remaining=100, dart scores 2*50=100 → newRemaining=0, segment=50 → valid finish
-		expect(isBust(100, d(2, 50), rule)).toBe(false);
+	it('inner bull finish from remaining=50 is valid (50 points)', () => {
+		// classifyHit returns { multiplier: 2, segment: 25 } for inner bull = 2*25 = 50 pts
+		// remaining=50, inner bull dart → newRemaining=0, multiplier=2 → valid double-out finish
+		expect(isBust(50, d(2, 25), 'double')).toBe(false);
 	});
 
 	it('newRemaining > 1 → not bust (game continues)', () => {

@@ -8,8 +8,8 @@
 
 	function formatDart(dart: DartScore): string {
 		if (dart.segment === 0) return '0 (Daneben)';
-		if (dart.segment === 50) return dart.multiplier === 2 ? 'Bull' : 'Outer Bull';
-		if (dart.segment === 25) return 'Outer Bull';
+		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';        // inner bull: { multiplier: 2, segment: 25 }
+		if (dart.multiplier === 1 && dart.segment === 25) return 'Outer Bull';  // outer bull: { multiplier: 1, segment: 25 }
 		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
 		return `${prefix}${dart.segment}`;
 	}

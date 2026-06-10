@@ -6,10 +6,10 @@ import { describe, it, expect } from 'vitest';
 import { classifyHit, angleToSegment, SEGMENT_ORDER } from './board.js';
 
 describe('classifyHit - ring zones', () => {
-	it('r < 14.4 → inner bull (multiplier 2, segment 50)', () => {
-		expect(classifyHit(0, 0)).toEqual({ multiplier: 2, segment: 50 });
-		expect(classifyHit(10, 0)).toEqual({ multiplier: 2, segment: 50 });
-		expect(classifyHit(14.3, 0)).toEqual({ multiplier: 2, segment: 50 });
+	it('r < 14.4 → inner bull (multiplier 2, segment 25 = double bull = 50pts)', () => {
+		expect(classifyHit(0, 0)).toEqual({ multiplier: 2, segment: 25 });
+		expect(classifyHit(10, 0)).toEqual({ multiplier: 2, segment: 25 });
+		expect(classifyHit(14.3, 0)).toEqual({ multiplier: 2, segment: 25 });
 	});
 
 	it('14.4 ≤ r < 36.5 → outer bull (multiplier 1, segment 25)', () => {
@@ -49,8 +49,8 @@ describe('classifyHit - ring zones', () => {
 	});
 
 	// Acceptance criteria checks
-	it('classifyHit(10, 0) returns inner bull', () => {
-		expect(classifyHit(10, 0)).toEqual({ multiplier: 2, segment: 50 });
+	it('classifyHit(10, 0) returns inner bull (multiplier 2, segment 25 = 50 pts)', () => {
+		expect(classifyHit(10, 0)).toEqual({ multiplier: 2, segment: 25 });
 	});
 
 	it('classifyHit(25, 0) returns outer bull', () => {

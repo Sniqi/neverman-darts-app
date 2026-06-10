@@ -160,7 +160,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <svg
 	bind:this={svgEl}
-	viewBox="0 0 400 400"
+	viewBox="-190 -190 780 780"
 	xmlns="http://www.w3.org/2000/svg"
 	class="dartboard"
 	style="touch-action: none; width: 100%; height: 100%; max-width: 100%; max-height: 100%;"

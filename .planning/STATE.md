@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-06-10T16:26:14.184Z"
-last_activity: 2026-06-10 — Roadmap created
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-06-10T16:45:35.920Z"
+last_activity: 2026-06-10 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 1 — Playable X01 Match
+**Current focus:** Phase 01 — playable-x01-match
 
 ## Current Position
 
-Phase: 1 of 6 (Playable X01 Match)
-Plan: 0 of ? in current phase
+Phase: 01 (playable-x01-match) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-06-10 — Roadmap created
+Last activity: 2026-06-10 -- Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01 P01 | 14 min | 4 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,8 @@ Recent decisions affecting current work:
 - Stack: SvelteKit 2.x + adapter-static, Svelte 5 runes, TypeScript ~5.9.x, Dexie 4.x, vite-plugin-pwa (from research 2026-06-10)
 - Spectator sync: BroadcastChannel + localStorage snapshot handshake (no external library)
 - Engine approach: pure reducer (reduce(state, action) -> state) with exhaustive unit tests before UI
+- [Phase 01-01]: Vitest 4 browser provider is a factory import from @vitest/browser-playwright (string 'playwright' was the Vitest 2/3 API) — Vitest 4.1 type-checks reject the string form; provider package confirmed via vitest's bundled docs
+- [Phase 01-01]: Dexie liveQuery wrapped in svelte/store readable for reactive DB reads; fake-indexeddb backs the node unit project — No extra integration package needed; RESEARCH Pattern 6 adopted as-built
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-10T15:27:53.827Z
-Stopped at: Phase 1 UI-SPEC approved
-Resume file: .planning/phases/01-playable-x01-match/01-UI-SPEC.md
+Last session: 2026-06-10T16:45:35.914Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None

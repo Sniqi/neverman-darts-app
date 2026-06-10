@@ -36,10 +36,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts
   5. Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match
 
-**Plans:** 4 plansPlans:
+**Plans:** 1/4 plans executed
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
+- [x] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -134,7 +134,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Playable X01 Match | 0/4 | Planned | - |
+| 1. Playable X01 Match | 1/4 | In Progress|  |
 | 2. Spectator Display | 0/? | Not started | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |

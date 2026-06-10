@@ -19,7 +19,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Input
 
-- [ ] **INP-01**: Player can enter each dart by tapping an on-screen dartboard (Singles, Doubles, Triples 1–20, 25, Bull, Miss) with triple/double segments reliably hittable by finger on a tablet
+- [x] **INP-01**: Player can enter each dart by tapping an on-screen dartboard (Singles, Doubles, Triples 1–20, 25, Bull, Miss) with triple/double segments reliably hittable by finger on a tablet
 - [ ] **INP-02**: Player can alternatively enter the visit total via numeric keypad (e.g. "140")
 - [ ] **INP-03**: App tracks darts thrown at a double (from per-dart input, or via prompt on numpad-entered finishing visits) so checkout percentage can be computed
 - [ ] **INP-04**: Visit auto-finalizes after 3 darts, bust, or leg win, with a brief correction window before the turn passes
@@ -52,7 +52,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Profiles & Data
 
-- [ ] **PROF-01**: Player can create, edit, and delete persistent player profiles
+- [x] **PROF-01**: Player can create, edit, and delete persistent player profiles
 - [ ] **PROF-02**: Player can add guest players to a match without creating a profile (guest stats are not persisted)
 - [ ] **PROF-03**: Player can export all data (profiles, history, stats) as a JSON file and import it again (backup / device transfer)
 
@@ -121,13 +121,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENG-05 | Phase 1 | Pending |
 | ENG-06 | Phase 1 | Pending |
 | ENG-07 | Phase 1 | Pending |
-| INP-01 | Phase 1 | Pending |
+| INP-01 | Phase 1 | Complete |
 | INP-02 | Phase 1 | Pending |
 | INP-03 | Phase 1 | Pending |
 | INP-04 | Phase 1 | Pending |
 | INP-05 | Phase 1 | Pending |
 | FLOW-01 | Phase 1 | Pending |
-| PROF-01 | Phase 1 | Pending |
+| PROF-01 | Phase 1 | Complete |
 | PROF-02 | Phase 1 | Pending |
 | DISP-01 | Phase 2 | Pending |
 | DISP-02 | Phase 2 | Pending |
@@ -157,6 +157,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-04 | Phase 6 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 41 total
 - Mapped to phases: 41
 - Unmapped: 0 ✓

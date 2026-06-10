@@ -171,14 +171,15 @@
 	<!-- Board background -->
 	<circle cx={CX} cy={CY} r={R_MISS_OUTER} fill="#111318" pointer-events="none" />
 
-	<!-- Scored regions -->
+	<!-- Scored regions (data-segment for E2E test targeting, pointer-events:all so Playwright can click) -->
 	{#each regions as region (region.key)}
 		<path
 			d={region.path}
 			fill={flashKey === region.key ? 'rgba(255,255,255,0.35)' : region.fill}
 			stroke="#444444"
 			stroke-width="0.5"
-			pointer-events="none"
+			data-segment={`${region.multiplier === 3 ? 'T' : region.multiplier === 2 ? 'D' : 'S'}${region.segment}`}
+			data-segment-key={region.key}
 		/>
 	{/each}
 

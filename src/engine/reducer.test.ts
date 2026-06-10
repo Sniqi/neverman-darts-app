@@ -6,6 +6,21 @@ import { describe, it, expect } from 'vitest';
 import { reduce, initialState } from './reducer.js';
 import type { MatchConfig, MatchAction, PlayerState } from './types.js';
 
+// Helper to build a test MatchConfig overriding the locked startScore type.
+// Tests use small start scores (32, 40) for brevity — the `as unknown` chain
+// bypasses the literal-type constraint on startScore for test-only convenience.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function cfg(overrides: Record<string, any>): MatchConfig {
+	return {
+		startScore: 501,
+		outRule: 'double',
+		legsToWin: 3,
+		setsEnabled: false,
+		setsToWin: 1,
+		...overrides,
+	} as MatchConfig;
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const config501Double: MatchConfig = {
@@ -169,7 +184,7 @@ describe('DART_THROWN - bust', () => {
 		// Use a fresh start with low score
 		const s2 = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 301 },
+			config: cfg({ startScore: 301 }),
 			players: [playerA],
 			order: ['a'],
 		});
@@ -187,7 +202,7 @@ describe('DART_THROWN - bust', () => {
 	it('bust visit is flagged bust: true on the stored visit', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 301 },
+			config: cfg({ startScore: 301 }),
 			players: [playerA],
 			order: ['a'],
 		});
@@ -205,7 +220,7 @@ describe('DART_THROWN - bust', () => {
 	it('bust passes the turn', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 301 },
+			config: cfg({ startScore: 301 }),
 			players: [playerA, playerB],
 			order: ['a', 'b'],
 		});
@@ -225,7 +240,7 @@ describe('DART_THROWN - leg win (double out)', () => {
 	it('valid double finish increments legsWon', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 32 },
+			config: cfg({ startScore: 32 }),
 			players: [playerA],
 			order: ['a'],
 		});
@@ -237,7 +252,7 @@ describe('DART_THROWN - leg win (double out)', () => {
 	it('single finish on single-out increments legsWon', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config301Single, startScore: 20 },
+			config: cfg({ startScore: 20, outRule: 'single', legsToWin: 2 }),
 			players: [playerA],
 			order: ['a'],
 		});
@@ -249,7 +264,7 @@ describe('DART_THROWN - leg win (double out)', () => {
 		// legsToWin=1 for quick test
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 40, legsToWin: 1 },
+			config: cfg({ startScore: 40, legsToWin: 1 }),
 			players: [playerA],
 			order: ['a'],
 		});
@@ -283,7 +298,7 @@ describe('UNDO', () => {
 	it('undo through leg win reverts legsWon (D-06, Pitfall 3)', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 40 },
+			config: cfg({ startScore: 40 }),
 			players: [playerA],
 			order: ['a'],
 		});
@@ -341,7 +356,7 @@ describe('NUMPAD_VISIT', () => {
 	it('finishing numpad visit carries dartsAtDouble (D-08, INP-03)', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 40 },
+			config: cfg({ startScore: 40 }),
 			players: [playerA],
 			order: ['a'],
 		});
@@ -425,7 +440,7 @@ describe('Leg starter alternation', () => {
 	it('second leg starts with player 1 (2-player game)', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { ...config501Double, startScore: 40, legsToWin: 3 },
+			config: cfg({ startScore: 40, legsToWin: 3 }),
 			players: [playerA, playerB],
 			order: ['a', 'b'],
 		});
@@ -444,7 +459,7 @@ describe('Sets (ENG-02)', () => {
 	it('winning all required legs wins the set when setsEnabled', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',
-			config: { startScore: 40, outRule: 'double', legsToWin: 1, setsEnabled: true, setsToWin: 2 },
+			config: cfg({ startScore: 40, legsToWin: 1, setsEnabled: true, setsToWin: 2 }),
 			players: [playerA],
 			order: ['a'],
 		});

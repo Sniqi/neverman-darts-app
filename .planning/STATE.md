@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-06-10T17:03:05.561Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-06-10T17:16:23.926Z"
 last_activity: 2026-06-10 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 01 (playable-x01-match) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-06-10 -- Phase 01 execution started
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P01 | 14 min | 4 tasks | 19 files |
 | Phase 01-playable-x01-match P02 | 12min | 3 tasks | 15 files |
+| Phase 01-playable-x01-match P03 | 8min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [Phase ?]: UNDO is pure log replay
 - [Phase ?]: [Phase 01-02]: start-of-visit remaining committed only at visit end — bust revert trivial, no special undo logic needed
 - [Phase ?]: [Phase 01-02]: MatchStore class getters (not dollar-derived) recompute on each access — sufficient for Svelte 5 live suggestion (D-10)
+- [Phase 01-03]: Correction window is pure UI delay: CONFIRM_VISIT is a reducer no-op; the match route watches player.visits.length and holds 2.5s before the next turn
+- [Phase 01-03]: SVG browser test coordinate mapping: (rect.width/400)*svgR maps SVG user-space radius to screen pixels — fraction-of-half-width approach was wrong
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-10T17:03:05.555Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-06-10T17:16:23.921Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None

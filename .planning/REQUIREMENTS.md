@@ -22,8 +22,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INP-01**: Player can enter each dart by tapping an on-screen dartboard (Singles, Doubles, Triples 1–20, 25, Bull, Miss) with triple/double segments reliably hittable by finger on a tablet
 - [x] **INP-02**: Player can alternatively enter the visit total via numeric keypad (e.g. "140")
 - [x] **INP-03**: App tracks darts thrown at a double (from per-dart input, or via prompt on numpad-entered finishing visits) so checkout percentage can be computed
-- [ ] **INP-04**: Visit auto-finalizes after 3 darts, bust, or leg win, with a brief correction window before the turn passes
-- [ ] **INP-05**: Screen stays awake during an active match (wake lock, re-acquired on visibility change)
+- [x] **INP-04**: Visit auto-finalizes after 3 darts, bust, or leg win, with a brief correction window before the turn passes
+- [x] **INP-05**: Screen stays awake during an active match (wake lock, re-acquired on visibility change)
 
 ### Spectator Display
 
@@ -124,8 +124,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INP-01 | Phase 1 | Complete |
 | INP-02 | Phase 1 | Complete |
 | INP-03 | Phase 1 | Complete |
-| INP-04 | Phase 1 | Pending |
-| INP-05 | Phase 1 | Pending |
+| INP-04 | Phase 1 | Complete |
+| INP-05 | Phase 1 | Complete |
 | FLOW-01 | Phase 1 | Pending |
 | PROF-01 | Phase 1 | Complete |
 | PROF-02 | Phase 1 | Complete |

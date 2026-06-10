@@ -49,18 +49,23 @@ export function reduce(state: MatchState, action: MatchAction): MatchState {
 		return trimmed.reduce(reduce, initialState());
 	}
 
-	// Append to event log for all other actions
+	// START_MATCH always resets the log to a fresh single-entry log (CR-07).
+	// CONFIRM_VISIT is a UI no-op — not appended to the log (WR-01).
+	if (action.type === 'START_MATCH') {
+		return applyStartMatch(action);
+	}
+	if (action.type === 'CONFIRM_VISIT') {
+		return state;
+	}
+
+	// Append to event log for recording actions
 	const newLog = [...state.eventLog, action];
 
 	switch (action.type) {
-		case 'START_MATCH':
-			return applyStartMatch(action, newLog);
 		case 'DART_THROWN':
 			return applyDartThrown(state, action, newLog);
 		case 'NUMPAD_VISIT':
 			return applyNumpadVisit(state, action, newLog);
-		case 'CONFIRM_VISIT':
-			return { ...state, eventLog: newLog };
 		default:
 			return state;
 	}
@@ -69,8 +74,7 @@ export function reduce(state: MatchState, action: MatchAction): MatchState {
 // ── Action handlers ────────────────────────────────────────────────────────
 
 function applyStartMatch(
-	action: Extract<MatchAction, { type: 'START_MATCH' }>,
-	newLog: MatchAction[]
+	action: Extract<MatchAction, { type: 'START_MATCH' }>
 ): MatchState {
 	// Build players in the order specified by `action.order`
 	const orderedPlayers: PlayerState[] = action.order.map(id => {
@@ -93,7 +97,7 @@ function applyStartMatch(
 		legStarterIndex: 0,
 		currentVisit: [],
 		phase: 'playing',
-		eventLog: newLog,
+		eventLog: [action], // fresh log — CR-07: START_MATCH resets the event log
 	};
 }
 

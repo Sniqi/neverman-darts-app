@@ -37,7 +37,7 @@ test('full X01 match happy path: setup → bull-off → match → leg win', asyn
 	// Visit 3: 125                → remaining 16
 	// Visit 4: 16 (D8)            → remaining 0, leg won
 
-	async function enterNumpadVisit(total: number) {
+	async function enterNumpadVisit(total: number, opts: { assertOverlay?: boolean } = {}) {
 		// Clear any existing input first (exact match to avoid matching undo button aria-label)
 		const clearBtn = page.getByRole('button', { name: 'C', exact: true });
 		await clearBtn.click();
@@ -58,17 +58,31 @@ test('full X01 match happy path: setup → bull-off → match → leg win', asyn
 		// Confirm
 		await page.getByRole('button', { name: 'Bestätigen' }).click();
 
-		// Wait for the correction window to either dismiss itself or dismiss it manually
-		// by clicking outside (the correction window overlay dismisses on outside click)
 		const overlay = page.locator('.overlay');
-		if (await overlay.isVisible().catch(() => false)) {
-			await overlay.click({ position: { x: 5, y: 5 } });
+
+		if (opts.assertOverlay) {
+			// Positively assert the correction window appears (regression guard for CR-03/CR-04)
+			await expect(overlay).toBeVisible();
+			// Dismiss via JS click on the overlay element: Playwright's pointer-based click
+			// is intercepted by .panel-area in headless mode, but a DOM click() dispatched
+			// via evaluate() reliably reaches the overlay and triggers handleOutsideClick.
+			await page.evaluate(() => {
+				(document.querySelector('.overlay') as HTMLElement)?.click();
+			});
+			// Assert overlay is removed from the DOM after dismissal
+			await expect(overlay).not.toBeVisible();
+		} else {
+			// For subsequent visits: assert and dismiss deterministically
+			await expect(overlay).toBeVisible();
+			await page.evaluate(() => {
+				(document.querySelector('.overlay') as HTMLElement)?.click();
+			});
+			await expect(overlay).not.toBeVisible();
 		}
-		// Allow a small tick for state updates
-		await page.waitForTimeout(100);
 	}
 
-	await enterNumpadVisit(180);
+	// First visit: assert the correction-window lifecycle (regression guard for CR-03/CR-04)
+	await enterNumpadVisit(180, { assertOverlay: true });
 	await enterNumpadVisit(180);
 	await enterNumpadVisit(125);
 
@@ -79,11 +93,8 @@ test('full X01 match happy path: setup → bull-off → match → leg win', asyn
 	await page.getByRole('button', { name: '6', exact: true }).click();
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 
-	// Dismiss the darts-at-double dialog (appears for numpad leg-winning visits)
-	const dartsDialog = page.getByText('Wie viele Darts auf die Doppel?');
-	if (await dartsDialog.isVisible().catch(() => false)) {
-		await page.getByRole('button', { name: '1 Dart' }).click();
-	}
+	// The darts-at-double dialog is suppressed for match-winning visits (win overlay takes over).
+	// In a multi-leg scenario (more legs remaining) it would appear — covered by unit tests (INP-03).
 
 	// 4. Leg/match won: win overlay appears with player name and Neues Spiel button
 	await expect(page.getByRole('heading', { name: /gewinnt!/ })).toBeVisible();

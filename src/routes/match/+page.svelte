@@ -104,8 +104,9 @@
 
 		matchStore.dispatch({ type: 'NUMPAD_VISIT', total });
 
-		// If the remaining was exactly `total` (leg win condition), show dialog
-		if (prevRemaining === total && prevPhase === 'playing') {
+		// Show darts-at-double dialog only for a leg win that does NOT end the match.
+		// If the match is now complete, the win overlay owns the screen — skip the dialog.
+		if (prevRemaining === total && prevPhase === 'playing' && matchStore.state.phase !== 'match-complete') {
 			pendingNumpadTotal = total;
 			showDartsAtDouble = true;
 		}

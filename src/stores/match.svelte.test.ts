@@ -123,4 +123,43 @@ describe('MatchStore', () => {
 			expect(store.isMatchComplete).toBe(false);
 		});
 	});
+
+	describe('mid-visit remaining (CR-06 / ENG-07)', () => {
+		beforeEach(() => {
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+		});
+
+		it('at visit start (no darts thrown), remaining equals committed remaining', () => {
+			expect(store.remaining).toBe(501);
+		});
+
+		it('after one T20 dart (60), remaining is 441 mid-visit', () => {
+			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
+			expect(store.remaining).toBe(441);
+		});
+
+		it('after two T20 darts (120), remaining is 381 mid-visit', () => {
+			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
+			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
+			expect(store.remaining).toBe(381);
+		});
+
+		it('on 100 after T20 mid-visit: remaining is 40 and suggestion includes D20', () => {
+			// Get the player to 100 via numpad visits: 501 - 180 - 180 - 41 = 100
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 }); // 321
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 }); // 141
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 41 });  // 100
+			// Now player is on 100; throw T20 (60)
+			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
+			expect(store.remaining).toBe(40);
+			const s = store.suggestion;
+			expect(s).not.toBeNull();
+			expect(s!.some(hint => hint.includes('D20'))).toBe(true);
+		});
+	});
 });

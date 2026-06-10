@@ -26,9 +26,19 @@ export class MatchStore {
 		return this.state.players[this.state.activePlayerIndex];
 	}
 
-	/** Remaining score for the active player. */
+	/** Remaining score for the active player.
+	 * Subtracts the running total of the current board visit so the value
+	 * updates live after every dart (ENG-07 / D-10 / CR-06).
+	 * When currentVisit is empty (numpad path, or start of visit) the
+	 * subtraction is 0, so the value equals the committed remaining.
+	 */
 	get remaining(): number {
-		return this.activePlayer?.remaining ?? 0;
+		const committed = this.activePlayer?.remaining ?? 0;
+		const visitScored = this.state.currentVisit.reduce(
+			(sum, d) => sum + d.multiplier * d.segment,
+			0
+		);
+		return committed - visitScored;
 	}
 
 	/** Darts thrown in the current visit (may be 0–2 mid-visit). */

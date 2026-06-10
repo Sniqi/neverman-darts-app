@@ -20,7 +20,7 @@ afterEach(() => {
 	dispatchSpy.mockRestore();
 });
 
-test('center tap dispatches inner bull {multiplier:2, segment:50}', async () => {
+test('center tap dispatches inner bull {multiplier:2, segment:25}', async () => {
 	const screen = render(Dartboard);
 
 	// The SVG element
@@ -47,7 +47,7 @@ test('center tap dispatches inner bull {multiplier:2, segment:50}', async () => 
 	const action = dispatchSpy.mock.calls[0][0];
 	expect(action.type).toBe('DART_THROWN');
 	if (action.type === 'DART_THROWN') {
-		expect(action.dart.segment).toBe(50);
+		expect(action.dart.segment).toBe(25);
 		expect(action.dart.multiplier).toBe(2);
 	}
 });

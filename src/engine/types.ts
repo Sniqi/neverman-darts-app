@@ -6,7 +6,7 @@ export type OutRule = 'single' | 'double';
 
 export interface DartScore {
 	multiplier: 1 | 2 | 3;
-	segment: number; // 0=miss, 1-20, 25=outer bull, 50=inner bull
+	segment: number; // 0=miss, 1-20, 25=outer bull or inner bull (inner bull uses multiplier:2, segment:25 = 50 pts)
 }
 
 export interface Visit {

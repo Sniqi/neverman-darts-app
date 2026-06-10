@@ -4,7 +4,7 @@
 //
 // Board center: (200, 200) in viewBox="0 0 400 400"
 // Ring boundaries (from UI-SPEC.md Dartboard Visual Spec):
-//   inner bull:   0   – 14.4px  → { multiplier: 2, segment: 50 }
+//   inner bull:   0   – 14.4px  → { multiplier: 2, segment: 25 }
 //   outer bull:   14.4 – 36.5px → { multiplier: 1, segment: 25 }
 //   inner single: 36.5 – 186px  → { multiplier: 1, segment: N }
 //   triple:       186  – 209px  → { multiplier: 3, segment: N }
@@ -41,7 +41,7 @@ export function angleToSegment(angleDeg: number): number {
  * angleDeg is the angle in degrees, 0° = right (3 o'clock), clockwise positive.
  */
 export function classifyHit(r: number, angleDeg: number): DartScore {
-	if (r < 14.4) return { multiplier: 2, segment: 50 };   // inner bull
+	if (r < 14.4) return { multiplier: 2, segment: 25 };   // inner bull (double-bull: 2×25 = 50 pts)
 	if (r < 36.5) return { multiplier: 1, segment: 25 };   // outer bull
 	if (r >= 325)  return { multiplier: 1, segment: 0 };   // miss
 

@@ -28,10 +28,9 @@ export function isBust(remaining: number, dart: DartScore, outRule: OutRule): bo
 	if (newRemaining < 0) return true;
 	if (newRemaining === 1) return true;
 	if (newRemaining === 0) {
-		// Valid finish: multiplier=2 (any double) OR segment=50 (inner bull = double bull)
+		// Valid finish: multiplier=2 (any double, including inner bull which encodes as { multiplier: 2, segment: 25 })
 		const isDouble = dart.multiplier === 2;
-		const isInnerBull = dart.segment === 50;
-		return !(isDouble || isInnerBull);
+		return !isDouble;
 	}
 	return false;
 }

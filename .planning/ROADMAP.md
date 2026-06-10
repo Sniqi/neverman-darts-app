@@ -7,6 +7,7 @@ Starting from an empty repo, six phases deliver a fully installable darts scorin
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
@@ -22,83 +23,108 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Playable X01 Match
+
 **Goal**: A full X01 match can be played from setup to finish in-browser by 1–4 players with touch input, correct bust handling, undo, and checkout suggestions
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
 **Requirements**: ENG-01, ENG-02, ENG-03, ENG-04, ENG-05, ENG-06, ENG-07, INP-01, INP-02, INP-03, INP-04, INP-05, FLOW-01, PROF-01, PROF-02
 **Success Criteria** (what must be TRUE):
+
   1. Player can configure a 301/401/501 match with Single Out or Double Out, set the number of legs/sets, add 1–4 named or guest players, and enter the bull-off result to set starting order
   2. Player can enter each dart by tapping the on-screen dartboard (all segments reliably hittable by finger) or by typing a visit total on the numeric keypad; the visit auto-finalizes after 3 darts, a bust, or a leg win with a brief correction window
   3. A bust (all three conditions: score < 0, reaching 1 on double-out, finishing on non-double) reverts the full visit and passes the turn immediately
   4. Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts
   5. Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match
-**Plans:** 4 plans
-Plans:
+
+**Plans:** 4 plansPlans:
+**Wave 1**
+
 - [ ] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 01-02-PLAN.md — X01 engine (TDD): pure reducer + event log, bust, rotation, checkout table, impossible scores, board polar math, real match store
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 01-03-PLAN.md — Scoring view: Dartboard, ScorePanel, VisitStrip, CheckoutSuggestion, Numpad, CorrectionWindow, DartsAtDouble, MatchWinOverlay, undo, wake lock
 - [ ] 01-04-PLAN.md — Setup + profiles + bull-off: profile CRUD, MatchSetup, PlayerPicker, BullOffOrder, START_MATCH wiring, E2E green
 
 ### Phase 2: Spectator Display
+
 **Goal**: A live spectator view shows all match state legibly on a 27" monitor from 3 m, opening as a second window on PC or as in-app fullscreen on tablet, and stays in sync automatically
 **Mode:** mvp
 **Depends on**: Phase 1
 **Requirements**: DISP-01, DISP-02, DISP-03, DISP-04, DISP-05
 **Success Criteria** (what must be TRUE):
+
   1. On PC, player can click a button to open the spectator view as a second browser window and drag it to a second monitor
   2. On tablet, player can switch the app into a fullscreen display view that shows current scores, legs/sets, player names, active player, last visit, leg average, and match average per player
   3. The spectator view is readable on a 27" monitor from 3 m (large typography, high contrast, dark mode) with correct layouts for 1–4 players
   4. The spectator window updates live on every dart entry and automatically re-syncs its state when closed and reopened or reloaded mid-match
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 3: Persistence & Data
+
 **Goal**: A match survives a browser reload or crash and resumes exactly where it stopped; player profiles and match history are stored persistently; all data can be exported and imported
 **Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: FLOW-03, STAT-06, PROF-03
 **Success Criteria** (what must be TRUE):
+
   1. Reloading the browser mid-match restores the exact game state including scores, leg/set counts, and whose turn it is
   2. Player can browse past matches in a match history list showing results and key stats
   3. Player can export all profiles, history, and stats as a JSON file and import that file on another device or after clearing browser data
+
 **Plans**: TBD
 
 ### Phase 4: Statistics & Achievements
+
 **Goal**: Players see live and lifetime statistics during and after every match; personal records are detected in real time and celebrated with an overlay
 **Mode:** mvp
 **Depends on**: Phase 3
 **Requirements**: STAT-01, STAT-02, STAT-03, STAT-04, STAT-05, STAT-07, STAT-08, ACHV-01, ACHV-02, ACHV-03
 **Success Criteria** (what must be TRUE):
+
   1. During a match, player sees the correct live 3-dart average and first-9 average for the current leg and the full match (busts counted as 3 darts; checkout legs count actual darts used)
   2. Player sees live checkout percentage, score-band counts (180s, 140+, 100+, 60+), highest visit, highest checkout, and best/worst leg
   3. Player can view lifetime statistics per profile including averages, checkout %, score bands, and all records
   4. Player can view a statistics dashboard with charts (score distribution, average trend, darts per leg, win rate)
   5. When a new personal record is set during play, an overlay/animation appears on both the input and spectator views and the record is permanently stored
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 5: Audio & Auto-Pause
+
 **Goal**: The caller announces visit scores and celebrates 180s and high checkouts with sound; the match automatically pauses with a countdown after a configurable number of legs
 **Mode:** mvp
 **Depends on**: Phase 4
 **Requirements**: AUD-01, AUD-02, AUD-03, FLOW-02
 **Success Criteria** (what must be TRUE):
+
   1. After every visit, a caller voice announces the score in the selected language (German or English) via speech synthesis
   2. Sound effects play on 180s, high finishes, and new personal records, reinforcing the achievement overlay
   3. Player can mute or independently configure the caller voice and sound effects
   4. After a configurable number of legs, a pause screen with a countdown timer appears on both views; the match continues automatically when the timer expires or when the player presses a button
+
 **Plans**: TBD
 
 ### Phase 6: PWA & Deployment
+
 **Goal**: The app is installable as a PWA on Android and desktop, works fully offline after first load, is deployed to GitHub Pages at the correct subpath, and shows an update prompt when a new version is available
 **Mode:** mvp
 **Depends on**: Phase 5
 **Requirements**: PLAT-01, PLAT-02, PLAT-03, PLAT-04
 **Success Criteria** (what must be TRUE):
+
   1. A user visiting the GitHub Pages URL can install the app to their Android home screen or Windows desktop and subsequently open it without a network connection
   2. The app loads and functions correctly at the GitHub Pages repository subpath (no broken assets, no routing failures)
   3. When a new version is deployed, a user running the installed app sees a prompt to update rather than silently loading a stale cached build
   4. The entire UI is in German with a native dark mode design
+
 **Plans**: TBD
 
 ## Progress

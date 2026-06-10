@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 01-04-PLAN.md (Phase 01 complete)
-last_updated: "2026-06-10T17:34:56.456Z"
+status: executing
+stopped_at: Completed 01-05-PLAN.md
+last_updated: "2026-06-10T21:21:57.493Z"
 last_activity: 2026-06-10 -- Phase 01 execution started
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 17
+  completed_phases: 0
+  total_plans: 9
+  completed_plans: 5
+  percent: 0
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 01 (playable-x01-match) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
+Plan: 2 of 9
+Status: Ready to execute
 Last activity: 2026-06-10 -- Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-playable-x01-match P02 | 12min | 3 tasks | 15 files |
 | Phase 01-playable-x01-match P03 | 8min | 2 tasks | 13 files |
 | Phase 01-playable-x01-match P04 | 14min | 2 tasks | 11 files |
+| Phase 01 P05 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,9 @@ Recent decisions affecting current work:
 - [Phase 01-03]: SVG browser test coordinate mapping: (rect.width/400)*svgR maps SVG user-space radius to screen pixels — fraction-of-half-width approach was wrong
 - [Phase 01-04]: sessionStorage pendingMatch handoff between /setup and /bulloff; cleared after START_MATCH dispatch
 - [Phase 01-04]: E2E drives the match via numpad, not SVG segment clicks — panel-area intercepts pointer events on small segments in headless Chromium
+- [Phase ?]: Fixes undo replay across matches
+- [Phase ?]: Fixes single-press undo after confirmed visit
+- [Phase ?]: Completes impossible-score guard for numpad
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-10T17:34:56.450Z
-Stopped at: Completed 01-04-PLAN.md (Phase 01 complete)
+Last session: 2026-06-10T21:21:57.487Z
+Stopped at: Completed 01-05-PLAN.md
 Resume file: None

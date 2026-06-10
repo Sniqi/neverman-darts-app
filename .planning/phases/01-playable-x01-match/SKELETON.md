@@ -22,12 +22,12 @@ A player can create a profile (written to and read back from IndexedDB) on the `
 | Cross-window sync | Deferred to Phase 2 (BroadcastChannel + IndexedDB hydration) | Not part of the skeleton. MatchState is kept serializable now so Phase 2 can adopt it without refactor. |
 | Deployment target | GitHub Pages static (Phase 6). Local full-stack run: `npm run build && npm run preview` | Static-only host; no backend. Phase 1 proves the stack locally; Phase 6 wires PWA + Pages deploy. |
 | Directory layout | `src/engine/` (pure TS), `src/db/` (Dexie), `src/stores/` (runes stores), `src/routes/` (SvelteKit file routing), `src/ui/{input,setup,overlays}/` (bespoke Svelte components), `src/lib/` (browser helpers), `static/` (`.nojekyll`) | Mirrors the RESEARCH Recommended Project Structure. Separates framework-free logic (engine) from client components, which keeps the engine testable in Node and the components testable in the Vitest browser project. |
-| Test infra | Vitest 4.1.x multi-project: `unit` (node — engine, db) + `browser` (Playwright/chromium — components); Playwright 1.60.x for E2E | Pure logic runs fast in Node; pointer/touch/SVG hit-detection needs a real browser (jsdom lies). One Playwright install backs both browser-mode component tests and the full-match E2E. |
+| Test infra | Vitest 4.1.x multi-project: `unit` (node — engine, db; fake-indexeddb backs Dexie) + `browser` (Playwright/chromium via `@vitest/browser-playwright` provider factory — components); Playwright 1.60.x for E2E | Pure logic runs fast in Node; pointer/touch/SVG hit-detection needs a real browser (jsdom lies). One Playwright install backs both browser-mode component tests and the full-match E2E. As-built note: Vitest 4 requires the provider as a factory import from `@vitest/browser-playwright` — the string `'playwright'` was the Vitest 2/3 API. |
 
 ## Stack Touched in Phase 1
 
-- [x] Project scaffold (SvelteKit + adapter-static, TypeScript, Vitest unit+browser projects, Playwright, svelte-check) — Plan 01 Task 2
-- [x] Routing — `/`, `/setup`, `/match` real routes (`/bulloff` added in Plan 04) — Plan 01 Tasks 2–3
+- [x] Project scaffold (SvelteKit + adapter-static, TypeScript, Vitest unit+browser projects, Playwright, svelte-check) — Plan 01 Task 1
+- [x] Routing — `/`, `/setup`, `/match` real routes (`/bulloff` added in Plan 04) — Plan 01 Tasks 1 & 3
 - [x] Database — real Dexie read AND write of a profile on `/setup` — Plan 01 Task 3 (full CRUD in Plan 04)
 - [x] UI — interactive dartboard tap wired through a runes store to a displayed score — Plan 01 Task 3 (real Dartboard in Plan 03)
 - [x] Deployment — documented local full-stack run (`npm run build && npm run preview`); GitHub Pages deploy itself is Phase 6

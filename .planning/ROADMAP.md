@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts
   5. Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match
 
-**Plans:** 9 base + 3 gap-closure plans (01-10..01-12) closing CR-01..CR-05 + WR-01
+**Plans:** 10/12 plans executed
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
@@ -60,7 +60,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 5 — Gap closure (re-verification 2026-06-11)** *(closes the 5 new Critical issues + WR-01 from the 2026-06-11 review; repairs ENG-04, ENG-07, INP-03, INP-04, FLOW-01)*
 
-- [ ] 01-10-PLAN.md — Inner-bull encoding fixed to 50 pts: board.ts {multiplier:2,segment:25}, bust.ts dead-branch removal, board/bust tests, VisitStrip 'Bull' label (CR-01)
+- [x] 01-10-PLAN.md — Inner-bull encoding fixed to 50 pts: board.ts {multiplier:2,segment:25}, bust.ts dead-branch removal, board/bust tests, VisitStrip 'Bull' label (CR-01)
 - [ ] 01-11-PLAN.md — CorrectionWindow untrack(startTimer) so auto-dismiss fires once + escapable paused state ('Fertig' button + outside-click), real-timer test (CR-03/CR-04)
 - [ ] 01-12-PLAN.md — Live ScorePanel score (CR-02), 0-player bull-off guard + reducer hardening (CR-05), record darts-at-double on numpad finish (WR-01)
 
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Playable X01 Match | 9/12 | Gap closure | - |
+| 1. Playable X01 Match | 10/12 | In Progress|  |
 | 2. Spectator Display | 0/? | Not started | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |

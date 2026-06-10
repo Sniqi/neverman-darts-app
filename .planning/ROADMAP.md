@@ -32,7 +32,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A bust (all three conditions: score < 0, reaching 1 on double-out, finishing on non-double) reverts the full visit and passes the turn immediately
   4. Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts
   5. Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
+- [ ] 01-02-PLAN.md — X01 engine (TDD): pure reducer + event log, bust, rotation, checkout table, impossible scores, board polar math, real match store
+- [ ] 01-03-PLAN.md — Scoring view: Dartboard, ScorePanel, VisitStrip, CheckoutSuggestion, Numpad, CorrectionWindow, DartsAtDouble, MatchWinOverlay, undo, wake lock
+- [ ] 01-04-PLAN.md — Setup + profiles + bull-off: profile CRUD, MatchSetup, PlayerPicker, BullOffOrder, START_MATCH wiring, E2E green
 
 ### Phase 2: Spectator Display
 **Goal**: A live spectator view shows all match state legibly on a 27" monitor from 3 m, opening as a second window on PC or as in-app fullscreen on tablet, and stays in sync automatically
@@ -103,7 +108,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Playable X01 Match | 0/? | Not started | - |
+| 1. Playable X01 Match | 0/4 | Planned | - |
 | 2. Spectator Display | 0/? | Not started | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |

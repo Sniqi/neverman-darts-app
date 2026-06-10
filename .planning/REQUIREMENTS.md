@@ -114,13 +114,53 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| ENG-01 | Phase 1 | Pending |
+| ENG-02 | Phase 1 | Pending |
+| ENG-03 | Phase 1 | Pending |
+| ENG-04 | Phase 1 | Pending |
+| ENG-05 | Phase 1 | Pending |
+| ENG-06 | Phase 1 | Pending |
+| ENG-07 | Phase 1 | Pending |
+| INP-01 | Phase 1 | Pending |
+| INP-02 | Phase 1 | Pending |
+| INP-03 | Phase 1 | Pending |
+| INP-04 | Phase 1 | Pending |
+| INP-05 | Phase 1 | Pending |
+| FLOW-01 | Phase 1 | Pending |
+| PROF-01 | Phase 1 | Pending |
+| PROF-02 | Phase 1 | Pending |
+| DISP-01 | Phase 2 | Pending |
+| DISP-02 | Phase 2 | Pending |
+| DISP-03 | Phase 2 | Pending |
+| DISP-04 | Phase 2 | Pending |
+| DISP-05 | Phase 2 | Pending |
+| FLOW-03 | Phase 3 | Pending |
+| STAT-06 | Phase 3 | Pending |
+| PROF-03 | Phase 3 | Pending |
+| STAT-01 | Phase 4 | Pending |
+| STAT-02 | Phase 4 | Pending |
+| STAT-03 | Phase 4 | Pending |
+| STAT-04 | Phase 4 | Pending |
+| STAT-05 | Phase 4 | Pending |
+| STAT-07 | Phase 4 | Pending |
+| STAT-08 | Phase 4 | Pending |
+| ACHV-01 | Phase 4 | Pending |
+| ACHV-02 | Phase 4 | Pending |
+| ACHV-03 | Phase 4 | Pending |
+| AUD-01 | Phase 5 | Pending |
+| AUD-02 | Phase 5 | Pending |
+| AUD-03 | Phase 5 | Pending |
+| FLOW-02 | Phase 5 | Pending |
+| PLAT-01 | Phase 6 | Pending |
+| PLAT-02 | Phase 6 | Pending |
+| PLAT-03 | Phase 6 | Pending |
+| PLAT-04 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 38 total
-- Mapped to phases: 0
-- Unmapped: 38 ⚠️
+- v1 requirements: 41 total
+- Mapped to phases: 41
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-10*
-*Last updated: 2026-06-10 after initial definition*
+*Last updated: 2026-06-10 after roadmap creation*

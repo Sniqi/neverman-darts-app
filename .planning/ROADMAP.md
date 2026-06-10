@@ -13,7 +13,7 @@ Starting from an empty repo, six phases deliver a fully installable darts scorin
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Playable X01 Match** - Complete end-to-end X01 match playable in-browser with touch input, undo, checkout suggestions, and match setup
+- [x] **Phase 1: Playable X01 Match** - Complete end-to-end X01 match playable in-browser with touch input, undo, checkout suggestions, and match setup (completed 2026-06-10)
 - [ ] **Phase 2: Spectator Display** - Live second-window and in-app fullscreen view showing all scores, readable at 3 m
 - [ ] **Phase 3: Persistence & Data** - Match survives reload/crash; player profiles and match history stored; JSON export/import
 - [ ] **Phase 4: Statistics & Achievements** - Full per-match and lifetime stats; personal records detected and celebrated live
@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts
   5. Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match
 
-**Plans:** 8/9 plans executed
+**Plans:** 9/9 plans complete
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
@@ -56,7 +56,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-06-PLAN.md — Dartboard viewBox expanded to show + hit the full double ring/miss zone (CR-01)
 - [x] 01-07-PLAN.md — Correction window ondismiss + per-player visit tracking, Numpad onconfirm/darts-at-double, hardened E2E (CR-03/CR-04/CR-05, ENG-04 UI)
 - [x] 01-08-PLAN.md — Live mid-visit remaining + checkout suggestion (CR-06)
-- [ ] 01-09-PLAN.md — Mount ProfileManager in setup so named profiles are reachable (CR-08)
+- [x] 01-09-PLAN.md — Mount ProfileManager in setup so named profiles are reachable (CR-08)
 
 ### Phase 2: Spectator Display
 
@@ -142,7 +142,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Playable X01 Match | 8/9 | In Progress|  |
+| 1. Playable X01 Match | 9/9 | Complete   | 2026-06-10 |
 | 2. Spectator Display | 0/? | Not started | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |

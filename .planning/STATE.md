@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: verifying
 stopped_at: Completed 01-08-PLAN.md
-last_updated: "2026-06-10T21:50:00Z"
+last_updated: "2026-06-10T21:50:43.304Z"
 last_activity: 2026-06-10 -- Completed 01-08 live mid-visit remaining fix (CR-06)
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 9
-  completed_plans: 8
-  percent: 0
+  completed_plans: 9
+  percent: 17
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 
 Phase: 01 (playable-x01-match) — EXECUTING
 Plan: 9 of 9
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-10 -- Completed 01-08 live mid-visit remaining fix (CR-06)
 
 Progress: [█████████░] 89%
@@ -60,6 +60,7 @@ Progress: [█████████░] 89%
 | Phase 01 P06 | 2min | 2 tasks | 2 files |
 | Phase 01 P07 | 11min | 3 tasks | 4 files |
 | Phase 01 P08 | 4min | 1 task | 2 files |
+| Phase 01 P09 | 3 | - tasks | - files |
 
 ## Accumulated Context
 
@@ -88,6 +89,7 @@ Recent decisions affecting current work:
 - [Phase 01-07]: E2E overlay click via page.evaluate() DOM click — Playwright pointer click intercepted by panel-area in headless mode
 - [Phase 01-07]: Darts-at-double dialog suppressed for match-winning visits (win overlay owns screen)
 - [Phase 01-08]: remaining getter subtracts currentVisit running total for live display; reducer stays committed at visit end only (CR-06 / ENG-07)
+- [Phase ?]: Collapsible Profile verwalten toggle chosen over always-visible section to keep setup screen uncluttered
 
 ### Pending Todos
 
@@ -106,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-10T21:50:00Z
+Last session: 2026-06-10T21:50:29.253Z
 Stopped at: Completed 01-08-PLAN.md
 Resume file: None

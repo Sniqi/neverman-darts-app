@@ -1,10 +1,11 @@
 ---
 phase: 1
 slug: playable-x01-match
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-06-10
+reviewed_at: 2026-06-10
 ---
 
 # Phase 1 — UI Design Contract
@@ -153,7 +154,7 @@ Score panel takes 38% width; dartboard takes 62% width.
 
 **Score panel card — per player:**
 - Player name: 20px / 600
-- Remaining score: 48px / 600 (display size, active player) or 32px / 600 (inactive players)
+- Remaining score: 48px / 600 (display size, active player) or 20px / 600 (inactive players — heading size provides sufficient contrast without adding a 5th font size)
 - Legs won this set: shown as dot indicators or "L: 2"
 - Sets won: shown if sets mode enabled
 - Checkout suggestion: 14px / 400 / accent color, one line only, e.g. "T20 T20 Bull"

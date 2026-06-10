@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-07-PLAN.md
-last_updated: "2026-06-10T23:40:00Z"
-last_activity: 2026-06-10 -- Phase 01 execution started
+stopped_at: Completed 01-08-PLAN.md
+last_updated: "2026-06-10T21:50:00Z"
+last_activity: 2026-06-10 -- Completed 01-08 live mid-visit remaining fix (CR-06)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 01 (playable-x01-match) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Status: Ready to execute
-Last activity: 2026-06-10 -- Completed 01-07 correction-window and numpad wiring fix
+Last activity: 2026-06-10 -- Completed 01-08 live mid-visit remaining fix (CR-06)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P05 | 3min | 2 tasks | 4 files |
 | Phase 01 P06 | 2min | 2 tasks | 2 files |
 | Phase 01 P07 | 11min | 3 tasks | 4 files |
+| Phase 01 P08 | 4min | 1 task | 2 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,7 @@ Recent decisions affecting current work:
 - [Phase 01-07]: Per-player visit counts use Record<string,number> keyed by player.id (replaces broken cross-player counter)
 - [Phase 01-07]: E2E overlay click via page.evaluate() DOM click — Playwright pointer click intercepted by panel-area in headless mode
 - [Phase 01-07]: Darts-at-double dialog suppressed for match-winning visits (win overlay owns screen)
+- [Phase 01-08]: remaining getter subtracts currentVisit running total for live display; reducer stays committed at visit end only (CR-06 / ENG-07)
 
 ### Pending Todos
 
@@ -104,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-10T23:40:00Z
-Stopped at: Completed 01-07-PLAN.md
+Last session: 2026-06-10T21:50:00Z
+Stopped at: Completed 01-08-PLAN.md
 Resume file: None

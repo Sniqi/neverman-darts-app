@@ -20,8 +20,10 @@
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.10",
+    "@types/node": "^22.19.20",
     "@vitest/browser": "^4.1.8",
     "@vitest/browser-playwright": "^4.1.8",
+    "fake-indexeddb": "^6.2.5",
     "playwright": "^1.60.0",
     "svelte-check": "^4.6.0",
     "typescript": "~5.9.3",

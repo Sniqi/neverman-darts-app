@@ -1,0 +1,30 @@
+/* Global dark-mode design tokens — Phase 1 UI-SPEC Color + Spacing sections */
+:root {
+	/* Color */
+	--bg: #111318;
+	--surface: #1e2027;
+	--accent: #e8a020;
+	--destructive: #c0392b;
+	--text: #f0f0f0;
+
+	/* Spacing scale (multiples of 4) */
+	--space-xs: 4px;
+	--space-sm: 8px;
+	--space-md: 16px;
+	--space-lg: 24px;
+	--space-xl: 32px;
+	--space-2xl: 48px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: system-ui, -apple-system, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+}

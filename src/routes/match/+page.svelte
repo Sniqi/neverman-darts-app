@@ -47,10 +47,8 @@
 	}
 
 	// ── Correction window state ────────────────────────────────────────────
-	// We track completed visits by watching state transitions.
-	// When activePlayerIndex changes (turn passed) OR a visit is appended to
-	// the active player's visits, show the correction window for the just-
-	// completed visit.
+	// We track completed visits per-player (CR-04) so the window fires for every
+	// visit, not just the first of the match.
 
 	interface PendingCorrection {
 		darts: DartScore[];
@@ -59,24 +57,24 @@
 	}
 
 	let pendingCorrection = $state<PendingCorrection | null>(null);
-	let lastVisitCount = $state(0);
-	let lastActiveIdx = $state(matchStore.state.activePlayerIndex);
+	// Per-player visit counts keyed by player.id (CR-04 fix: was a single cross-player number)
+	let lastVisitCounts = $state<Record<string, number>>({});
 
-	// Watch for completed visits: when any player's visit count increases
+	// Watch for completed visits: compare each player's visit count against the per-player record
 	$effect(() => {
 		const state = matchStore.state;
 		if (state.phase !== 'playing') return;
 
-		// Scan all players for a new visit
 		for (const player of state.players) {
-			if (player.visits.length > lastVisitCount && pendingCorrection === null) {
+			const prevCount = lastVisitCounts[player.id] ?? 0;
+			if (player.visits.length > prevCount && pendingCorrection === null) {
 				const lastVisit = player.visits[player.visits.length - 1];
 				const total = lastVisit.darts.reduce(
 					(s, d) => s + d.multiplier * d.segment,
 					0
 				);
-				lastVisitCount = player.visits.length;
-				lastActiveIdx = state.activePlayerIndex;
+				// Update immutably so Svelte reactivity fires
+				lastVisitCounts = { ...lastVisitCounts, [player.id]: player.visits.length };
 				pendingCorrection = {
 					darts: lastVisit.darts,
 					isBust: lastVisit.bust,
@@ -85,16 +83,12 @@
 				return;
 			}
 		}
-		// Also track total visit count across all players for resets
-		const totalVisits = state.players.reduce((s, p) => s + p.visits.length, 0);
-		if (totalVisits > lastVisitCount) {
-			lastVisitCount = totalVisits;
-		}
 	});
 
+	// CorrectionWindow is the sole CONFIRM_VISIT dispatcher (it owns the 2.5s timer).
+	// dismissCorrection only clears pendingCorrection so the overlay unmounts.
 	function dismissCorrection() {
 		pendingCorrection = null;
-		matchStore.dispatch({ type: 'CONFIRM_VISIT' });
 	}
 
 	// ── Darts-at-double dialog (D-08, INP-03) ─────────────────────────────
@@ -156,6 +150,7 @@
 					visitDarts={pendingCorrection.darts}
 					isBust={pendingCorrection.isBust}
 					visitTotal={pendingCorrection.total}
+					ondismiss={dismissCorrection}
 				/>
 			{/if}
 		</div>
@@ -166,7 +161,7 @@
 		{#if inputMode === 'board'}
 			<Dartboard />
 		{:else}
-			<Numpad />
+			<Numpad onconfirm={handleNumpadVisit} />
 		{/if}
 	</div>
 </div>

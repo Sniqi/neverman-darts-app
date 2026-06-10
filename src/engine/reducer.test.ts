@@ -467,3 +467,79 @@ describe('Sets (ENG-02)', () => {
 		expect(s.players[0].setsWon).toBe(1);
 	});
 });
+
+// ── ENG-05 / CR-07 / WR-01: Event-log reset and CONFIRM_VISIT no-op ────────
+
+describe('ENG-05: Event-log per-match semantics (CR-07, WR-01)', () => {
+	it('START_MATCH on a non-empty eventLog produces eventLog with length exactly 1', () => {
+		// Simulate a prior match by building a state with a non-empty event log
+		let s = startMatch();
+		s = numpadVisit(s, 60); // eventLog now has 2 entries: START_MATCH, NUMPAD_VISIT
+		expect(s.eventLog.length).toBeGreaterThan(1);
+
+		// Start a new match on top of that state
+		const action: MatchAction = {
+			type: 'START_MATCH',
+			config: config501Double,
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		};
+		const s2 = reduce(s, action);
+		expect(s2.eventLog).toHaveLength(1);
+		expect(s2.eventLog[0].type).toBe('START_MATCH');
+	});
+
+	it('CONFIRM_VISIT is NOT appended to the eventLog', () => {
+		let s = startMatch();
+		s = numpadVisit(s, 60);
+		const logLenAfterVisit = s.eventLog.length; // START_MATCH + NUMPAD_VISIT = 2
+		s = reduce(s, { type: 'CONFIRM_VISIT' });
+		expect(s.eventLog).toHaveLength(logLenAfterVisit); // no change
+	});
+
+	it('single UNDO after CONFIRM_VISIT reverts the NUMPAD_VISIT (not a no-op)', () => {
+		let s = startMatch(cfg({ startScore: 501 }), [playerA, playerB], ['a', 'b']);
+		const remainingBefore = s.players[0].remaining; // 501
+		s = numpadVisit(s, 60);
+		// After NUMPAD_VISIT(60): player A remaining=441, turn passes to player B
+		expect(s.players[0].remaining).toBe(441);
+		// CONFIRM_VISIT is dispatched (simulates UI correction window)
+		s = reduce(s, { type: 'CONFIRM_VISIT' });
+		// UNDO — must revert the NUMPAD_VISIT, not be consumed by CONFIRM_VISIT
+		s = reduce(s, { type: 'UNDO' });
+		// After UNDO, we should be back to the state after START_MATCH:
+		// player A has remaining=501, activePlayerIndex=0
+		expect(s.players[0].remaining).toBe(remainingBefore);
+		expect(s.activePlayerIndex).toBe(0);
+	});
+
+	it('cross-match regression: UNDO at start of match B does not replay match A', () => {
+		// Match A: legsToWin=1, finish it
+		const matchAConfig = cfg({ startScore: 40, legsToWin: 1, outRule: 'double' });
+		let sA = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: matchAConfig,
+			players: [playerA],
+			order: ['a'],
+		});
+		sA = throwDart(sA, 2, 20); // D20=40 → leg win → match-complete
+		expect(sA.phase).toBe('match-complete');
+
+		// Start match B on top of the completed match A state
+		const matchBAction: MatchAction = {
+			type: 'START_MATCH',
+			config: config501Double,
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		};
+		let sB = reduce(sA, matchBAction);
+		expect(sB.phase).toBe('playing');
+
+		// UNDO once at the start of match B
+		sB = reduce(sB, { type: 'UNDO' });
+		// Should revert to setup (undid the START_MATCH of match B), NOT replay match A
+		expect(sB.phase).toBe('setup');
+		// Specifically, must NOT return to 'match-complete'
+		expect(sB.phase).not.toBe('match-complete');
+	});
+});

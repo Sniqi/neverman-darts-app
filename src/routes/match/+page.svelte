@@ -1,54 +1,104 @@
 <script lang="ts">
-	// Skeleton match route: ONE wired tap interaction through the runes store.
-	// Plan 03 replaces this with the real Dartboard + ScorePanel components.
-	import { skeletonStore } from '../../stores/skeleton.svelte';
+	// src/routes/match/+page.svelte
+	// Real scoring view: portrait/landscape responsive layout (D-02).
+	// Wires ScorePanel, VisitStrip, CheckoutSuggestion, Dartboard, Numpad,
+	// CorrectionWindow, DartsAtDoubleDialog, MatchWinOverlay, wake lock.
+	// Task 1 delivers the core play loop; Task 2 adds the remaining components.
+	import { matchStore } from '../../stores/match.svelte.js';
+	import ScorePanel from '../../ui/input/ScorePanel.svelte';
+	import VisitStrip from '../../ui/input/VisitStrip.svelte';
+	import Dartboard from '../../ui/input/Dartboard.svelte';
+
+	// Task 2 components (imported after creation)
+	// Numpad, CorrectionWindow, DartsAtDoubleDialog, MatchWinOverlay, wake lock
+	// are added in Task 2 below.
+
+	// Undo dispatcher for the dedicated undo button
+	function undo() {
+		matchStore.dispatch({ type: 'UNDO' });
+	}
 </script>
 
-<main>
-	<p class="score">{skeletonStore.score}</p>
-
-	<!-- Placeholder dartboard region — Plan 03 builds the real SVG board -->
-	<div
-		class="board"
-		role="button"
-		tabindex="0"
-		aria-label="Dartboard (Platzhalter) — tippen wirft T20"
-		onpointerdown={() => skeletonStore.tap(20)}
-	>
-		<span>T20</span>
+<div class="match-view">
+	<!-- Score panel: all players with active highlight -->
+	<div class="panel-area">
+		<ScorePanel />
+		<VisitStrip />
+		<div class="undo-bar">
+			<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
+				Rückgängig
+			</button>
+		</div>
 	</div>
-</main>
+
+	<!-- Dartboard area -->
+	<div class="board-area">
+		<Dartboard />
+	</div>
+</div>
 
 <style>
-	main {
+	.match-view {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: var(--space-2xl);
-		padding: var(--space-xl);
+		height: 100dvh;
+		width: 100%;
+		overflow: hidden;
+		background: #111318;
+		color: #f0f0f0;
 	}
-	.score {
-		font-size: 48px;
-		font-weight: 600;
-		line-height: 1;
-		margin: 0;
+
+	.panel-area {
+		flex: 0 0 auto;
 	}
-	.board {
-		width: 220px;
-		height: 220px;
-		border-radius: 50%;
-		background: var(--surface);
-		border: 2px solid #444444;
+
+	.board-area {
+		flex: 1 1 auto;
+		min-height: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 20px;
-		font-weight: 600;
-		cursor: pointer;
-		touch-action: none;
-		user-select: none;
+		padding: var(--space-sm, 8px);
 	}
-	.board:active {
-		background: #2d2d2d;
+
+	.undo-bar {
+		display: flex;
+		justify-content: flex-end;
+		padding: 4px var(--space-md, 16px);
+	}
+
+	.undo-btn {
+		height: 48px;
+		padding: 0 var(--space-lg, 24px);
+		background: transparent;
+		border: 1px solid #e8a020;
+		border-radius: 6px;
+		color: #e8a020;
+		font-size: 16px;
+		font-weight: 400;
+		cursor: pointer;
+		min-width: 120px;
+	}
+
+	.undo-btn:active {
+		background: rgba(232, 160, 32, 0.1);
+	}
+
+	/* Landscape layout (D-02): score panel left 38%, board right 62% */
+	@media (orientation: landscape) {
+		.match-view {
+			flex-direction: row;
+		}
+
+		.panel-area {
+			flex: 0 0 38%;
+			display: flex;
+			flex-direction: column;
+			overflow-y: auto;
+		}
+
+		.board-area {
+			flex: 0 0 62%;
+		}
 	}
 </style>

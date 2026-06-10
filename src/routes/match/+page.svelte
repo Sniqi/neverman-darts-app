@@ -1,41 +1,184 @@
 <script lang="ts">
 	// src/routes/match/+page.svelte
-	// Real scoring view: portrait/landscape responsive layout (D-02).
-	// Wires ScorePanel, VisitStrip, CheckoutSuggestion, Dartboard, Numpad,
-	// CorrectionWindow, DartsAtDoubleDialog, MatchWinOverlay, wake lock.
-	// Task 1 delivers the core play loop; Task 2 adds the remaining components.
+	// Complete scoring view: portrait/landscape responsive layout (D-02).
+	// Wires all input components to matchStore. Wake lock acquired on mount.
 	import { matchStore } from '../../stores/match.svelte.js';
+	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
 	import VisitStrip from '../../ui/input/VisitStrip.svelte';
 	import Dartboard from '../../ui/input/Dartboard.svelte';
+	import Numpad from '../../ui/input/Numpad.svelte';
+	import CorrectionWindow from '../../ui/input/CorrectionWindow.svelte';
+	import DartsAtDoubleDialog from '../../ui/input/DartsAtDoubleDialog.svelte';
+	import MatchWinOverlay from '../../ui/overlays/MatchWinOverlay.svelte';
+	import type { DartScore } from '../../engine/types.js';
 
-	// Task 2 components (imported after creation)
-	// Numpad, CorrectionWindow, DartsAtDoubleDialog, MatchWinOverlay, wake lock
-	// are added in Task 2 below.
+	// ── Wake lock (INP-05) ─────────────────────────────────────────────────
+	$effect(() => {
+		acquireWakeLock();
 
-	// Undo dispatcher for the dedicated undo button
+		function handleVisibility() {
+			if (document.visibilityState === 'visible') {
+				acquireWakeLock();
+			}
+		}
+
+		document.addEventListener('visibilitychange', handleVisibility);
+
+		return () => {
+			releaseWakeLock();
+			document.removeEventListener('visibilitychange', handleVisibility);
+		};
+	});
+
+	// ── Numpad toggle: remembers last-used mode per player (D-07) ──────────
+	// keyed by activePlayerIndex, default to 'board'
+	let inputModeByPlayer = $state<Record<number, 'board' | 'numpad'>>({});
+
+	let inputMode = $derived(
+		inputModeByPlayer[matchStore.state.activePlayerIndex] ?? 'board'
+	);
+
+	function setInputMode(mode: 'board' | 'numpad') {
+		inputModeByPlayer = {
+			...inputModeByPlayer,
+			[matchStore.state.activePlayerIndex]: mode
+		};
+	}
+
+	// ── Correction window state ────────────────────────────────────────────
+	// We track completed visits by watching state transitions.
+	// When activePlayerIndex changes (turn passed) OR a visit is appended to
+	// the active player's visits, show the correction window for the just-
+	// completed visit.
+
+	interface PendingCorrection {
+		darts: DartScore[];
+		isBust: boolean;
+		total: number;
+	}
+
+	let pendingCorrection = $state<PendingCorrection | null>(null);
+	let lastVisitCount = $state(0);
+	let lastActiveIdx = $state(matchStore.state.activePlayerIndex);
+
+	// Watch for completed visits: when any player's visit count increases
+	$effect(() => {
+		const state = matchStore.state;
+		if (state.phase !== 'playing') return;
+
+		// Scan all players for a new visit
+		for (const player of state.players) {
+			if (player.visits.length > lastVisitCount && pendingCorrection === null) {
+				const lastVisit = player.visits[player.visits.length - 1];
+				const total = lastVisit.darts.reduce(
+					(s, d) => s + d.multiplier * d.segment,
+					0
+				);
+				lastVisitCount = player.visits.length;
+				lastActiveIdx = state.activePlayerIndex;
+				pendingCorrection = {
+					darts: lastVisit.darts,
+					isBust: lastVisit.bust,
+					total
+				};
+				return;
+			}
+		}
+		// Also track total visit count across all players for resets
+		const totalVisits = state.players.reduce((s, p) => s + p.visits.length, 0);
+		if (totalVisits > lastVisitCount) {
+			lastVisitCount = totalVisits;
+		}
+	});
+
+	function dismissCorrection() {
+		pendingCorrection = null;
+		matchStore.dispatch({ type: 'CONFIRM_VISIT' });
+	}
+
+	// ── Darts-at-double dialog (D-08, INP-03) ─────────────────────────────
+	// Show after a numpad visit that wins a leg.
+	// We detect this by watching for phase 'leg-complete' after a NUMPAD_VISIT.
+	let pendingNumpadTotal = $state<number | null>(null);
+	let showDartsAtDouble = $state(false);
+
+	// Track when a numpad finish happens via a flag set in dispatchNumpad
+	function handleNumpadVisit(total: number) {
+		const prevPhase = matchStore.state.phase;
+		const prevRemaining = matchStore.activePlayer?.remaining ?? 0;
+
+		matchStore.dispatch({ type: 'NUMPAD_VISIT', total });
+
+		// If the remaining was exactly `total` (leg win condition), show dialog
+		if (prevRemaining === total && prevPhase === 'playing') {
+			pendingNumpadTotal = total;
+			showDartsAtDouble = true;
+		}
+	}
+
+	function handleDartsAtDoubleConfirm(dartsAtDouble: number, dartsUsed: 1 | 2 | 3) {
+		// The NUMPAD_VISIT was already dispatched; just record darts-at-double
+		// For now we just close the dialog — Phase 3 persistence will use this value
+		showDartsAtDouble = false;
+		pendingNumpadTotal = null;
+	}
+
+	// Undo button
 	function undo() {
 		matchStore.dispatch({ type: 'UNDO' });
 	}
 </script>
 
 <div class="match-view">
-	<!-- Score panel: all players with active highlight -->
+	<!-- Score panel + visit strip + undo -->
 	<div class="panel-area">
 		<ScorePanel />
-		<VisitStrip />
-		<div class="undo-bar">
-			<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
-				Rückgängig
-			</button>
+
+		<!-- Correction window overlays the panel area (not the board) -->
+		<div class="panel-relative">
+			<VisitStrip />
+			<div class="undo-bar">
+				<button
+					class="toggle-btn"
+					onclick={() => setInputMode(inputMode === 'board' ? 'numpad' : 'board')}
+				>
+					{inputMode === 'board' ? '🔢 Numpad' : '🎯 Board'}
+				</button>
+				<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
+					Rückgängig
+				</button>
+			</div>
+
+			{#if pendingCorrection !== null}
+				<CorrectionWindow
+					visible={true}
+					visitDarts={pendingCorrection.darts}
+					isBust={pendingCorrection.isBust}
+					visitTotal={pendingCorrection.total}
+				/>
+			{/if}
 		</div>
 	</div>
 
-	<!-- Dartboard area -->
+	<!-- Board or numpad area -->
 	<div class="board-area">
-		<Dartboard />
+		{#if inputMode === 'board'}
+			<Dartboard />
+		{:else}
+			<Numpad />
+		{/if}
 	</div>
 </div>
+
+<!-- Overlays (rendered outside the layout flow) -->
+<DartsAtDoubleDialog
+	visible={showDartsAtDouble}
+	pendingTotal={pendingNumpadTotal ?? 0}
+	onconfirm={handleDartsAtDoubleConfirm}
+/>
+
+<MatchWinOverlay />
 
 <style>
 	.match-view {
@@ -50,6 +193,11 @@
 
 	.panel-area {
 		flex: 0 0 auto;
+		position: relative;
+	}
+
+	.panel-relative {
+		position: relative;
 	}
 
 	.board-area {
@@ -63,8 +211,25 @@
 
 	.undo-bar {
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
+		align-items: center;
 		padding: 4px var(--space-md, 16px);
+		gap: var(--space-sm, 8px);
+	}
+
+	.toggle-btn {
+		height: 40px;
+		padding: 0 var(--space-md, 16px);
+		background: #1e2027;
+		border: 1px solid #444444;
+		border-radius: 6px;
+		color: #f0f0f0;
+		font-size: 14px;
+		cursor: pointer;
+	}
+
+	.toggle-btn:active {
+		background: #2d2d2d;
 	}
 
 	.undo-btn {

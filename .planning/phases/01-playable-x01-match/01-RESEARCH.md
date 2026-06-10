@@ -799,22 +799,25 @@ test('hit at center scores inner bull (50)', async () => {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Complete checkout table source**
    - What we know: Routes for scores 140-170, scores as clean doubles (2-50), and a few key two-dart finishes. The full 51-139 range (non-trivial routes) is not yet encoded.
    - What's unclear: Which published table to use as the canonical source (dartly.fun, darts-oche.com, or darts501.com all differ marginally on 2-3 scores).
    - Recommendation: Pick darts501.com as the canonical source (referenced in REQUIREMENTS.md ENG-07); encode the full table as a Wave 0 data task. The specific choice is Claude's discretion per D-11.
+   - RESOLVED: darts501.com is the canonical source; the full single-route table is encoded in `src/engine/checkout.ts` (Plan 01-02 Task 1, per D-11).
 
 2. **Leg starter rotation for 3-4 players**
    - What we know: For 2 players, it alternates. Standard darts rules for 3-4 players rotate each leg in the original playing order.
    - What's unclear: Whether the bull-off order is also the rotation order for subsequent legs.
    - Recommendation: Use the bull-off order as the cycle. Leg n starts with player at index `(legNumber % numPlayers)`.
+   - RESOLVED: bull-off order is the rotation cycle; `legStarterIndex = L % n` implemented and unit-tested in `src/engine/rotation.ts` (Plan 01-02 Task 1).
 
 3. **Dexie liveQuery in Svelte 5 compatibility**
    - What we know: Dexie's `liveQuery` returns an `Observable`-like that has a `.subscribe()` method. Svelte 4 stores are still present in Svelte 5.
    - What's unclear: Whether Dexie 4.4.3 has a native Svelte 5 rune integration or if the readable-store wrapper is the current recommended approach.
    - Recommendation: Use the `readable` store wrapper pattern shown above. If Dexie releases a `$effect`-based helper, migrate in Phase 3 when DB usage grows.
+   - RESOLVED: the `liveQuery` -> `readable` store wrapper is adopted (Plan 01-01 Task 3 skeleton setup route; Plan 01-04 `profilesLive()`); no extra package.
 
 ---
 

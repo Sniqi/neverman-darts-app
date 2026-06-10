@@ -2,9 +2,15 @@
 	// src/ui/input/Numpad.svelte
 	// 10-key numeric entry with validation (INP-02).
 	// Validates via isValidVisitTotal; shakes + shows "Ungültige Punktzahl" on invalid.
-	// Dispatches NUMPAD_VISIT on valid confirm.
-	import { matchStore } from '../../stores/match.svelte.js';
+	// Routes confirmed visits through the onconfirm callback so the parent can decide
+	// whether to show the darts-at-double dialog (INP-03, CR-05).
 	import { isValidVisitTotal } from '../../engine/impossible-scores.js';
+
+	interface Props {
+		onconfirm: (total: number) => void;
+	}
+
+	let { onconfirm }: Props = $props();
 
 	let inputValue = $state('');
 	let isInvalid = $state(false);
@@ -29,7 +35,7 @@
 			setTimeout(() => { shaking = false; }, 400);
 			return;
 		}
-		matchStore.dispatch({ type: 'NUMPAD_VISIT', total });
+		onconfirm(total);
 		inputValue = '';
 		isInvalid = false;
 	}

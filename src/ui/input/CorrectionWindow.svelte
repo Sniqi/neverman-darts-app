@@ -13,9 +13,13 @@
 		visitDarts: DartScore[];
 		isBust: boolean;
 		visitTotal: number;
+		// ondismiss: called after CONFIRM_VISIT is dispatched so the parent can clear
+		// pendingCorrection. Optional: no-op default so existing tests rendering without
+		// ondismiss do not crash.
+		ondismiss?: () => void;
 	}
 
-	let { visible, visitDarts, isBust, visitTotal }: Props = $props();
+	let { visible, visitDarts, isBust, visitTotal, ondismiss = () => {} }: Props = $props();
 
 	const TIMEOUT_MS = 2500;
 
@@ -54,6 +58,7 @@
 	function confirm() {
 		stopTimer();
 		matchStore.dispatch({ type: 'CONFIRM_VISIT' });
+		ondismiss();
 	}
 
 	function pause() {

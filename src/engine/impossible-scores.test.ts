@@ -72,8 +72,8 @@ describe('isValidVisitTotal', () => {
 });
 
 describe('IMPOSSIBLE_3DART set', () => {
-	it('contains all 7 impossible values', () => {
-		const expected = [179, 178, 176, 175, 173, 172, 169];
+	it('contains all 9 impossible values (including 163 and 166)', () => {
+		const expected = [163, 166, 169, 172, 173, 175, 176, 178, 179];
 		for (const v of expected) {
 			expect(IMPOSSIBLE_3DART.has(v)).toBe(true);
 		}
@@ -85,5 +85,35 @@ describe('IMPOSSIBLE_3DART set', () => {
 
 	it('does not contain 0', () => {
 		expect(IMPOSSIBLE_3DART.has(0)).toBe(false);
+	});
+});
+
+describe('isValidVisitTotal — 163 and 166 (CR-02)', () => {
+	it('isValidVisitTotal(163) returns false', () => {
+		expect(isValidVisitTotal(163)).toBe(false);
+	});
+
+	it('isValidVisitTotal(166) returns false', () => {
+		expect(isValidVisitTotal(166)).toBe(false);
+	});
+
+	it('IMPOSSIBLE_3DART.has(163) is true', () => {
+		expect(IMPOSSIBLE_3DART.has(163)).toBe(true);
+	});
+
+	it('IMPOSSIBLE_3DART.has(166) is true', () => {
+		expect(IMPOSSIBLE_3DART.has(166)).toBe(true);
+	});
+
+	it('neighbor 164 remains valid', () => {
+		expect(isValidVisitTotal(164)).toBe(true);
+	});
+
+	it('neighbor 167 remains valid', () => {
+		expect(isValidVisitTotal(167)).toBe(true);
+	});
+
+	it('isValidVisitTotal(170) remains valid', () => {
+		expect(isValidVisitTotal(170)).toBe(true);
 	});
 });

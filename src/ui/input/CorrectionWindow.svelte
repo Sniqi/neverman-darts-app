@@ -4,6 +4,7 @@
 	// A draining progress bar auto-dismisses via CONFIRM_VISIT after 2.5s.
 	// "Korrigieren" pauses timer and keeps overlay open for undo/correction.
 	// Bust visits show "Überworfen!" — turn does NOT pass before window dismisses (Pitfall 5).
+	import { untrack } from 'svelte';
 	import { matchStore } from '../../stores/match.svelte.js';
 	import type { DartScore } from '../../engine/types.js';
 
@@ -31,8 +32,8 @@
 
 	function formatDart(dart: DartScore): string {
 		if (dart.segment === 0) return '0 (Daneben)';
-		if (dart.segment === 50) return 'Bull';
-		if (dart.segment === 25) return 'Outer Bull';
+		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';
+		if (dart.multiplier === 1 && dart.segment === 25) return 'Outer Bull';
 		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
 		return `${prefix}${dart.segment}`;
 	}
@@ -68,15 +69,18 @@
 	}
 
 	function handleOutsideClick() {
-		if (!paused) confirm();
+		confirm();
 	}
 
-	// Start/stop timer when visibility changes
+	// Start/stop timer when visibility changes.
+	// untrack(() => startTimer()) prevents elapsed (read inside startTimer/tick) from
+	// being registered as a tracked dependency of this effect, so the effect runs once
+	// per visibility transition instead of once per rAF frame (CR-04 fix).
 	$effect(() => {
 		if (visible) {
 			elapsed = 0;
 			paused = false;
-			startTimer();
+			untrack(() => startTimer());
 		} else {
 			stopTimer();
 			elapsed = 0;
@@ -116,6 +120,9 @@
 				</button>
 			{:else}
 				<div class="paused-hint">Verwende Rückgängig zum Bearbeiten</div>
+				<button class="fertig-btn" onclick={(e) => { e.stopPropagation(); confirm(); }}>
+					Fertig
+				</button>
 			{/if}
 		</div>
 	</div>
@@ -190,5 +197,15 @@
 	.paused-hint {
 		font-size: 14px;
 		color: #888888;
+	}
+
+	.fertig-btn {
+		font-size: 14px;
+		color: #e8a020;
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 4px 8px;
+		text-decoration: underline;
 	}
 </style>

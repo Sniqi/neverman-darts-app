@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import PlayerPicker from './PlayerPicker.svelte';
+	import ProfileManager from './ProfileManager.svelte';
 	import type { MatchConfig } from '../../engine/types.js';
 
 	interface MatchPlayer {
@@ -22,6 +23,9 @@
 
 	// Player list (bound to PlayerPicker)
 	let players = $state<MatchPlayer[]>([]);
+
+	// Profile manager collapsible toggle
+	let profilesOpen = $state(false);
 
 	let canStart = $derived(players.length >= 1);
 
@@ -53,6 +57,17 @@
 	<!-- Player picker section -->
 	<section>
 		<PlayerPicker bind:players />
+	</section>
+
+	<!-- Profile management (collapsible) -->
+	<section>
+		<button class="profiles-toggle" onclick={() => (profilesOpen = !profilesOpen)} aria-expanded={profilesOpen}>
+			Profile verwalten
+			<span class="toggle-arrow" class:open={profilesOpen}>▼</span>
+		</button>
+		{#if profilesOpen}
+			<ProfileManager />
+		{/if}
 	</section>
 
 	<!-- Game mode chips: 301 / 401 / 501 -->
@@ -314,5 +329,31 @@
 		color: #888;
 		margin: 0;
 		text-align: center;
+	}
+
+	/* Profile manager toggle */
+	.profiles-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		background: var(--surface);
+		color: var(--text);
+		border: 1px solid #444;
+		border-radius: 4px;
+		padding: var(--space-sm) var(--space-md);
+		font-size: 16px;
+		min-height: 48px;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.toggle-arrow {
+		font-size: 12px;
+		transition: transform 0.2s;
+	}
+
+	.toggle-arrow.open {
+		transform: rotate(180deg);
 	}
 </style>

@@ -81,8 +81,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The spectator view is readable on a 27" monitor from 3 m (large typography, high contrast, dark mode) with correct layouts for 1–4 players
   4. The spectator window updates live on every dart entry and automatically re-syncs its state when closed and reopened or reloaded mid-match
 
-**Plans**: TBD
+**Plans:** 4 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 02-01-PLAN.md — Engine data foundation: legStartVisitIndex + averages.ts, DisplayStore subscriber, failing sync e2e baseline (Wave 1)
+- [ ] 02-02-PLAN.md — MVP slice: BroadcastChannel publisher + /display TV grid (PlayerPanel, MatchHeader, IdleScreen), live sync (Wave 2)
+- [ ] 02-03-PLAN.md — Per-dart behavior + states: VisitLine, checkout route, BUST flash, LegWinBanner, MatchWinDisplay (Wave 3)
+- [ ] 02-04-PLAN.md — Launch + control: SpectatorChooser (PC window/tablet fullscreen), fullscreen toggle/exit, e2e green, human review (Wave 4)
 
 ### Phase 3: Persistence & Data
 
@@ -153,7 +159,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
-| 2. Spectator Display | 0/? | Not started | - |
+| 2. Spectator Display | 0/4 | Planned | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |

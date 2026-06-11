@@ -75,6 +75,10 @@
 	// Guard document access — the route has ssr:false but fullscreen API must
 	// only be called in browser context inside $effect / click handlers.
 	let isFullscreen = $state(false);
+	// Latches true once fullscreen has been entered at least once this page-load (WR-01):
+	// after a fullscreen round-trip the big amber prompt must not re-appear over the live
+	// scoreboard. The always-rendered top-right .fullscreen-toggle still re-enters fullscreen.
+	let hasEnteredFullscreen = $state(false);
 
 	// Read the tablet-fullscreen intent flag once at mount (fixed for page lifetime).
 	// SpectatorChooser's goToDisplayFullscreen() sets ?fullscreen=1; openSecondWindow()
@@ -88,6 +92,7 @@
 	$effect(() => {
 		function onFullscreenChange() {
 			isFullscreen = document.fullscreenElement !== null;
+			if (isFullscreen) hasEnteredFullscreen = true;
 		}
 		document.addEventListener('fullscreenchange', onFullscreenChange);
 		return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
@@ -175,8 +180,10 @@
 
 <!-- Tablet fullscreen prompt (D-14, DISP-02): shown when not fullscreen AND either idle/setup
      OR the tablet-fullscreen intent flag is set (?fullscreen=1, only set by SpectatorChooser's
-     goToDisplayFullscreen — PC second window has no flag and is never affected). -->
-{#if !isFullscreen && (matchState === null || matchState.phase === 'setup' || tabletFullscreenIntent)}
+     goToDisplayFullscreen — PC second window has no flag and is never affected). The intent
+     case is also gated on !hasEnteredFullscreen (WR-01) so the prompt does not re-appear over
+     the live scoreboard after a mid-match fullscreen exit; the top-right toggle re-enters. -->
+{#if !isFullscreen && (matchState === null || matchState.phase === 'setup' || (tabletFullscreenIntent && !hasEnteredFullscreen))}
 	<button class="fullscreen-prompt" onclick={activateFullscreen}>
 		Vollbild aktivieren
 	</button>

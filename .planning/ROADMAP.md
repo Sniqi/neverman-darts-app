@@ -81,7 +81,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The spectator view is readable on a 27" monitor from 3 m (large typography, high contrast, dark mode) with correct layouts for 1–4 players
   4. The spectator window updates live on every dart entry and automatically re-syncs its state when closed and reopened or reloaded mid-match
 
-**Plans:** 5/6 plans complete (02-06 gap closure pending)
+**Plans:** 6/6 plans complete
 **UI hint**: yes
 Plans:
 **Wave 1**
@@ -106,7 +106,7 @@ Plans:
 
 **Wave 6 — Gap closure (UAT 2026-06-11)** *(closes the 1 DISP-02 UAT gap from 02-UAT.md Test 4: tablet "Vollbild aktivieren" prompt hidden during an active match)*
 
-- [ ] 02-06-PLAN.md — Widen the tablet fullscreen prompt to appear mid-match via a fullscreen-intent query flag, without regressing the PC second window (DISP-02) (Wave 6)
+- [x] 02-06-PLAN.md — Widen the tablet fullscreen prompt to appear mid-match via a fullscreen-intent query flag, without regressing the PC second window (DISP-02) (Wave 6)
 
 ### Phase 3: Persistence & Data
 
@@ -177,7 +177,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
-| 2. Spectator Display | 5/5 | Complete   | 2026-06-11 |
+| 2. Spectator Display | 6/6 | Complete   | 2026-06-11 |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |

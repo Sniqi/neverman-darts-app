@@ -1,8 +1,8 @@
 ---
 phase: 01-playable-x01-match
-reviewed: 2026-06-11T00:15:47Z
+reviewed: 2026-06-11T12:01:36Z
 depth: standard
-files_reviewed: 44
+files_reviewed: 43
 files_reviewed_list:
   - e2e/full-match-flow.spec.ts
   - src/app.css
@@ -50,237 +50,170 @@ files_reviewed_list:
   - static/.nojekyll
 findings:
   critical: 1
-  warning: 11
-  info: 10
-  total: 22
+  warning: 7
+  info: 11
+  total: 19
 status: issues_found
 ---
 
-# Phase 1: Code Review Report
+# Phase 01: Code Review Report
 
-**Reviewed:** 2026-06-11T00:15:47Z
+**Reviewed:** 2026-06-11T12:01:36Z
 **Depth:** standard
-**Files Reviewed:** 44
+**Files Reviewed:** 43
 **Status:** issues_found
 
 ## Summary
 
-Second-round review of the complete Phase 01 implementation (X01 engine, runes store, scoring UI, setup flow, profiles/Dexie layer, tests, E2E spec), with specific attention to regressions from gap plans 01-10..01-12. The pure engine (bust detection, checkout table arithmetic, impossible totals, rotation, reducer immutability/undo) is solid — checkout-table sums were spot-verified and are correct, and the inner-bull `{multiplier:2, segment:25}` encoding is consistently applied in `bust.ts`, `board.ts`, `VisitStrip`, and `CorrectionWindow`.
+Full adversarial review of the Phase 01 playable-X01-match implementation (engine, store, routes, input UI, setup UI, Dexie profiles, e2e). The pure engine (bust rules, board polar math, impossible-total validation, checkout table arithmetic) is solid — all checkout-table sums were spot-verified and the three double-out bust conditions are correct, including the outer-bull pitfall. Security posture is clean: no `{@html}`, no `eval`, no hardcoded secrets, `JSON.parse` of sessionStorage is guarded, player names are rendered via interpolation only.
 
-However, two of the recent gap fixes introduced regressions: (1) the numpad-finish deferral breaks the E2E happy path — the test never confirms the now-mandatory darts-at-double dialog, so the match never completes and the win-overlay assertion cannot pass; (2) the inner-bull re-encoding left dead `segment === 50` flash logic in `Dartboard.svelte`, so inner-bull taps flash the outer bull. Additional defects cluster around sets-mode leg-starter logic, the hand-rolled drag reorder (non-functional on touch, corrupted by the post-drag click on desktop), silent rejection of invalid numpad input, and stale per-player visit counters after UNDO.
+The two recently changed files (plan 01-13) hold up: the trial-reduce in `handleNumpadVisit` is genuinely side-effect-free (the reducer never mutates input state), and the multiplier-aware bull flash in `Dartboard.svelte` correctly distinguishes inner bull (`{2,25}`) from outer bull (`{1,25}`) before the generic prefix branch.
 
-## Narrative Findings (AI reviewer)
+However, the review found one critical scoring-integrity gap in the numpad finish path, and a cluster of warnings around sets-mode rotation, the correction-window lifecycle after UNDO, mixed board/numpad input, and touch drag-reorder on the bull-off screen.
 
 ## Critical Issues
 
-### CR-01: E2E happy path cannot pass — finishing numpad visit is deferred behind the darts-at-double dialog, which the test never confirms
+### CR-01: Numpad finish grants impossible double-out checkouts (bogey numbers and >170)
 
-**File:** `e2e/full-match-flow.spec.ts:89-101`, `src/routes/match/+page.svelte:103-130`
-**Issue:** `handleNumpadVisit` treats every `prevRemaining === total` entry as a finish and defers the `NUMPAD_VISIT` dispatch until `DartsAtDoubleDialog` is confirmed — with no distinction between leg-winning and match-winning visits. The E2E test enters the final `16`, never clicks a dialog option, then asserts `getByRole('heading', { name: /gewinnt!/ })`. Since the deferred dispatch never happens, `matchStore.isMatchComplete` stays false, `MatchWinOverlay` never renders, and the assertion times out. The test comment ("The darts-at-double dialog is suppressed for match-winning visits (win overlay takes over)") describes behavior that does not exist anywhere in the code. This is a regression introduced by the gap fix that moved the finish dispatch behind the dialog: either the E2E suite is currently red, or it was never re-run after that fix.
-**Fix:** Make the test confirm the dialog after the final `Bestätigen`:
-```ts
-// Darts-at-double dialog appears for the finishing visit — confirm it
-await page.getByRole('button', { name: '1 Dart' }).click();
-// Now the win overlay appears
-await expect(page.getByRole('heading', { name: /gewinnt!/ })).toBeVisible();
+**File:** `src/engine/reducer.ts:195-232`
+**Issue:** `applyNumpadVisit` validates the entered total only with `isValidVisitTotal` (is it a scoreable 3-dart total?) plus the overshoot/leaves-1 rules. When `newRemaining === 0` it unconditionally awards the leg. In double-out mode, the totals **159, 162, 165, 168, 171, 174, 177, 180** are scoreable in three darts (so they pass `isValidVisitTotal`) but are **impossible to finish on a double** (bogey numbers and anything above 170 — the max double-out finish is 170). A player on 159 who enters `159` is granted a leg — and possibly the match — that cannot exist under X01 rules. This silently corrupts match results in an app whose core value is accurate scoring. Note `checkout.ts` already encodes exactly this knowledge (bogeys map to `null`, `>170 → null`), so the engine is internally inconsistent.
+**Fix:** In `applyNumpadVisit`, reject a finishing total under double-out when it is not a checkable score:
+```typescript
+// Leg win
+if (newRemaining === 0) {
+	if (state.config.outRule === 'double') {
+		const BOGEY = new Set([159, 162, 163, 165, 166, 168, 169]);
+		if (total > 170 || BOGEY.has(total)) return state; // impossible double-out finish
+	}
+	// ... existing win handling
+}
 ```
-Alternatively, if the suppression described in the comment is the intended UX, implement it in `handleNumpadVisit` — but the dialog is the only place `dartsAtDouble` is captured, so confirming in the test is the better fix. Either way, run the E2E suite and remove the stale comment.
+(Or derive the check from the existing table — `total > 170 || CHECKOUT_TABLE[total] === null` — to avoid duplicating the bogey list.)
 
 ## Warnings
 
-### WR-01: Sets mode — leg starter resets to player 0 after every set win
+### WR-01: Sets mode — leg-starter rotation resets to player 0 at every set boundary
 
-**File:** `src/engine/reducer.ts:284-295`
-**Issue:** In `handleLegWinFromPlayers`, after a set win (but not match win) the code hardcodes `const totalLegsCompleted = 0;`, so `legStarterIndex(0, n)` always returns 0. Player 0 (the bull-off winner) starts the first leg of every set, regardless of how many legs have been played. Standard darts rules continue the starter rotation across set boundaries. Additionally, because `legsWon` is reset to 0 for all players on a set win, leg counting within the next set (derived from `players.reduce(sum of legsWon)` at line 311) also restarts from 0 — and that same derivation undercounts whenever any reset has occurred. Player 0 gets a systematic first-throw advantage in every set.
-**Fix:** Track total legs completed across the whole match instead of deriving it from per-set `legsWon` — e.g. add a `legsCompleted` counter to `MatchState`, incremented on every leg win and never reset:
-```ts
-const nextLegStarter = legStarterIndex(state.legsCompleted + 1, numPlayers);
-```
+**File:** `src/engine/reducer.ts:285-291`
+**Issue:** After a set win that does not end the match, the code does `const totalLegsCompleted = 0; // reset after set win` and then `legStarterIndex(0, numPlayers)`, which is always `0`. Player 0 therefore starts the first leg of **every** set regardless of how many legs/sets have been played, and the within-set alternation is re-anchored to player 0 each set. Standard darts convention (and the resolved RESEARCH decision "legStarterIndex(L, n) = L % n" with L the match-wide leg number) requires the rotation to continue across set boundaries. This cannot be recomputed from `legsWon` because those are zeroed at the set boundary.
+**Fix:** Track total legs completed across the match (e.g., a `legsPlayed` counter on `MatchState`, incremented on every leg win and reset only by `START_MATCH`) and use `legStarterIndex(legsPlayed, numPlayers)` in both the set-win and leg-win branches.
 
-### WR-02: Inner-bull tap flashes the outer bull — dead `segment === 50` branch left behind by the encoding fix
+### WR-02: Correction window permanently stops firing after any UNDO (high-water-mark counts)
 
-**File:** `src/ui/input/Dartboard.svelte:143-152`
-**Issue:** `classifyHit` now returns `{ multiplier: 2, segment: 25 }` for the inner bull (gap fix 01-10), but the flash logic still checks `dart.segment === 50` first — which can never be true — and then `dart.segment === 25` sets `flashKey = 'outer-bull'` for both bulls. Tapping the inner bull visually highlights the outer bull ring; the `'inner-bull'` flash branch is unreachable dead code. Scoring is unaffected (the regression is visual feedback only), but flash confirmation of the hit region is the primary input-accuracy affordance on a touch board.
-**Fix:**
-```ts
-if (dart.segment === 0) {
-	flashKey = 'miss';
-} else if (dart.segment === 25 && dart.multiplier === 2) {
-	flashKey = 'inner-bull';
-} else if (dart.segment === 25) {
-	flashKey = 'outer-bull';
-} else { /* unchanged */ }
-```
-
-### WR-03: BullOffOrder drag-to-reorder is broken on touch and corrupted by the post-drag click on desktop
-
-**File:** `src/ui/setup/BullOffOrder.svelte:76-119, 159-165`
-**Issue:** Two related defects in the hand-rolled drag:
-1. **Touch (the primary platform):** `pointerdown` from touch implicitly captures the pointer to the originating element, so `pointerenter` never fires on sibling cards during the drag — `dragOverId` stays `null` and `onUp` performs no reorder. Drag-to-reorder is non-functional on Android tablets.
-2. **Desktop:** after a completed mouse drag, the browser still fires `click` on the source card. `onUp` has already set `isDragging = false`, so `handleTap`'s `if (isDragging) return` guard does not trip. The tap handler adds the dragged player to `tapSequence` and rebuilds `order` from `initialPlayers`, silently discarding the reorder the user just performed (and marking the card as tap position 1).
-**Fix:** (1) Call `(e.target as Element).releasePointerCapture(e.pointerId)` in `onPointerDown`, or compute `dragOverId` via `document.elementFromPoint` in `onMove`. (2) Suppress the click that follows a drag:
-```ts
-let suppressClick = false;
-function onUp() {
-	if (isDragging) { suppressClick = true; setTimeout(() => (suppressClick = false), 0); }
-	// ...existing logic
-}
-function handleTap(id: string) {
-	if (isDragging || suppressClick) return;
-	// ...
+**File:** `src/routes/match/+page.svelte:62-87`
+**Issue:** `lastVisitCounts` is only ever increased (`player.visits.length > prevCount`). UNDO shrinks `player.visits`, but the recorded count is not lowered. After the canonical correction flow — visit completes, user taps "Korrigieren", presses "Rückgängig", re-enters the corrected dart(s) — the re-completed visit has `visits.length === lastVisitCounts[id]`, so the correction window never appears for the corrected visit (and stays suppressed until the count exceeds the stale high-water mark). This breaks INP-04/D-05 for every visit that follows an undo.
+**Fix:** Synchronize the recorded count downward when visits shrink:
+```typescript
+for (const player of state.players) {
+	const prevCount = lastVisitCounts[player.id] ?? 0;
+	if (player.visits.length < prevCount) {
+		lastVisitCounts = { ...lastVisitCounts, [player.id]: player.visits.length };
+		continue;
+	}
+	// existing > prevCount detection ...
 }
 ```
 
-### WR-04: Invalid numpad visits (overshoot / leaving 1 in double-out) are silently swallowed — input clears with no feedback
+### WR-03: Mid-visit board darts are silently discarded by a numpad entry
 
-**File:** `src/ui/input/Numpad.svelte:30-41`, `src/engine/reducer.ts:209-215`, `src/routes/match/+page.svelte:113-116`
-**Issue:** `Numpad.pressConfirm` only validates `isValidVisitTotal`. Overshoot (`total > remaining`) and "leaves 1 in double-out" pass that check, get dispatched, and the reducer rejects them by returning the unchanged state. The numpad then clears `inputValue` and shows no error. To the scorer it looks exactly like a successfully recorded visit — the score simply doesn't change, which during fast play will cause missed or doubled entries.
-**Fix:** Validate against the active player's remaining before dispatching (pass `remaining`/`outRule` into Numpad as props, or do the check in `handleNumpadVisit` with an error callback), reusing the existing shake/error UI:
-```ts
-const newRemaining = remaining - total;
-if (newRemaining < 0 || (newRemaining === 1 && outRule === 'double')) {
-	isInvalid = true; shaking = true; setTimeout(() => (shaking = false), 400);
-	return;
-}
-```
+**File:** `src/engine/reducer.ts:195-248` (and `src/routes/match/+page.svelte:161` — toggle always enabled)
+**Issue:** The board/numpad toggle is available mid-visit. If a player throws one or two board darts (accumulated in `currentVisit`, already reflected in the live `remaining` display) and then switches to numpad and confirms a total, `applyNumpadVisit` applies the total against the **committed** start-of-visit remaining and resets `currentVisit: []`. The already-thrown darts vanish from the score without any feedback, and the displayed remaining jumps. The orphaned `DART_THROWN` events stay in the log (replay stays consistent, but the user-visible behavior is wrong).
+**Fix:** Reject `NUMPAD_VISIT` while a board visit is in progress — `if (state.currentVisit.length > 0) return state;` in the reducer — and/or disable the mode toggle in `+page.svelte` while `matchStore.currentVisit.length > 0`.
 
-### WR-05: VisitStrip bust highlight evaluates the wrong player
+### WR-04: Numpad silently swallows rejected entries (overshoot / leaves-1) — input cleared, no feedback, bust unrecordable
+
+**File:** `src/ui/input/Numpad.svelte:30-41` and `src/engine/reducer.ts:211-215`
+**Issue:** For an overshoot (`newRemaining < 0`) or a score leaving 1 in double-out, the reducer returns the unchanged state — but the Numpad has already called `onconfirm` and cleared `inputValue` with no error shown. To the user the entry looks accepted while nothing happened. Additionally, a genuine bust (player overshot at the board) cannot be recorded via numpad as a bust: entering the actual score is silently dropped, and entering `0` records a normal non-bust visit (`bust: false`), so bust data is wrong for numpad play.
+**Fix:** Validate against `matchStore.remaining` in the parent before dispatching and signal rejection back to the Numpad (e.g., `onconfirm` returns boolean; on `false` reuse the existing shake/"Ungültige Punktzahl" path). Decide explicitly how a numpad bust is recorded (e.g., treat overshoot/leaves-1 entry as a bust visit: score reverts, `bust: true`, turn passes — matching the board path).
+
+### WR-05: VisitStrip bust styling evaluates the wrong player's visit
 
 **File:** `src/ui/input/VisitStrip.svelte:24-33`
-**Issue:** `isBustVisit()` checks the last visit of `matchStore.activePlayer`. But when a bust occurs, the reducer immediately passes the turn — so by the time the UI renders, the active player is the *next* player. Consequences: (a) the red bust flash never shows for the player who just busted; (b) it *does* show whenever a player whose own previous visit (one full rotation ago) was a bust becomes active — a misleading red strip at the start of an unrelated turn.
-**Fix:** Drive bust styling from the just-completed visit the parent already tracks (`pendingCorrection.isBust` in `match/+page.svelte`) by passing it as a prop, or check the previous player: `state.players[(activePlayerIndex + n - 1) % n]`.
+**Issue:** `isBustVisit()` reads the **active** player's last completed visit. A bust immediately passes the turn (`applyDartThrown` advances `activePlayerIndex`), so right after a bust the active player is the *next* player and the red styling never shows for the bust itself. Conversely, when a player who busted earlier becomes active again, their last completed visit is still the bust, so the strip renders red for their **entire next turn** — a false "Überworfen" signal while they throw fresh darts.
+**Fix:** Drive the bust styling from the pending-correction data (the just-completed visit passed to `CorrectionWindow`) — e.g., lift `pendingCorrection.isBust` into a prop for `VisitStrip` — or clear the styling once `currentVisit.length > 0`.
 
-### WR-06: Toggling board → numpad mid-visit silently discards thrown darts
+### WR-06: Darts-at-double dialog shown for single-out finishes; no cancel path
 
-**File:** `src/routes/match/+page.svelte:42-47, 103-117`, `src/engine/reducer.ts:195-249`
-**Issue:** The input-mode toggle is always enabled. If a player has 1–2 darts in `currentVisit` (board mode) and the scorer switches to numpad and confirms a total, `applyNumpadVisit` ignores `currentVisit` entirely: it subtracts `total` from the start-of-visit `remaining` and resets `currentVisit: []`. The darts already entered vanish without a trace, and the live remaining (which had been showing the mid-visit subtraction) jumps. `handleNumpadVisit`'s `isFinish` check likewise uses the committed remaining, ignoring pending board darts.
-**Fix:** Disable the toggle while a board visit is in progress:
-```svelte
-<button class="toggle-btn" disabled={matchStore.currentVisit.length > 0} ...>
-```
+**File:** `src/routes/match/+page.svelte:108-129` and `src/ui/input/DartsAtDoubleDialog.svelte`
+**Issue:** `handleNumpadVisit` defers every leg-winning numpad finish to the "Wie viele Darts auf die Doppel?" dialog without checking `config.outRule`. In single-out mode the question is meaningless (no double is required to finish) and the answer pollutes `dartsAtDouble`. Additionally, the dialog is modal with no cancel/back affordance: if the user mistyped a total that happens to equal the remaining score, they are forced to confirm a leg win and then undo it.
+**Fix:** Dispatch immediately with `dartsAtDouble: 0` when `matchStore.state.config.outRule === 'single'`. Add an "Abbrechen" action to the sheet that clears `pendingNumpadTotal`/`showDartsAtDouble` without dispatching.
 
-### WR-07: Correction window stops appearing after UNDO — `lastVisitCounts` is never decremented
+### WR-07: Bull-off drag-to-reorder is broken on touch devices (the primary platform)
 
-**File:** `src/routes/match/+page.svelte:61-86`
-**Issue:** The completed-visit detector compares `player.visits.length > lastVisitCounts[player.id]`. UNDO replays the log and *reduces* `visits.length`, but `lastVisitCounts` keeps the stale higher value. When the player re-completes the visit, `visits.length` equals (does not exceed) the stale count, so the correction window never fires for the corrected visit — precisely the visit the scorer most wants to verify (D-05 degraded for every post-undo visit).
-**Fix:** Clamp stale counts inside the effect:
-```ts
-if (player.visits.length < prevCount) {
-	lastVisitCounts = { ...lastVisitCounts, [player.id]: player.visits.length };
-}
-```
-
-### WR-08: CorrectionWindow paused flow — the "Rückgängig" button it points to is covered by the overlay, and the first tap dismisses instead of undoing
-
-**File:** `src/ui/input/CorrectionWindow.svelte:71-73, 117-126`, `src/routes/match/+page.svelte:144-167`
-**Issue:** When paused, the window shows "Verwende Rückgängig zum Bearbeiten" — but the overlay (`inset: 0` over `.panel-relative`, which contains the undo bar) sits on top of the Rückgängig button. Tapping the button hits the overlay instead, triggering `handleOutsideClick()` → `confirm()` → window dismissed without undoing; the user's first tap is silently consumed and they must tap again after the window closes. Additionally, the header comment "turn does NOT pass before window dismisses (Pitfall 5)" is false — the reducer already advanced `activePlayerIndex` when the visit completed; `CONFIRM_VISIT` is a no-op.
-**Fix:** Render a "Rückgängig" button inside the correction window's `.window` element (dispatching `UNDO` and dismissing), or exclude the undo bar from the overlay's covered area. Update or remove the stale Pitfall-5 comment.
-
-### WR-09: Board-input visits always record `dartsAtDouble: 0` — checkout-statistics data is permanently wrong for board-entered legs
-
-**File:** `src/engine/reducer.ts:135-139, 157, 171`
-**Issue:** All three `applyDartThrown` visit-construction sites hardcode `dartsAtDouble: 0`, including the leg-winning visit. A double-out finish by definition includes at least one dart at a double (the finishing dart), so every board-entered winning visit stores provably false data in the `Visit` record that Phase 4 stats (checkout percentage) will consume. Unlike the numpad path there is no dialog — but for board input the value is *computable*: a dart was "at double" iff the remaining before it was an even number ≤ 40 or exactly 50.
-**Fix:** Compute it in `applyDartThrown` (double-out only):
-```ts
-function countDartsAtDouble(startRemaining: number, darts: DartScore[]): number {
-	let rem = startRemaining, count = 0;
-	for (const d of darts) {
-		if ((rem <= 40 && rem % 2 === 0) || rem === 50) count++;
-		rem -= d.multiplier * d.segment;
-	}
-	return count;
-}
-```
-
-### WR-10: Numpad path accepts impossible double-out finishes (159, 162, 165, 168) as leg wins
-
-**File:** `src/engine/reducer.ts:204-232`
-**Issue:** `applyNumpadVisit` enforces "leaves 1 is invalid" in double-out but accepts any `newRemaining === 0` as a win. Totals 159, 162, 165 and 168 are scoreable in 3 darts (so they pass `isValidVisitTotal`) but cannot be finished ending on a double — the checkout table itself marks them `null` as bogey numbers. A player on 162 whose scorer enters 162 is awarded a leg that is impossible under double-out rules. This is inconsistent with the leaves-1 enforcement a few lines above.
-**Fix:** Reject bogey finishes in the double-out finish path:
-```ts
-const DOUBLE_OUT_BOGEY = new Set([159, 162, 163, 165, 166, 168, 169]);
-if (newRemaining === 0 && state.config.outRule === 'double' && DOUBLE_OUT_BOGEY.has(total)) return state;
-```
-(163/166/169 are already caught by `isValidVisitTotal`; including them keeps the rule self-documenting.)
-
-### WR-11: `updateProfile` accepts an empty/whitespace name, unlike `createProfile`
-
-**File:** `src/db/profiles.ts:31-42`
-**Issue:** `createProfile` throws on empty names, but `updateProfile` writes `name: ''` and `initial: ''` when passed whitespace (`trimmed[0]?.toUpperCase() ?? ''`). The UI (`ProfileManager.saveEdit`) guards this today, but this module is explicitly the defensive wrapper layer ("Wraps all DB access…") and Phases 3-4 will reuse it. A nameless profile breaks `PlayerPicker` rendering (empty `initial`) and name-based sorting.
-**Fix:** Mirror the create validation:
-```ts
-if (patch.name !== undefined) {
-	const trimmed = patch.name.trim();
-	if (!trimmed) throw new Error('Profile name cannot be empty');
-	update.name = trimmed;
-	update.initial = trimmed[0].toUpperCase();
-}
-```
+**File:** `src/ui/setup/BullOffOrder.svelte:76-119,159-165`
+**Issue:** Two compounding defects: (1) On touch, `pointerdown` triggers *implicit pointer capture* on the originating element, so all subsequent pointer events target that element — `onpointerenter` on sibling cards never fires, `dragOverId` stays `null`, and the drop in `onUp` does nothing. The card has `touch-action: none`, so the gesture is consumed with zero effect. (2) After a drag (mouse or touch), the browser still fires `click` on the card; by then `onUp` has already reset `isDragging = false`, so the `if (isDragging) return` guard in `handleTap` fails — the drag is followed by an unintended tap that enters tap-sequence mode and **rebuilds `order` from `initialPlayers`, discarding the drag result**. Net effect: drag-reorder does not work on Android tablets, and with a mouse the result is corrupted by the trailing click.
+**Fix:** Call `(e.target as Element).releasePointerCapture(e.pointerId)` in `onPointerDown` (or compute the drag-over card from `pointermove` coordinates via `document.elementFromPoint`), and suppress the post-drag click — e.g., keep a `didDrag` flag that `handleTap` checks and that is cleared on the next tick rather than synchronously in `onUp`.
 
 ## Info
 
-### IN-01: `phase: 'leg-complete'` is declared but never produced — dead state, plus stale comment referencing it
+### IN-01: `dartsUsed` is accepted, logged, and never used; dialog conflates dartsUsed with dartsAtDouble
 
-**File:** `src/engine/types.ts:42`, `src/routes/match/+page.svelte:94-96`
-**Issue:** The reducer never enters `'leg-complete'` (leg wins go straight back to `'playing'` or to `'match-complete'`). The match-page comment "We detect this by watching for phase 'leg-complete' after a NUMPAD_VISIT" describes a mechanism that does not exist (actual detection is `prevRemaining === total`).
-**Fix:** Remove the unused phase value or document it as reserved; correct the comment.
+**File:** `src/engine/reducer.ts:202` / `src/ui/input/DartsAtDoubleDialog.svelte:22-27`
+**Issue:** The reducer destructures `dartsUsed = 3` and never reads it — the finishing `Visit` does not record how many darts the finish took. Meanwhile `DartsAtDoubleDialog.select()` calls `onconfirm(darts, darts)`, writing the darts-at-double answer into the event log's `dartsUsed` field (a player finishing 60 with S20·S20·D10 answers "1" → log says `dartsUsed: 1`, which is false). Phase 4 averages computed from the log will be wrong if the field is trusted.
+**Fix:** Either record `dartsUsed` on the finishing `Visit` and collect it separately, or drop the field from the action until Phase 4 defines it.
 
-### IN-02: `dartsUsed` is destructured but never used in the reducer — finishing visits lose their dart count
+### IN-02: Phase value `'leg-complete'` is declared but never produced
 
-**File:** `src/engine/reducer.ts:202`
-**Issue:** `dartsUsed` is accepted in the action and supplied by the dialog, but the `Visit` record stores `darts: []` with no count. Phase 4 per-dart averages for numpad legs must re-derive it from the event log. At minimum it is an unused variable today.
-**Fix:** Persist it on the `Visit` (or remove it from the destructure and document that stats replay the event log).
+**File:** `src/engine/types.ts:42`, `src/routes/match/+page.svelte:97`
+**Issue:** No reducer path ever sets `phase: 'leg-complete'` (leg wins go straight back to `'playing'`). The comment in `+page.svelte` ("We detect this by watching for phase 'leg-complete'") describes a mechanism that does not exist — actual detection uses `prevRemaining === total`. Dead union member plus a misleading comment.
+**Fix:** Remove `'leg-complete'` from the union (or implement it), and update the stale comment.
 
-### IN-03: DartsAtDoubleDialog shown for single-out finishes; `pendingTotal` prop unused; no cancel affordance
+### IN-03: `ensureDbOpen` is exported but never called
 
-**File:** `src/ui/input/DartsAtDoubleDialog.svelte`, `src/routes/match/+page.svelte:107-117`
-**Issue:** (a) `handleNumpadVisit` defers every finish behind the dialog even when `outRule === 'single'`, where "Wie viele Darts auf die Doppel?" is meaningless and records bogus `dartsAtDouble > 0`. (b) The `pendingTotal` prop is accepted but never rendered. (c) The dialog cannot be cancelled — a mis-entered finishing total forces the scorer to pick an option and then undo.
-**Fix:** Skip the dialog for single-out (dispatch immediately with `dartsAtDouble: 0`); drop or display `pendingTotal`; consider an "Abbrechen" action that clears `pendingNumpadTotal` without dispatching.
+**File:** `src/db/db.ts:34-43`
+**Issue:** The defensive open helper (T-01-02 rationale) has no callers; the app relies on Dexie's implicit open plus the try/catch in `profiles.ts`. Dead code that claims a safety property nothing exercises.
+**Fix:** Call it from layout/setup initialization (and surface a "Profile nicht verfügbar" hint on `false`), or delete it.
 
-### IN-04: Unguarded non-null assertion `pendingNumpadTotal!` in the dialog confirm handler
+### IN-04: Dartboard miss tap has no visual flash; rapid taps cut the flash short
 
-**File:** `src/routes/match/+page.svelte:122-127`
-**Issue:** A double-fired confirm (fast double-tap before the dialog unmounts) would dispatch `total: null` on the second call; `isValidVisitTotal(null)` evaluates to `true` (`null < 0` and `null > 180` are both false, `Set.has(null)` is false) and `remaining - null` coerces to `remaining - 0`, recording a spurious 0-score visit and passing the turn.
-**Fix:** `if (pendingNumpadTotal === null) return;` at the top of `handleDartsAtDoubleConfirm`.
+**File:** `src/ui/input/Dartboard.svelte:145-156,210-217`
+**Issue:** `flashKey = 'miss'` has no corresponding element — neither the background circle nor the miss-zone path binds its fill to `flashKey === 'miss'`, so a registered miss gives zero visual feedback. Also, each tap schedules `setTimeout(() => flashKey = null, 300)` without cancelling the previous one; a second tap within 300 ms has its flash cleared early by the first tap's stale timer.
+**Fix:** Bind the miss-zone fill to the flash state (e.g., faint white ring), and store the timeout id so a new tap clears the pending one before scheduling.
 
-### IN-05: No visual feedback for miss taps; entire SVG box (including corners beyond the board edge) registers a miss
+### IN-05: English labels "Bull"/"Outer Bull" in the German UI; stale CorrectionWindow comment
 
-**File:** `src/ui/input/Dartboard.svelte:143-156, 161-172`
-**Issue:** `flashKey = 'miss'` matches no rendered element, so miss taps give zero visual confirmation. Also, because `onpointerdown` is on the `<svg>` root, taps anywhere in the element's CSS box — including corners outside the drawn 390-radius board background — dispatch a miss dart. Accidental edge touches while handling the tablet will score misses.
-**Fix:** Flash the background circle for misses; optionally ignore taps with `r > R_MISS_OUTER`.
+**File:** `src/ui/input/VisitStrip.svelte:11-12`, `src/ui/input/CorrectionWindow.svelte:6,35-36`
+**Issue:** The project constraint is "German UI throughout"; dart labels render "Outer Bull". Additionally the CorrectionWindow header comment claims "turn does NOT pass before window dismisses (Pitfall 5)" — false: the reducer passes the turn immediately when the visit finalizes; `CONFIRM_VISIT` is a no-op and the dartboard stays interactive for the next player while the window is open.
+**Fix:** Use German labels (e.g., "Bull" / "25" or "Außen-Bull") and correct the comment to describe the actual no-op semantics.
 
-### IN-06: `acquireWakeLock` can orphan a previously held sentinel
-
-**File:** `src/lib/wake-lock.svelte.ts:12-20`
-**Issue:** Calling `acquireWakeLock` while a sentinel is already held overwrites `sentinel` without releasing the old one, losing the only reference. In practice the visibility handler only re-acquires after the UA auto-released the old lock, so impact is minimal.
-**Fix:** `if (sentinel && !sentinel.released) return;` at the top.
-
-### IN-07: Duplicated sort logic between `listProfiles` and `profilesLive`
-
-**File:** `src/db/profiles.ts:53-60, 67-82`
-**Issue:** The `toArray()` + `localeCompare` sort + empty-array fallback block is copy-pasted in both functions.
-**Fix:** Extract a shared `async function fetchSorted(): Promise<Profile[]>`.
-
-### IN-08: `enterNumpadVisit` E2E helper has identical if/else branches
-
-**File:** `e2e/full-match-flow.spec.ts:63-81`
-**Issue:** The `opts.assertOverlay` true and false branches execute the exact same statements (modulo comments); the option is dead weight.
-**Fix:** Delete the branch and the `opts` parameter.
-
-### IN-09: BullOffOrder aria-label reads "Position null" for unsequenced players during tap mode
-
-**File:** `src/ui/setup/BullOffOrder.svelte:153, 164-167`
-**Issue:** When `tapSequence` is non-empty, `tapPosition` returns `null` for untapped players; the template-literal aria-label stringifies it as "Position null" and the visible `{pos}` badge renders empty.
-**Fix:** `{@const pos = tapSequence.length > 0 ? (tapPosition(player.id) ?? '–') : i + 1}` and adjust the label accordingly.
-
-### IN-10: Single-out checkout suggestions reuse the double-out table
+### IN-06: Checkout suggestions missing for several single-out scores
 
 **File:** `src/engine/checkout.ts:196-205`
-**Issue:** In single-out mode, `getSuggestion(1, 'single')` returns `null` although S1 finishes; 2 suggests `D1` rather than the simpler S2; scoreable totals 171–179 (e.g. 171 = T20 T20 T17) return null. Behavior is safe (no suggestion is never a wrong suggestion) but underserves single-out games.
-**Fix:** Acceptable for v1; consider a single-out lookup (e.g. `['S' + remaining]` for remaining ≤ 20) in a later phase.
+**Issue:** In single-out mode, `getSuggestion` returns `null` for 1 (S1 finish), for the bogey entries 159/162/165/168 (scoreable in single-out, e.g., 159 = T20 T19 T14), and for 171/174/177 (e.g., 174 = T20 T20 T18) — all real single-out finishes. D-12 says "single-out → any score with a route returns that route", which the double-out-shaped table cannot satisfy.
+**Fix:** Add a small single-out override map consulted when `outRule === 'single'`, or document the accepted gap.
+
+### IN-07: e2e helper has identical if/else branches — dead `assertOverlay` option
+
+**File:** `e2e/full-match-flow.spec.ts:63-81`
+**Issue:** Both branches of `if (opts.assertOverlay)` perform the same three steps (assert visible, JS-click, assert hidden). The option and the comment distinguishing "first visit" from "subsequent visits" are dead weight.
+**Fix:** Collapse to a single unconditional block and drop the `opts` parameter.
+
+### IN-08: Vacuous reducer test — "restores remaining after undoing a dart"
+
+**File:** `src/engine/reducer.test.ts:324-331`
+**Issue:** Comments claim `remaining` is 441 after one dart, but the reducer only commits `remaining` at visit end — it is 501 before and after, so the assertion (`501 === 501`) passes even if UNDO were a no-op. The test does not verify what its name claims (mid-visit dart undo is covered by the `currentVisit` test and committed undo by the store test, but this test guards nothing).
+**Fix:** Assert on `currentVisit`/live total, or complete a 3-dart visit before undoing; fix the comments.
+
+### IN-09: Bull-off cards announce "Position null" in tap mode
+
+**File:** `src/ui/setup/BullOffOrder.svelte:153,164`
+**Issue:** When `tapSequence` is non-empty, untapped players get `pos = tapPosition(id)` → `null`; the position badge renders empty and the template literal `aria-label` becomes the literal string "Spieler X, Position null".
+**Fix:** Fall back to a placeholder: `tapPosition(player.id) ?? '–'` and omit the position from the aria-label when unsequenced.
+
+### IN-10: `sessionStorage.setItem` unguarded in MatchSetup
+
+**File:** `src/ui/setup/MatchSetup.svelte:36-40`
+**Issue:** `loadPending` in BullOffOrder is wrapped in try/catch, but the corresponding write in `handleStart` is not. In storage-restricted contexts `setItem` throws, aborting `handleStart` before `goto` — the start button appears dead with no message.
+**Fix:** Wrap the `setItem` in try/catch; on failure either still navigate (BullOffOrder's empty-state path redirects back) or show a hint.
+
+### IN-11: `dartsAtDouble` always recorded as 0 for board-entered visits
+
+**File:** `src/engine/reducer.ts:136-139,157,171`
+**Issue:** Bust, winning, and normal board visits all hardcode `dartsAtDouble: 0` even though the dart sequence is fully recorded. Acceptable for Phase 1 (D-08 scopes the prompt to numpad, and the value is derivable from the event log by computing remaining-before-each-dart), but Phase 4 checkout-percentage stats must derive it rather than trust the stored field.
+**Fix:** Add a comment on the `Visit` type / reducer noting `dartsAtDouble` is authoritative only for numpad finishing visits.
 
 ---
 
-_Reviewed: 2026-06-11T00:15:47Z_
+_Reviewed: 2026-06-11T12:01:36Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_

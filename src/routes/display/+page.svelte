@@ -4,6 +4,7 @@
 	// Connects displayStore on mount, branches on idle vs active match.
 	// Manages legWinMessage state via legsWon/setsWon delta watcher (D-09).
 	import { base } from '$app/paths';
+	import { goto } from '$app/navigation';
 	import { displayStore } from '../../stores/display.svelte.js';
 	import MatchHeader from '../../ui/display/MatchHeader.svelte';
 	import PlayerPanel from '../../ui/display/PlayerPanel.svelte';
@@ -69,14 +70,56 @@
 		prevSetsWon = s.players.map(p => p.setsWon);
 	});
 
-	// Suppress unused import warning — base used for future navigation
-	void base;
+	// ── Fullscreen state (D-15 PC toggle, D-14 tablet exit) ──────────────────
+	// isFullscreen tracks document.fullscreenElement state.
+	// Guard document access — the route has ssr:false but fullscreen API must
+	// only be called in browser context inside $effect / click handlers.
+	let isFullscreen = $state(false);
+	let showExit = $state(false);
+	let exitTimerId: ReturnType<typeof setTimeout> | null = null;
+
+	$effect(() => {
+		function onFullscreenChange() {
+			isFullscreen = document.fullscreenElement !== null;
+		}
+		document.addEventListener('fullscreenchange', onFullscreenChange);
+		return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+	});
+
+	function toggleFullscreen() {
+		if (document.fullscreenElement) {
+			document.exitFullscreen?.().catch(() => {});
+		} else {
+			document.documentElement.requestFullscreen().catch(() => {});
+		}
+	}
+
+	function activateFullscreen() {
+		document.documentElement.requestFullscreen().catch(() => {});
+	}
+
+	function handleDisplayTap() {
+		showExit = true;
+		if (exitTimerId !== null) clearTimeout(exitTimerId);
+		exitTimerId = setTimeout(() => {
+			showExit = false;
+			exitTimerId = null;
+		}, 3000);
+	}
+
+	function exitToMatch() {
+		if (exitTimerId !== null) { clearTimeout(exitTimerId); exitTimerId = null; }
+		document.exitFullscreen?.().catch(() => {});
+		goto(`${base}/match`);
+	}
 </script>
 
 {#if matchState === null || matchState.phase === 'setup'}
 	<IdleScreen />
 {:else}
-	<div class="display-root">
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div class="display-root" onclick={handleDisplayTap}>
 		<MatchHeader config={matchState.config} {currentLeg} />
 		<div
 			class="panels-grid"
@@ -102,6 +145,41 @@
 	</div>
 {/if}
 
+<!-- Layer 3: fullscreen controls (z-index 30) — outside the conditional so always rendered -->
+
+<!-- PC fullscreen toggle (D-15): small icon button top-right, always visible on /display -->
+<button
+	class="fullscreen-toggle"
+	aria-label={isFullscreen ? 'Vollbild beenden' : 'Vollbild aktivieren'}
+	onclick={toggleFullscreen}
+>
+	{#if isFullscreen}
+		<!-- Exit fullscreen icon -->
+		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+		</svg>
+	{:else}
+		<!-- Enter fullscreen icon -->
+		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+		</svg>
+	{/if}
+</button>
+
+<!-- Tablet fullscreen prompt (D-14, DISP-02): shown on first load when not fullscreen -->
+{#if !isFullscreen && (matchState === null || matchState.phase === 'setup')}
+	<button class="fullscreen-prompt" onclick={activateFullscreen}>
+		Vollbild aktivieren
+	</button>
+{/if}
+
+<!-- Tablet exit button (D-14): auto-hides after 3s; tap anywhere to show -->
+{#if showExit}
+	<button class="exit-btn" onclick={exitToMatch}>
+		Zurück zur Eingabe
+	</button>
+{/if}
+
 <style>
 	.display-root {
 		display: flex;
@@ -117,5 +195,80 @@
 		grid-template-columns: repeat(var(--player-count), 1fr);
 		height: calc(100dvh - 40px);
 		gap: 2px;
+	}
+
+	/* Layer 3: fullscreen controls (z-index 30) */
+
+	.fullscreen-toggle {
+		position: fixed;
+		top: 8px;
+		right: 8px;
+		z-index: 30;
+		width: 36px;
+		height: 36px;
+		background: rgba(30, 32, 39, 0.7);
+		border: 1px solid #444;
+		border-radius: 6px;
+		color: #f0f0f0;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+	}
+
+	.fullscreen-toggle:active {
+		background: rgba(232, 160, 32, 0.15);
+	}
+
+	.fullscreen-prompt {
+		position: fixed;
+		bottom: 24px;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 30;
+		height: 48px;
+		padding: 0 var(--space-xl, 32px);
+		background: #e8a020;
+		border: none;
+		border-radius: 6px;
+		color: #111318;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		min-width: 200px;
+		animation: fadeIn 150ms ease-out;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+		to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+	}
+
+	.exit-btn {
+		position: fixed;
+		bottom: 24px;
+		right: 24px;
+		z-index: 30;
+		min-height: 48px;
+		min-width: 120px;
+		padding: 0 var(--space-lg, 24px);
+		background: rgba(30, 32, 39, 0.9);
+		border: 1px solid #e8a020;
+		border-radius: 6px;
+		color: #e8a020;
+		font-size: 16px;
+		font-weight: 400;
+		cursor: pointer;
+		animation: fadeInExit 150ms ease-out;
+	}
+
+	@keyframes fadeInExit {
+		from { opacity: 0; }
+		to   { opacity: 1; }
+	}
+
+	.exit-btn:active {
+		background: rgba(232, 160, 32, 0.1);
 	}
 </style>

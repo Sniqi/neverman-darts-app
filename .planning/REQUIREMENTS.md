@@ -29,9 +29,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **DISP-01**: On PC, player can open the live game display as a second browser window and drag it to a second monitor
 - [ ] **DISP-02**: On tablet, player can switch the app into a fullscreen display view
-- [ ] **DISP-03**: Display shows current scores, legs/sets, player names, active player, last visit, leg average, and match average per player
+- [x] **DISP-03**: Display shows current scores, legs/sets, player names, active player, last visit, leg average, and match average per player
 - [ ] **DISP-04**: Display is readable on a 27" monitor from 3 m (large typography, high contrast, dark mode), with layouts for 1–4 players
-- [ ] **DISP-05**: Spectator window stays in sync live and re-syncs automatically after being closed, reloaded, or opened mid-match
+- [x] **DISP-05**: Spectator window stays in sync live and re-syncs automatically after being closed, reloaded, or opened mid-match
 
 ### Game Flow
 
@@ -131,9 +131,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROF-02 | Phase 1 | Complete |
 | DISP-01 | Phase 2 | Pending |
 | DISP-02 | Phase 2 | Pending |
-| DISP-03 | Phase 2 | Pending |
+| DISP-03 | Phase 2 | Complete |
 | DISP-04 | Phase 2 | Pending |
-| DISP-05 | Phase 2 | Pending |
+| DISP-05 | Phase 2 | Complete |
 | FLOW-03 | Phase 3 | Pending |
 | STAT-06 | Phase 3 | Pending |
 | PROF-03 | Phase 3 | Pending |

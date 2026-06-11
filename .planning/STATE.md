@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-06-11T15:48:20.421Z"
-last_activity: 2026-06-11 -- Phase 02 planning complete
+last_updated: "2026-06-11T16:00:20.126Z"
+last_activity: 2026-06-11 -- Phase 02 execution started
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 17
+  completed_plans: 14
   percent: 17
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 01 — playable-x01-match
+**Current focus:** Phase 02 — spectator-display
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
+Phase: 02 (spectator-display) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-06-11 -- Phase 02 planning complete
+Last activity: 2026-06-11 -- Phase 02 execution started
 
 Progress: [█████████░] 89%
 
@@ -65,6 +65,7 @@ Progress: [█████████░] 89%
 | Phase 01-playable-x01-match P11 | 3min | 2 tasks | 2 files |
 | Phase 01-playable-x01-match P12 | 8min | 3 tasks | 6 files |
 | Phase 01-playable-x01-match P13 | 6min | 2 tasks | 2 files |
+| Phase 02-spectator-display P01 | 6min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Collapsible Profile verwalten toggle chosen over always-visible section to keep setup screen uncluttered
 - [Phase ?]: Trial reduce for match-win detection: import pure reduce() from engine, compute prospective state before dispatch decision — read-only, no mutation (01-13)
 - [Phase ?]: Flash key keyed on multiplier not segment: multiplier===2 && segment===25 → inner-bull; segment===50 branch was dead code since 01-10 (01-13)
+- [Phase ?]: [Phase 02-01]: legStartVisitIndex added to MatchState
+- [Phase ?]: [Phase 02-01]: DisplayStore uses vi.stubGlobal mocks for BroadcastChannel/localStorage in node env; connect() returns cleanup fn for Svelte $effect teardown
 
 ### Pending Todos
 
@@ -114,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-11T15:20:19.361Z
+Last session: 2026-06-11T15:59:11.534Z
 Stopped at: Phase 2 UI-SPEC approved
 Resume file: .planning/phases/02-spectator-display/02-UI-SPEC.md

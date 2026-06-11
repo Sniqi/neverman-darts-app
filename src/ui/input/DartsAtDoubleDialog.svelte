@@ -20,6 +20,9 @@
 	];
 
 	function select(darts: 1 | 2 | 3) {
+		// Phase 1: darts-used equals darts-at-double for a finishing visit — a finish's
+		// last dart is always the double, so darts-at-double ≤ darts-used.
+		// Precise darts-used (e.g. 2 at double but 3 darts total) is a Phase 4 stats concern.
 		onconfirm(darts, darts);
 	}
 </script>

@@ -97,24 +97,34 @@
 	let pendingNumpadTotal = $state<number | null>(null);
 	let showDartsAtDouble = $state(false);
 
-	// Track when a numpad finish happens via a flag set in dispatchNumpad
+	// For a finishing visit (prevRemaining === total), defer the NUMPAD_VISIT dispatch
+	// until after the darts-at-double dialog confirms so dartsAtDouble is recorded.
+	// For non-finishing visits, dispatch immediately (no dialog shown, dartsAtDouble=0).
 	function handleNumpadVisit(total: number) {
 		const prevPhase = matchStore.state.phase;
 		const prevRemaining = matchStore.activePlayer?.remaining ?? 0;
 
-		matchStore.dispatch({ type: 'NUMPAD_VISIT', total });
+		const isFinish = prevRemaining === total && prevPhase === 'playing';
 
-		// Show darts-at-double dialog only for a leg win that does NOT end the match.
-		// If the match is now complete, the win overlay owns the screen — skip the dialog.
-		if (prevRemaining === total && prevPhase === 'playing' && matchStore.state.phase !== 'match-complete') {
+		if (isFinish) {
+			// Defer dispatch until dialog confirms — store total for handleDartsAtDoubleConfirm
 			pendingNumpadTotal = total;
 			showDartsAtDouble = true;
+		} else {
+			// Non-finishing visit: dispatch immediately, no dialog (dartsAtDouble=0 per D-08)
+			matchStore.dispatch({ type: 'NUMPAD_VISIT', total });
 		}
 	}
 
 	function handleDartsAtDoubleConfirm(dartsAtDouble: number, dartsUsed: 1 | 2 | 3) {
-		// The NUMPAD_VISIT was already dispatched; just record darts-at-double
-		// For now we just close the dialog — Phase 3 persistence will use this value
+		// Dispatch the deferred finishing NUMPAD_VISIT with the chosen darts-at-double value.
+		// The reducer's finishing path records dartsAtDouble in the visit and event log (INP-03).
+		matchStore.dispatch({
+			type: 'NUMPAD_VISIT',
+			total: pendingNumpadTotal!,
+			dartsUsed,
+			dartsAtDouble
+		});
 		showDartsAtDouble = false;
 		pendingNumpadTotal = null;
 	}

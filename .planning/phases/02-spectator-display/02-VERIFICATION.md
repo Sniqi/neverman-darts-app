@@ -1,7 +1,9 @@
 ---
 phase: 02-spectator-display
 verified: 2026-06-11T19:30:00Z
-status: human_needed
+status: passed
+human_verification_status: complete
+human_verification_resolution: "All 5 human-verification items confirmed. Items 1, 2, 3, 5 passed in 02-UAT.md (Tests 1, 2, 3, 5). Item 4 (DISP-02 tablet fullscreen prompt) was the single UAT issue; closed by gap-closure plan 02-06 (commit 3d5a77b, latch follow-up ede8637) and re-verified in a real browser across all scenarios. 02-UAT.md now records 5/5 passed, 0 issues, gap resolved."
 score: 5/5 must-haves verified
 overrides_applied: 0
 re_verification:
@@ -47,9 +49,9 @@ human_verification:
 # Phase 02: Spectator Display Verification Report
 
 **Phase Goal:** A live spectator view shows all match state legibly on a 27" monitor from 3 m, opening as a second window on PC or as in-app fullscreen on tablet, and stays in sync automatically (updates live on every dart entry; re-syncs automatically when closed/reopened or reloaded mid-match).
-**Verified:** 2026-06-11T19:30:00Z
-**Status:** human_needed
-**Re-verification:** Yes — after gap closure plan 02-05 (commits eef1047, 3652a84, 67baa65, 04381a9)
+**Verified:** 2026-06-11T19:30:00Z (automated) · human verification completed 2026-06-11 via 02-UAT.md + 02-06 gap closure
+**Status:** passed
+**Re-verification:** Yes — after gap closure plan 02-05 (commits eef1047, 3652a84, 67baa65, 04381a9). Human-verification items subsequently confirmed via 02-UAT.md (4 pass) and gap-closure plan 02-06 (item 4 / DISP-02 tablet prompt — commit 3d5a77b + WR-01 latch ede8637, re-verified in a real browser).
 
 ## Summary
 

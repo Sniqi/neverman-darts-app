@@ -1,0 +1,281 @@
+<script lang="ts">
+	// src/ui/display/SpectatorChooser.svelte
+	// Monitor/cast icon in the scoring view toolbar that opens a chooser menu.
+	// D-12: monitor icon always reachable mid-match.
+	// D-13: chooser with two options — PC second window (DISP-01) and tablet fullscreen (DISP-02).
+	// T-02-06: window.open uses 'noopener,noreferrer' (no reverse tabnabbing).
+	// T-02-07: popup-blocked null-check; no crash on denied fullscreen.
+	// T-02-04: player names / copy rendered via {interpolation} only — no {@html}.
+	import { base } from '$app/paths';
+	import { goto } from '$app/navigation';
+
+	let open = $state(false);
+	let popupBlocked = $state(false);
+
+	function toggle() {
+		open = !open;
+		if (!open) popupBlocked = false;
+	}
+
+	function close() {
+		open = false;
+		popupBlocked = false;
+	}
+
+	function openSecondWindow() {
+		const win = window.open(`${base}/display`, '_blank', 'noopener,noreferrer');
+		if (!win) {
+			popupBlocked = true;
+		} else {
+			close();
+		}
+	}
+
+	function goToDisplayFullscreen() {
+		close();
+		goto(`${base}/display`);
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && open) {
+			close();
+		}
+	}
+
+	function handleOutsideClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		const menu = document.querySelector('.chooser-menu');
+		const iconBtn = document.querySelector('.chooser-icon-btn');
+		if (menu && !menu.contains(target) && iconBtn && !iconBtn.contains(target)) {
+			close();
+		}
+	}
+
+	$effect(() => {
+		if (open) {
+			document.addEventListener('keydown', handleKeydown);
+			document.addEventListener('pointerdown', handleOutsideClick);
+			return () => {
+				document.removeEventListener('keydown', handleKeydown);
+				document.removeEventListener('pointerdown', handleOutsideClick);
+			};
+		}
+	});
+</script>
+
+<!-- Monitor icon button — 44×44px touch target -->
+<button
+	class="chooser-icon-btn"
+	aria-label="Anzeigemodus öffnen"
+	aria-expanded={open}
+	onclick={toggle}
+>
+	<!-- Inline SVG monitor/cast icon, accent stroke per UI-SPEC -->
+	<svg
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="#e8a020"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		aria-hidden="true"
+	>
+		<!-- Monitor outline -->
+		<rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+		<!-- Stand stem -->
+		<line x1="8" y1="21" x2="16" y2="21" />
+		<line x1="12" y1="17" x2="12" y2="21" />
+	</svg>
+</button>
+
+{#if open}
+	<!-- Bottom-sheet chooser menu -->
+	<div class="chooser-menu" role="dialog" aria-label="Anzeigemodus">
+		<h2 class="chooser-heading">Anzeigemodus</h2>
+
+		<button class="chooser-action-btn" onclick={openSecondWindow}>
+			<!-- PC second window icon -->
+			<svg
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+				class="action-icon"
+			>
+				<rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+				<line x1="8" y1="21" x2="16" y2="21" />
+				<line x1="12" y1="17" x2="12" y2="21" />
+			</svg>
+			Zweites Fenster öffnen
+		</button>
+
+		{#if popupBlocked}
+			<p class="popup-blocked-msg">
+				<svg
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+					class="warn-icon"
+				>
+					<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+					<line x1="12" y1="9" x2="12" y2="13" />
+					<line x1="12" y1="17" x2="12.01" y2="17" />
+				</svg>
+				Bitte Popups für diese Seite erlauben
+			</p>
+		{/if}
+
+		<button class="chooser-action-btn" onclick={goToDisplayFullscreen}>
+			<!-- Fullscreen icon -->
+			<svg
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+				class="action-icon"
+			>
+				<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+			</svg>
+			Anzeige hier im Vollbild
+		</button>
+	</div>
+{/if}
+
+<style>
+	.chooser-icon-btn {
+		width: 44px;
+		height: 44px;
+		background: none;
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+		flex-shrink: 0;
+	}
+
+	.chooser-icon-btn:active {
+		background: rgba(232, 160, 32, 0.1);
+	}
+
+	.chooser-menu {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: #1e2027;
+		border-top: 1px solid #333;
+		border-radius: 12px 12px 0 0;
+		padding: var(--space-lg, 24px);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm, 8px);
+		z-index: 50;
+		animation: slideUp 200ms ease-out;
+	}
+
+	@keyframes slideUp {
+		from {
+			transform: translateY(100%);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0);
+			opacity: 1;
+		}
+	}
+
+	/* Landscape: inline popover instead of bottom sheet */
+	@media (orientation: landscape) {
+		.chooser-menu {
+			position: absolute;
+			bottom: auto;
+			top: 100%;
+			left: auto;
+			right: 0;
+			width: 280px;
+			border-radius: 8px;
+			border: 1px solid #444;
+			animation: fadeIn 200ms ease-out;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(-4px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+	}
+
+	.chooser-heading {
+		font-size: 20px;
+		font-weight: 600;
+		color: #f0f0f0;
+		margin: 0 0 var(--space-sm, 8px) 0;
+	}
+
+	.chooser-action-btn {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm, 8px);
+		width: 100%;
+		min-height: 48px;
+		padding: 0 var(--space-md, 16px);
+		background: #111318;
+		border: 1px solid #333;
+		border-radius: 6px;
+		color: #f0f0f0;
+		font-size: 16px;
+		font-weight: 400;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.chooser-action-btn:active {
+		background: #22242d;
+	}
+
+	.action-icon {
+		flex-shrink: 0;
+		opacity: 0.7;
+	}
+
+	.popup-blocked-msg {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 14px;
+		color: #f0f0f0;
+		margin: 0;
+		padding: var(--space-xs, 4px) var(--space-md, 16px);
+	}
+
+	.warn-icon {
+		flex-shrink: 0;
+		color: #e8a020;
+	}
+</style>

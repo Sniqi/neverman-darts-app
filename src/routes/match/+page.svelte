@@ -12,6 +12,7 @@
 	import CorrectionWindow from '../../ui/input/CorrectionWindow.svelte';
 	import DartsAtDoubleDialog from '../../ui/input/DartsAtDoubleDialog.svelte';
 	import MatchWinOverlay from '../../ui/overlays/MatchWinOverlay.svelte';
+	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
 
 	// ── Wake lock (INP-05) ─────────────────────────────────────────────────
@@ -197,6 +198,7 @@
 />
 
 <MatchWinOverlay />
+<SpectatorChooser />
 
 <style>
 	.match-view {

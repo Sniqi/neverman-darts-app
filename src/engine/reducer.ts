@@ -36,6 +36,7 @@ export function initialState(): MatchState {
 		currentVisit: [],
 		phase: 'setup',
 		eventLog: [],
+		legStartVisitIndex: {},
 	};
 }
 
@@ -98,6 +99,12 @@ function applyStartMatch(
 		return initialState();
 	}
 
+	// Initialise legStartVisitIndex to 0 for every player — first leg starts at visit index 0
+	const legStartVisitIndex: Record<string, number> = {};
+	for (const p of orderedPlayers) {
+		legStartVisitIndex[p.id] = 0;
+	}
+
 	return {
 		config: action.config,
 		players: orderedPlayers,
@@ -106,6 +113,7 @@ function applyStartMatch(
 		currentVisit: [],
 		phase: 'playing',
 		eventLog: [action], // fresh log — CR-07: START_MATCH resets the event log
+		legStartVisitIndex,
 	};
 }
 
@@ -284,6 +292,11 @@ function handleLegWinFromPlayers(
 			// Won a set but not the match — start next set
 			const totalLegsCompleted = 0; // reset after set win
 			const nextLegStarter = legStarterIndex(totalLegsCompleted, numPlayers);
+			// Record each player's visits.length as the start of the new leg
+			const newLegStartVisitIndex: Record<string, number> = {};
+			for (const p of updatedPlayers) {
+				newLegStartVisitIndex[p.id] = p.visits.length;
+			}
 			return {
 				...state,
 				players: updatedPlayers,
@@ -292,6 +305,7 @@ function handleLegWinFromPlayers(
 				currentVisit: [],
 				phase: 'playing',
 				eventLog: newLog,
+				legStartVisitIndex: newLegStartVisitIndex,
 			};
 		} else {
 			// No sets — match complete
@@ -314,6 +328,12 @@ function handleLegWinFromPlayers(
 	// Reset all players' remaining for the new leg
 	const resetPlayers = players.map(p => ({ ...p, remaining: config.startScore }));
 
+	// Record each player's visits.length as the start index of the new leg
+	const newLegStartVisitIndex: Record<string, number> = {};
+	for (const p of resetPlayers) {
+		newLegStartVisitIndex[p.id] = p.visits.length;
+	}
+
 	return {
 		...state,
 		players: resetPlayers,
@@ -322,5 +342,6 @@ function handleLegWinFromPlayers(
 		currentVisit: [],
 		phase: 'playing',
 		eventLog: newLog,
+		legStartVisitIndex: newLegStartVisitIndex,
 	};
 }

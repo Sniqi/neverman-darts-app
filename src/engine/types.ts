@@ -41,6 +41,7 @@ export interface MatchState {
 	currentVisit: DartScore[];
 	phase: 'setup' | 'playing' | 'leg-complete' | 'match-complete';
 	eventLog: MatchAction[];
+	legStartVisitIndex: Record<string, number>;
 }
 
 export type MatchAction =

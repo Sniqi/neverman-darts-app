@@ -503,6 +503,58 @@ describe('Sets (ENG-02)', () => {
 	});
 });
 
+// ── legStartVisitIndex ─────────────────────────────────────────────────────
+
+describe('legStartVisitIndex', () => {
+	it('is initialised to 0 for every player after START_MATCH', () => {
+		const s = startMatch();
+		expect(s.legStartVisitIndex).toBeDefined();
+		expect(s.legStartVisitIndex['a']).toBe(0);
+		expect(s.legStartVisitIndex['b']).toBe(0);
+	});
+
+	it('updates to each player visits.length at the start of a new leg', () => {
+		// legsToWin=2 so first leg win doesn't end match
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		});
+		// Player A accumulates 1 visit, then wins leg
+		s = numpadVisit(s, 20); // player A: 1 visit, remaining=20
+		// player B takes a turn
+		s = numpadVisit(s, 10); // player B: 1 visit, remaining=30
+		// player A wins leg
+		s = throwDart(s, 2, 10); // D10=20 → leg win (player A remaining was 20)
+		// New leg started: legStartVisitIndex[a] should equal player A's visits.length (2)
+		// and legStartVisitIndex[b] should equal player B's visits.length (1)
+		expect(s.legStartVisitIndex['a']).toBe(2);
+		expect(s.legStartVisitIndex['b']).toBe(1);
+	});
+
+	it('is reconstructed correctly by UNDO replay', () => {
+		// Test that UNDO (which replays the log) gives consistent legStartVisitIndex
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		});
+		s = numpadVisit(s, 20); // player A
+		s = numpadVisit(s, 10); // player B
+		s = throwDart(s, 2, 10); // player A wins leg
+		const afterLegWin = s.legStartVisitIndex['a'];
+		// Undo the winning dart
+		s = reduce(s, { type: 'UNDO' });
+		// After undo, legStartVisitIndex should be back to 0 (match start state)
+		expect(s.legStartVisitIndex['a']).toBe(0);
+		expect(s.legStartVisitIndex['b']).toBe(0);
+		// afterLegWin value was non-zero (2 in this scenario) — different from post-undo
+		expect(afterLegWin).not.toBe(0);
+	});
+});
+
 // ── ENG-05 / CR-07 / WR-01: Event-log reset and CONFIRM_VISIT no-op ────────
 
 describe('ENG-05: Event-log per-match semantics (CR-07, WR-01)', () => {

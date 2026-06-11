@@ -83,11 +83,21 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Plans:** 4 plans
 **UI hint**: yes
-
 Plans:
+**Wave 1**
+
 - [ ] 02-01-PLAN.md — Engine data foundation: legStartVisitIndex + averages.ts, DisplayStore subscriber, failing sync e2e baseline (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 02-02-PLAN.md — MVP slice: BroadcastChannel publisher + /display TV grid (PlayerPanel, MatchHeader, IdleScreen), live sync (Wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 02-03-PLAN.md — Per-dart behavior + states: VisitLine, checkout route, BUST flash, LegWinBanner, MatchWinDisplay (Wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 02-04-PLAN.md — Launch + control: SpectatorChooser (PC window/tablet fullscreen), fullscreen toggle/exit, e2e green, human review (Wave 4)
 
 ### Phase 3: Persistence & Data

@@ -665,22 +665,27 @@ function completedVisitLine(visit: Visit, startScore: number): string {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Visit total storage for numpad display (Pitfall 5 + Example 3)**
+*All three questions were resolved during planning; resolutions are reflected in the Plan 01–04 tasks.*
+
+1. **Visit total storage for numpad display (Pitfall 5 + Example 3)** — **(RESOLVED)**
    - What we know: `Visit.darts` is empty for numpad entries; total cannot be recomputed from `Visit` alone
    - What's unclear: Should Phase 2 add a `total` field to the `Visit` type, or compute it from `startScore - player.remaining`?
    - Recommendation: Add `total?: number` to `Visit` type for numpad visits only. This is a small backward-compatible change to `types.ts`. Alternatively, compute from `eventLog` entries — but that's more complex. The planner should decide; it affects the `Visit` type in `types.ts` (frozen field caveat: adding optional field is safe).
+   - **Resolution:** Resolved in **Plan 02-03 (Task 1)** via the `completedTotal` prop on `VisitLine.svelte` — the numpad visit total is computed at the panel/parent layer (`config.startScore - player.remaining` delta basis per Example 3) and passed into the component, rather than mutating the frozen `Visit` type. No change to the `Visit` type was needed.
 
-2. **Match average in Phase 2 (Pitfall 5)**
+2. **Match average in Phase 2 (Pitfall 5)** — **(RESOLVED)**
    - What we know: `player.visits` spans all legs; total darts thrown and total scored can both be derived
    - What's unclear: D-04 says "leg average + match average" — is match average required for Phase 2 or deferred to Phase 4?
    - Recommendation: Implement both. Match average is straightforward with all visits available: `computeAverage(player.visits, config.startScore, player.remaining)`. No extra state needed. The concern about leg average needing cross-leg tracking is the harder part; match average is simpler.
+   - **Resolution:** Resolved as "implement both." **Plan 02-01 (Task 1)** ships `legAverage` and `matchAverage` in `averages.ts`; **Plan 02-02 (Task 2)** renders both "Ø Leg" and "Ø Match" per panel (D-04). Match average is required for Phase 2, not deferred to Phase 4.
 
-3. **`legStartVisitCounts` for leg average (Pitfall 5)**
+3. **`legStartVisitCounts` for leg average (Pitfall 5)** — **(RESOLVED)**
    - What we know: Leg average requires knowing which visits are in the current leg
    - What's unclear: Best way to track this given the current reducer design
    - Recommendation: Add `legStartVisitIndex: Record<string, number>` to `MatchState`, set in `handleLegWinFromPlayers` to `updatedPlayer.visits.length` at the start of each new leg. This is a one-line reducer change and enables both Phase 2 and Phase 4 stat computation.
+   - **Resolution:** Resolved via `legStartVisitIndex: Record<string, number>` on `MatchState` in **Plan 02-01 (Task 1)** — initialised to `0` per player in `applyStartMatch` and reset to each player's `visits.length` at every new leg/set start in `handleLegWinFromPlayers`. Leg average uses `visits.slice(legStartVisitIndex[id])`; match average uses all visits. (The earlier Pattern 4 / Pitfall 5 "defer Ø Match to Phase 4" framing is superseded by this resolution — both averages ship in Phase 2.)
 
 ---
 

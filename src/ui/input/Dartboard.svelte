@@ -139,12 +139,14 @@
 		const { r, angleDeg } = screenToBoard(e, svgEl);
 		const dart = classifyHit(r, angleDeg);
 
-		// Flash the region that was hit
+		// Flash the region that was hit.
+		// classifyHit returns {multiplier:2, segment:25} for inner bull (50 pts)
+		// and {multiplier:1, segment:25} for outer bull (25 pts); segment 50 is never produced.
 		if (dart.segment === 0) {
 			flashKey = 'miss';
-		} else if (dart.segment === 50) {
+		} else if (dart.multiplier === 2 && dart.segment === 25) {
 			flashKey = 'inner-bull';
-		} else if (dart.segment === 25) {
+		} else if (dart.multiplier === 1 && dart.segment === 25) {
 			flashKey = 'outer-bull';
 		} else {
 			const prefix = dart.multiplier === 3 ? 'tr' : dart.multiplier === 2 ? 'db' : (r < R_INNER_SINGLE ? 'is' : 'os');

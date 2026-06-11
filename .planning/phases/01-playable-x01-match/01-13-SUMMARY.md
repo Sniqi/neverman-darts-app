@@ -108,6 +108,15 @@ None — no new attack surface introduced. Both edits are pure client-side UI lo
 
 Phase 01 gap closure complete: all 5 must-have truths from 01-VERIFICATION.md are now satisfied. The phase is ready for final verification sign-off and Phase 02 planning.
 
+## Self-Check: PASSED
+
+- `src/routes/match/+page.svelte` — FOUND
+- `src/ui/input/Dartboard.svelte` — FOUND
+- `01-13-SUMMARY.md` — FOUND
+- Task commit `914d39f` — FOUND (fix(01-13): suppress darts-at-double dialog for match-winning numpad visits)
+- Task commit `1d8fa46` — FOUND (fix(01-13): flash inner-bull region on inner-bull taps)
+- Plan metadata commit `97799d4` — FOUND (docs(01-13): complete gap closure plan)
+
 ---
 *Phase: 01-playable-x01-match*
 *Completed: 2026-06-11*

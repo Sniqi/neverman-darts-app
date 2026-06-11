@@ -81,7 +81,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The spectator view is readable on a 27" monitor from 3 m (large typography, high contrast, dark mode) with correct layouts for 1–4 players
   4. The spectator window updates live on every dart entry and automatically re-syncs its state when closed and reopened or reloaded mid-match
 
-**Plans:** 4/4 plans complete
+**Plans:** 5 plans (4 complete + 1 gap closure)
 **UI hint**: yes
 Plans:
 **Wave 1**
@@ -99,6 +99,10 @@ Plans:
 **Wave 4** *(blocked on Wave 3 completion)*
 
 - [x] 02-04-PLAN.md — Launch + control: SpectatorChooser (PC window/tablet fullscreen), fullscreen toggle/exit, e2e green, human review (Wave 4)
+
+**Wave 5 — Gap closure (verification 2026-06-11)** *(closes the 2 blockers + WR-02 from 02-VERIFICATION.md: dead live BroadcastChannel sync + infinite leg-win effect loop + popup-blocked false positive)*
+
+- [ ] 02-05-PLAN.md — Restore live sync ($state.snapshot publisher, CR-01/DISP-05), fix infinite $effect loop (CR-02), fix SpectatorChooser popup-blocked false positive (WR-02/DISP-01), add live no-reload e2e test (Wave 5)
 
 ### Phase 3: Persistence & Data
 
@@ -169,7 +173,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
-| 2. Spectator Display | 4/4 | Complete   | 2026-06-11 |
+| 2. Spectator Display | 4/5 | Gap closure | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |

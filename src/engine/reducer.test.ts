@@ -118,6 +118,41 @@ describe('START_MATCH', () => {
 			expect(p.visits).toHaveLength(0);
 		}
 	});
+
+	it('empty players/order returns phase=setup with no players (CR-05)', () => {
+		const s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: config501Double,
+			players: [],
+			order: [],
+		});
+		expect(s.phase).toBe('setup');
+		expect(s.players).toHaveLength(0);
+	});
+
+	it('order with unmatched id drops that id; all unmatched returns phase=setup (CR-05)', () => {
+		// All ids in order are absent from players → empty result → setup phase
+		const s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: config501Double,
+			players: [playerA],
+			order: ['nonexistent-id'],
+		});
+		expect(s.phase).toBe('setup');
+		expect(s.players).toHaveLength(0);
+	});
+
+	it('order with one matched and one unmatched id drops the unmatched id only (CR-05)', () => {
+		const s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: config501Double,
+			players: [playerA, playerB],
+			order: ['a', 'nonexistent-id'],
+		});
+		expect(s.phase).toBe('playing');
+		expect(s.players).toHaveLength(1);
+		expect(s.players[0].id).toBe('a');
+	});
 });
 
 // ── DART_THROWN — basic scoring ────────────────────────────────────────────

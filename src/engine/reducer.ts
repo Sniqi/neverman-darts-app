@@ -76,10 +76,12 @@ export function reduce(state: MatchState, action: MatchAction): MatchState {
 function applyStartMatch(
 	action: Extract<MatchAction, { type: 'START_MATCH' }>
 ): MatchState {
-	// Build players in the order specified by `action.order`
-	const orderedPlayers: PlayerState[] = action.order.map(id => {
-		const p = action.players.find(pl => pl.id === id)!;
-		return {
+	// Build players in the order specified by `action.order`.
+	// Drop any order id that has no matching entry in action.players (defense in depth).
+	const orderedPlayers: PlayerState[] = action.order
+		.map(id => action.players.find(pl => pl.id === id))
+		.filter((p): p is NonNullable<typeof p> => p !== undefined)
+		.map(p => ({
 			id: p.id,
 			name: p.name,
 			isGuest: p.isGuest,
@@ -87,8 +89,14 @@ function applyStartMatch(
 			legsWon: 0,
 			setsWon: 0,
 			visits: [],
-		};
-	});
+		}));
+
+	// Guard: empty player list must not produce a playing state (CR-05).
+	// The UI guard in BullOffOrder.svelte is the primary defence; this prevents
+	// the 0-player crash class entirely (state machine invariant).
+	if (orderedPlayers.length === 0) {
+		return initialState();
+	}
 
 	return {
 		config: action.config,

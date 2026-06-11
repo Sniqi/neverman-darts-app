@@ -120,6 +120,11 @@
 
 	// ── Confirm ──────────────────────────────────────────────────────────────
 	function confirmOrder() {
+		if (order.length === 0) {
+			goto(`${base}/setup`);
+			return;
+		}
+
 		const playerOrder = order.map((p) => p.id);
 		const matchPlayers = order.map((p) => ({
 			id: p.id,
@@ -170,7 +175,7 @@
 		{/each}
 	</div>
 
-	<button class="confirm-btn" onclick={confirmOrder}>
+	<button class="confirm-btn" onclick={confirmOrder} disabled={order.length === 0}>
 		Spielreihenfolge bestätigen
 	</button>
 </div>

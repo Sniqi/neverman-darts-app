@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-06-11T17:31:58.328Z"
+stopped_at: Completed 02-05 gap-closure plan — live sync, effect loop, popup fix + e2e guard
+last_updated: "2026-06-11T18:40:22.679Z"
 last_activity: 2026-06-11 -- Phase 02 execution started
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 17
-  completed_plans: 16
-  percent: 17
+  completed_phases: 2
+  total_plans: 18
+  completed_plans: 18
+  percent: 33
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 02 (spectator-display) — EXECUTING
-Plan: 4 of 4
+Plan: 2 of 5
 Status: Ready to execute
 Last activity: 2026-06-11 -- Phase 02 execution started
 
@@ -67,6 +67,7 @@ Progress: [█████████░] 89%
 | Phase 01-playable-x01-match P13 | 6min | 2 tasks | 2 files |
 | Phase 02-spectator-display P01 | 6min | 2 tasks | 8 files |
 | Phase 02-spectator-display P03 | 8min | 2 tasks | 7 files |
+| Phase 02-spectator-display P05 | 5min | 4 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Flash key keyed on multiplier not segment: multiplier===2 && segment===25 → inner-bull; segment===50 branch was dead code since 01-10 (01-13)
 - [Phase ?]: [Phase 02-01]: legStartVisitIndex added to MatchState
 - [Phase ?]: [Phase 02-01]: DisplayStore uses vi.stubGlobal mocks for BroadcastChannel/localStorage in node env; connect() returns cleanup fn for Svelte $effect teardown
+- [Phase ?]: WR-02 option (a): drop noopener features string from window.open, null win.opener manually — preserves popup-block detection and reverse-tabnabbing guard (T-02-06)
 
 ### Pending Todos
 
@@ -118,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-11T16:20:32.509Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-spectator-display/02-UI-SPEC.md
+Last session: 2026-06-11T18:40:22.673Z
+Stopped at: Completed 02-05 gap-closure plan — live sync, effect loop, popup fix + e2e guard
+Resume file: None

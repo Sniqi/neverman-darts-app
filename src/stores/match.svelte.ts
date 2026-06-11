@@ -29,7 +29,7 @@ export class MatchStore {
 		// Publish to spectator display — non-fatal; BroadcastChannel unavailable in SSR/private mode
 		try {
 			const ch = new BroadcastChannel(BC_CHANNEL);
-			ch.postMessage(this.state);
+			ch.postMessage($state.snapshot(this.state));
 			ch.close();
 		} catch {
 			// Silently ignore — match play must continue uninterrupted

@@ -14,7 +14,7 @@ Starting from an empty repo, six phases deliver a fully installable darts scorin
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Playable X01 Match** - Complete end-to-end X01 match playable in-browser with touch input, undo, checkout suggestions, and match setup (completed 2026-06-10)
-- [ ] **Phase 2: Spectator Display** - Live second-window and in-app fullscreen view showing all scores, readable at 3 m
+- [x] **Phase 2: Spectator Display** - Live second-window and in-app fullscreen view showing all scores, readable at 3 m (completed 2026-06-11)
 - [ ] **Phase 3: Persistence & Data** - Match survives reload/crash; player profiles and match history stored; JSON export/import
 - [ ] **Phase 4: Statistics & Achievements** - Full per-match and lifetime stats; personal records detected and celebrated live
 - [ ] **Phase 5: Audio & Auto-Pause** - Caller voice announces scores; sound effects on 180s and records; auto-pause countdown between legs
@@ -81,7 +81,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The spectator view is readable on a 27" monitor from 3 m (large typography, high contrast, dark mode) with correct layouts for 1–4 players
   4. The spectator window updates live on every dart entry and automatically re-syncs its state when closed and reopened or reloaded mid-match
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 **UI hint**: yes
 Plans:
 **Wave 1**
@@ -98,7 +98,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 02-04-PLAN.md — Launch + control: SpectatorChooser (PC window/tablet fullscreen), fullscreen toggle/exit, e2e green, human review (Wave 4)
+- [x] 02-04-PLAN.md — Launch + control: SpectatorChooser (PC window/tablet fullscreen), fullscreen toggle/exit, e2e green, human review (Wave 4)
 
 ### Phase 3: Persistence & Data
 
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
-| 2. Spectator Display | 3/4 | In Progress|  |
+| 2. Spectator Display | 4/4 | Complete   | 2026-06-11 |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |

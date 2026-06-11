@@ -31,8 +31,8 @@
 	// and cleared when the first dart of the next leg is thrown (currentVisit.length > 0).
 	let legWinMessage: string | null = $state(null);
 	let legWinSubtitle: string | null = $state(null);
-	let prevLegsWon: number[] = $state([]);
-	let prevSetsWon: number[] = $state([]);
+	let prevLegsWon: number[] = [];
+	let prevSetsWon: number[] = [];
 
 	$effect(() => {
 		const s = matchState;

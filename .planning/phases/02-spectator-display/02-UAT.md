@@ -32,10 +32,12 @@ evidence: "Clicked monitor icon → 'Anzeigemodus' dialog opened with both optio
 
 ### 4. Tablet fullscreen prompt shows during an active match (DISP-02 implementation gap)
 expected: After navigating to /display via "Anzeige hier im Vollbild" while a match is in progress (matchState.phase === 'playing'), the "Vollbild aktivieren" prompt OR the PC toggle in the top-right is sufficient to enter fullscreen. Confirm the user can reach fullscreen without returning to the idle screen.
-result: issue
-reported: "User judgment: the dedicated 'Vollbild aktivieren' prompt should ALSO appear during an active match, not only in idle/setup. Currently a tablet user mid-match sees only the small top-right PC toggle icon."
+result: pass
+resolved_by: "02-06 (commit 3d5a77b)"
+verified_by: automated (Playwright real-browser, 3-scenario re-verification during gaps-only re-run)
+evidence: "After 02-06 fix, on a live 501 match (phase=playing): TABLET path — chooser 'Anzeige hier im Vollbild' navigates to /display?fullscreen=1 and the bottom-center '.fullscreen-prompt' ('Vollbild aktivieren') now renders and is visible over the live scoreboard. PC NO-REGRESSION — /display with no flag (same playing match) does NOT render '.fullscreen-prompt' (only the top-right '.fullscreen-toggle' icon). IDLE UNCHANGED — /display with no match shows 'Warte auf Match…' + the prompt. svelte-check clean; 221 unit + 48 browser tests pass; production build green. Caveat: the fullscreen-ENTRY on tapping the prompt was not exercised under headless automation (Fullscreen API requires a real user gesture); only the render condition was widened — the prompt's onclick=activateFullscreen wiring is unchanged."
 severity: minor
-dom_facts: "Confirmed via DOM inspection during an active match: bottom '.fullscreen-prompt' (text 'Vollbild aktivieren') is NOT rendered; top-right '.fullscreen-toggle' icon IS present (aria-label 'Vollbild aktivieren'). In idle/setup state the bottom prompt DOES render. Root cause is the render condition at display/+page.svelte line 170."
+original_report: "User judgment: the dedicated 'Vollbild aktivieren' prompt should ALSO appear during an active match, not only in idle/setup. Tablet user mid-match previously saw only the small top-right PC toggle icon. Root cause was the render condition at display/+page.svelte that gated the prompt on idle/setup only."
 
 ### 5. End-of-phase spectator display visual review (Plan 02-04 Task 3, all 8 steps)
 expected: |
@@ -54,8 +56,8 @@ evidence: "Step 1 (TV grid equal-split panels) ✓. Step 2 (active player distin
 ## Summary
 
 total: 5
-passed: 4
-issues: 1
+passed: 5
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
@@ -63,14 +65,16 @@ blocked: 0
 ## Gaps
 
 - truth: "On tablet, navigating to /display during an active match presents a clear, prominent way to enter fullscreen (DISP-02)."
-  status: failed
-  reason: "User reported: the dedicated 'Vollbild aktivieren' prompt is hidden during an active match (only the small top-right PC toggle is available); per user judgment the prompt should also appear during an active match."
+  status: resolved
+  resolved_by: "02-06 (commit 3d5a77b)"
+  reason: "User reported: the dedicated 'Vollbild aktivieren' prompt was hidden during an active match (only the small top-right PC toggle was available); per user judgment the prompt should also appear during an active match."
+  resolution: "02-06 widened the .fullscreen-prompt render condition to `!isFullscreen && (matchState === null || matchState.phase === 'setup' || tabletFullscreenIntent)`, where tabletFullscreenIntent is read once at mount from the ?fullscreen=1 flag that SpectatorChooser.goToDisplayFullscreen() now sets. The PC openSecondWindow() path was left unchanged (no flag), so the PC second window does not show the prompt — no regression. Re-verified in a real browser across all 3 scenarios (tablet shows prompt, PC does not, idle unchanged)."
   severity: minor
   test: 4
-  root_cause: "src/routes/display/+page.svelte line 170 gates the .fullscreen-prompt on `!isFullscreen && (matchState === null || matchState.phase === 'setup')`, so the prominent prompt never renders while phase === 'playing'."
+  root_cause: "src/routes/display/+page.svelte gated the .fullscreen-prompt on `!isFullscreen && (matchState === null || matchState.phase === 'setup')`, so the prominent prompt never rendered while phase === 'playing'."
   artifacts:
     - path: "src/routes/display/+page.svelte"
-      issue: "Fullscreen prompt render condition excludes active match"
-  missing:
-    - "Widen the .fullscreen-prompt render condition so it also appears during an active match (e.g. gate on !isFullscreen), without regressing the PC second-window experience (prompt should not obstruct the live scoreboard on a desktop second window)."
+      issue: "Fullscreen prompt render condition excluded active match — RESOLVED in 02-06"
+    - path: "src/ui/display/SpectatorChooser.svelte"
+      issue: "goToDisplayFullscreen() now tags tablet-fullscreen intent via ?fullscreen=1 — added in 02-06"
   debug_session: ""

@@ -1,80 +1,44 @@
 ---
 phase: 01-playable-x01-match
-verified: 2026-06-11T02:40:00Z
-status: gaps_found
-score: 4/5 must-haves verified
+verified: 2026-06-11T14:10:00Z
+status: human_needed
+score: 5/5 must-haves verified
 overrides_applied: 0
 re_verification:
   previous_status: gaps_found
-  previous_score: 2/5
+  previous_score: 4/5
   gaps_closed:
-    - "Inner bull encoding fixed to {multiplier:2, segment:25} = 50 pts; bust on Bull finish from remaining=50 eliminated (CR-01)"
-    - "CorrectionWindow auto-dismiss fires once via untrack(() => startTimer()); effect runs only on visibility change, not every rAF frame (CR-04)"
-    - "CorrectionWindow paused state escapable via 'Fertig' button and unconditional outside-click handler (CR-03)"
-    - "ScorePanel active player remaining bound to isActive ? matchStore.remaining : player.remaining; live mid-visit updates agree with CheckoutSuggestion (CR-02)"
-    - "BullOffOrder confirmOrder guards order.length === 0 with redirect to /setup; confirm button disabled when empty; reducer returns initialState() for empty player list (CR-05)"
-  gaps_remaining:
-    - "E2E happy-path spec fails: handleNumpadVisit shows darts-at-double dialog for ALL finishing visits including match-winning; spec never answers dialog; win-overlay assertion times out (CR-01 from 01-REVIEW.md)"
-  regressions:
-    - "Dartboard.svelte flash logic: dead segment===50 branch left behind by 01-10 encoding fix; inner-bull taps flash outer bull instead of inner bull (WR-02 from 01-REVIEW.md)"
-gaps:
-  - truth: "Player can enter each dart by tapping the on-screen dartboard (all segments reliably hittable by finger) or by typing a visit total on the numeric keypad; the visit auto-finalizes after 3 darts, a bust, or a leg win with a correction window"
-    status: partial
-    reason: >
-      The E2E happy-path spec (e2e/full-match-flow.spec.ts) is RED. handleNumpadVisit
-      in match/+page.svelte shows the darts-at-double dialog for ANY finishing visit where
-      prevRemaining === total — there is no distinction between leg-winning and
-      match-winning visits. The spec enters the final 16 (D8, match-winning in a 1-leg
-      game) and then asserts the win overlay without ever clicking a dialog option. Because
-      the NUMPAD_VISIT dispatch is deferred until the dialog confirms, the win overlay
-      never renders and the assertion times out (confirmed by running the spec:
-      'getByRole heading /gewinnt!/ — element(s) not found', exit code 1).
-      The spec comment on line 96-97 claims 'The darts-at-double dialog is suppressed for
-      match-winning visits (win overlay takes over)' — this behavior does NOT exist in the
-      codebase. The dialog is never suppressed for any finishing visit.
-      Unit tests and unit-test-covered functionality are unaffected — the scoring engine
-      and CorrectionWindow are correct. This gap is isolated to the E2E spec and the
-      dialog suppression missing from match/+page.svelte.
-    artifacts:
-      - path: "e2e/full-match-flow.spec.ts"
-        issue: >
-          Line 96-97: stale comment claiming dialog is suppressed for match-winning visits.
-          Lines 94-100: enters '16', presses Bestätigen, then immediately asserts win overlay
-          without clicking a dialog option. The dialog intercepts and blocks the win overlay.
-      - path: "src/routes/match/+page.svelte"
-        issue: >
-          handleNumpadVisit (lines 103-117): isFinish = prevRemaining === total regardless of
-          whether the win is a leg-win or match-win. showDartsAtDouble = true for all finishes.
-          No suppression logic for match-winning visits exists anywhere in the file.
-    missing:
-      - "Option A (preferred): update the E2E spec to click a dialog option after the final Bestätigen before asserting the win overlay — e.g. await page.getByRole('button', { name: '1 Dart' }).click()"
-      - "Option B (alternative): add match-win suppression to handleNumpadVisit — detect that dispatch would produce phase=match-complete and skip the dialog (dispatch immediately with dartsAtDouble:0), then remove the stale comment"
+    - "handleNumpadVisit now uses a side-effect-free trial reduce to detect prospective.phase === 'match-complete'; match-winning numpad finish dispatches immediately with dartsAtDouble:0; MatchWinOverlay owns the screen unobstructed (CR-01 from 01-REVIEW.md)"
+    - "Dartboard.svelte flash logic: dead dart.segment === 50 branch removed; inner-bull taps now set flashKey='inner-bull' (multiplier===2 && segment===25); outer-bull taps set flashKey='outer-bull' (multiplier===1 && segment===25) (WR-02 from 01-REVIEW.md)"
+    - "E2E happy-path spec: npx playwright test e2e/full-match-flow.spec.ts exits 0 (1 passed, 1.4s); win overlay heading /gewinnt!/ and Neues Spiel button both visible without any dialog click"
+  gaps_remaining: []
+  regressions: []
 human_verification:
-  - test: "Start a 2-player match with 2 legs to win. Score down to 16 remaining for player 1. Enter 16 on the numpad and press Bestätigen. Observe: darts-at-double dialog appears. Press '1 Dart'. Observe: correction window appears briefly then dismisses. Score player 2 down similarly. Repeat until someone reaches 2 legs."
-    expected: "Full 2-leg 2-player match completes end-to-end — match win overlay appears with player name and Neues Spiel button. Correction window appears and auto-dismisses after each visit. Mid-visit ScorePanel score updates live after each board dart."
-    why_human: "Multi-leg match flow through the darts-at-double dialog requires live browser interaction. The E2E spec only covers a 1-leg game and currently fails."
-  - test: "Start a match with any player. After the first 3-dart board visit, tap 'Korrigieren' in the correction window. Then tap 'Fertig'. Observe the window dismisses and the next player's board is reachable."
-    expected: "Correction window dismisses and the board is accessible for the next player. (Unit tests cover this but real browser test confirms the interaction post-plan-11 fix.)"
-    why_human: "Paused-state escape path in a real browser interaction; covered by unit tests but human confirmation needed after the CR-03 fix."
-  - test: "Start a solo 501 match. Switch to board mode. Score down to exactly 50. Tap the inner bull (center circle). Observe the outcome."
-    expected: "Win overlay appears (leg won). Score must reach 0, not -50. Inner bull must flash the inner-bull region (amber circle), not the outer bull ring. (Unit tests confirm the 50-point scoring; visual flash requires browser observation.)"
-    why_human: "WR-02 (Dartboard flash): inner-bull taps produce flashKey='outer-bull' because the dead segment===50 branch precedes the segment===25 check. The score is correct (50 pts, valid finish) but the visual feedback is wrong. Requires browser observation to confirm the flash region."
+  - test: "Start a 2-player match with 2 legs to win. Score player 1 down to a finishing numpad value (e.g. 32 for D16) and enter it. Observe: the darts-at-double dialog appears (leg win, but match continues). Click a dialog option (e.g. '1 Dart'). Observe the correction window briefly appears then auto-dismisses. Continue until one player wins both legs."
+    expected: "Full 2-leg match completes end-to-end. Darts-at-double dialog appears for each leg-winning numpad visit that does NOT end the match. Win overlay appears with player name and Neues Spiel button when the final leg is won. Correction window appears and auto-dismisses (~2.5s) after each non-winning visit."
+    why_human: "The E2E spec covers a 1-leg game only. Multi-leg flow — dialog on a continuing leg win, then win overlay on the match-winning leg — requires live browser interaction. Unit tests cover INP-03 correctness; this test confirms the full UI flow end-to-end."
+  - test: "Start a match. Complete one 3-dart board visit. When the correction window appears, tap 'Korrigieren'. Then tap 'Fertig'."
+    expected: "Correction window dismisses immediately; the next player's board is accessible. No overlay lock."
+    why_human: "Covered by unit tests (CR-03) but real-browser confirmation ensures the Svelte lifecycle behaves correctly in production. The paused-state 'Fertig' button path was added in plan 01-11."
+  - test: "Score a player down to exactly 50 remaining. Tap the inner bull (amber center circle). Observe which region flashes."
+    expected: "The amber center circle (inner-bull region) flashes briefly. The score correctly deducts 50. If remaining was exactly 50, the win overlay appears."
+    why_human: "The Dartboard flash logic fix (WR-02, plan 01-13) can only be confirmed visually in a real browser. The source code change is verified (multiplier===2 && segment===25 gates flashKey='inner-bull') but the correct visual behavior requires observation."
 ---
 
-# Phase 1: Playable X01 Match — Re-Verification Report (Round 3)
+# Phase 1: Playable X01 Match — Re-Verification Report (Round 4)
 
 **Phase Goal:** A full X01 match can be played from setup to finish in-browser by 1–4 players with touch input, correct bust handling, undo, and checkout suggestions
-**Verified:** 2026-06-11T02:40:00Z
-**Status:** gaps_found
-**Re-verification:** Yes — after gap closure plans 01-10 (inner-bull encoding), 01-11 (CorrectionWindow timer + paused escape), 01-12 (live score, 0-player guard, darts-at-double)
+**Verified:** 2026-06-11T14:10:00Z
+**Status:** human_needed
+**Re-verification:** Yes — after gap closure plan 01-13 (match-win dialog suppression + inner-bull flash fix, commits 914d39f and 1d8fa46)
 
 ---
 
 ## Previous Verification Summary
 
-Previous verification (2026-06-11T00:00:00Z): status `gaps_found`, score `2/5`. Five new critical defects were identified from the wave 5 gap-closure plans.
+Previous verification (2026-06-11T02:40:00Z): status `gaps_found`, score `4/5`. One blocker gap remained: `handleNumpadVisit` showed the darts-at-double dialog for ALL numpad finishing visits including match-winning ones; the E2E happy-path spec failed (exit code 1, win overlay assertion timed out). One warning remained: inner-bull taps flashed the outer-bull ring due to dead `segment===50` branch.
 
-**Four of the five previous gaps were resolved.** One new gap surfaced from the code review (01-REVIEW.md CR-01): the darts-at-double dialog now intercepts all numpad finishes including match-winning ones, and the E2E spec was never updated to handle the dialog — it fails at the win-overlay assertion.
+**Both the gap and the warning are now closed.** Plan 01-13 (commits 914d39f, 1d8fa46) restored match-win dialog suppression via a trial reduce and fixed the flash logic to key off multiplier. The E2E spec passes (exit code 0, 1.4s). All 5 must-have truths are now verified. Three human verification items remain for real-browser confirmation.
 
 ---
 
@@ -84,25 +48,13 @@ Previous verification (2026-06-11T00:00:00Z): status `gaps_found`, score `2/5`. 
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|---------|
-| 1 | Player can configure a 301/401/501 match with Single Out or Double Out, set the number of legs/sets, add 1–4 named or guest players, and enter the bull-off result to set starting order | VERIFIED | BullOffOrder.svelte line 122-126: empty-order guard redirects to /setup. Confirm button `disabled={order.length === 0}` at line 178. reducer.ts lines 94-99: applyStartMatch returns initialState() for empty player list. reducer.test.ts lines 122-155: three CR-05 tests pass. MatchSetup, PlayerPicker, ProfileManager all wired and tested. |
-| 2 | Player can enter each dart by tapping the on-screen dartboard (all segments reliably hittable by finger) or by typing a visit total on the numeric keypad; the visit auto-finalizes after 3 darts, a bust, or a leg win with a correction window | PARTIAL | Board tap, polar-math hit detection, numpad, and CorrectionWindow are all correct in isolation. Unit tests: 162/162 pass including 6 real-timer CorrectionWindow tests. HOWEVER: E2E spec fails (confirmed, exit code 1). handleNumpadVisit defers all finishing NUMPAD_VISITs behind the darts-at-double dialog with no match-win suppression; the spec never clicks the dialog; win overlay assertion times out. This is the only gap blocking goal achievement. |
-| 3 | A bust (all three conditions: score < 0, reaching 1 on double-out, finishing on non-double) reverts the full visit and passes the turn immediately | VERIFIED | board.ts line 44: `{ multiplier: 2, segment: 25 }` — 2×25=50 pts. bust.ts line 32: `multiplier === 2` only, no dead segment===50 branch. isBust(50, {m:2,s:25}, 'double') returns false (valid finish). bust.test.ts and board.test.ts both updated and passing. Checkout routes 50/161/164/167/170 via 'Bull' now terminate correctly. |
-| 4 | Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts | VERIFIED | reducer.ts: UNDO = reduce(initialState(), ...log.slice(0,-1)). START_MATCH resets log to [action] (eventLog: [action] at line 108). CONFIRM_VISIT returns state unchanged (line 58). reducer.test.ts: undo-through-leg-win test passes. Full 162-test suite green. |
-| 5 | Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match | VERIFIED | ScorePanel.svelte line 16: `{isActive ? matchStore.remaining : player.remaining}`. matchStore.remaining getter subtracts currentVisit running total. CheckoutSuggestion consumes matchStore.suggestion (which uses live remaining). match/+page.svelte: acquireWakeLock on mount + visibilitychange handler. Bull-route checkout suggestions (170/167/164/161/50) no longer cause busts. |
+| 1 | Player can configure a 301/401/501 match with Single Out or Double Out, set legs/sets, add 1–4 named or guest players, and enter the bull-off result to set starting order | VERIFIED | BullOffOrder.svelte: empty-order guard redirects to /setup (lines 122-126); confirm button `disabled={order.length === 0}` (line 178). reducer.ts lines 94-99: returns initialState() for empty player list. MatchSetup, PlayerPicker, ProfileManager all wired and unit-tested. |
+| 2 | Player can enter each dart by tapping the on-screen dartboard or by typing a visit total on the numeric keypad; the visit auto-finalizes after 3 darts, a bust, or a leg win with a correction window | VERIFIED | Board tap (polar-math hit detection), numpad, and CorrectionWindow correct. match/+page.svelte line 6: `import { reduce }` from reducer; lines 116-124: trial reduce detects match-complete and dispatches immediately (no dialog); leg-winning non-match-ending finish still defers to dialog. E2E spec: `npx playwright test e2e/full-match-flow.spec.ts` — 1 passed (1.4s, exit 0). Unit suite: 162/162 pass. |
+| 3 | A bust (score < 0, reaching 1 on double-out, finishing on non-double) reverts the full visit and passes the turn immediately | VERIFIED | board.ts line 44: `{ multiplier: 2, segment: 25 }` — 2×25=50 pts. bust.ts line 32: `multiplier === 2` only check. isBust(50, {m:2,s:25}, 'double') returns false. bust.test.ts and board.test.ts updated and passing. |
+| 4 | Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts | VERIFIED | reducer.ts: UNDO = reduce(initialState(), ...log.slice(0,-1)). START_MATCH resets log to [action]. CONFIRM_VISIT not in log. reducer.test.ts: undo-through-leg-win test passes. 162-test suite green. |
+| 5 | Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match | VERIFIED | ScorePanel.svelte line 16: `{isActive ? matchStore.remaining : player.remaining}`. matchStore.remaining getter subtracts currentVisit running total. CheckoutSuggestion consumes matchStore.suggestion (live remaining). match/+page.svelte: acquireWakeLock on mount + visibilitychange handler. Bull-route checkout suggestions (170/167/164/161/50) correct. |
 
-**Score:** 4/5 truths verified (Truth 2 partially verified — code is correct, E2E spec is red)
-
----
-
-### Gaps Closed Since Previous Verification
-
-| Gap (Previous) | Resolution |
-|----------------|-----------|
-| Inner bull scores 100 instead of 50 (CR-01 new) | FIXED: board.ts line 44 returns `{multiplier:2,segment:25}`; 2×25=50 at every scoring site |
-| CorrectionWindow $effect reads elapsed making auto-dismiss never fire (CR-04 new) | FIXED: `untrack(() => startTimer())` at line 83; effect runs once per visibility change |
-| CorrectionWindow 'Korrigieren' paused state is inescapable (CR-03 new) | FIXED: `handleOutsideClick` unconditional at line 72; 'Fertig' button in paused branch at line 123 |
-| ScorePanel renders player.remaining not matchStore.remaining — stale mid-visit (CR-02 new) | FIXED: line 16 reads `{isActive ? matchStore.remaining : player.remaining}` |
-| BullOffOrder has no 0-player guard (CR-05 new) | FIXED: confirmOrder redirects to /setup on empty order; button disabled; reducer returns initialState() |
+**Score:** 5/5 truths verified
 
 ---
 
@@ -110,63 +62,53 @@ Previous verification (2026-06-11T00:00:00Z): status `gaps_found`, score `2/5`. 
 
 | Artifact | Status | Details |
 |----------|--------|---------|
-| `src/engine/board.ts` | VERIFIED | classifyHit inner-bull returns `{multiplier:2,segment:25}`; ring-boundary comment updated |
-| `src/engine/bust.ts` | VERIFIED | Double-out finish check is `multiplier===2` only; no dead segment===50 branch; isBust(50,{m:2,s:25},'double') = false |
-| `src/engine/board.test.ts` | VERIFIED | Assertions updated to `{multiplier:2,segment:25}` |
-| `src/engine/bust.test.ts` | VERIFIED | 50-point bull test present; 100-point bug test removed |
-| `src/ui/input/VisitStrip.svelte` | VERIFIED | formatDart: `multiplier===2 && segment===25` → 'Bull'; `multiplier===1 && segment===25` → 'Outer Bull'; no segment===50 branch |
-| `src/ui/input/CorrectionWindow.svelte` | VERIFIED | `untrack` imported; `$effect` calls `untrack(() => startTimer())`; `handleOutsideClick` unconditional; 'Fertig' button in paused branch; formatDart updated for 01-10 encoding |
-| `src/ui/input/CorrectionWindow.test.ts` | VERIFIED | 6 tests pass: render, real-timer auto-dismiss (2503ms, exactly 1 call), bust label, not-visible, Fertig button, outside-click while paused |
-| `src/ui/input/ScorePanel.svelte` | VERIFIED | Line 16: `{isActive ? matchStore.remaining : player.remaining}` |
-| `src/ui/setup/BullOffOrder.svelte` | VERIFIED | confirmOrder: `if (order.length === 0) { goto(...setup); return; }` at lines 122-126; `disabled={order.length === 0}` at line 178 |
-| `src/engine/reducer.ts` | VERIFIED | applyStartMatch: filter-safe lookup, returns initialState() for empty player list (lines 94-99) |
-| `src/engine/reducer.test.ts` | VERIFIED | CR-05 guard tests (3 tests): empty order, all-unmatched, partial-match. 42 tests total, all passing |
-| `src/routes/match/+page.svelte` | PARTIAL | handleNumpadVisit defers finish dispatch until dialog confirms — correct for INP-03. BUT: no match-win suppression; dialog shown for all finishes including match-winning, breaking the E2E spec |
-| `src/ui/input/DartsAtDoubleDialog.svelte` | VERIFIED | select() calls onconfirm(darts, darts); Phase 1 comment added; no UI change |
-| `src/ui/input/Dartboard.svelte` | STUB (flash only) | viewBox="-190 -190 780 780" correct; polar math correct; score dispatch correct. BUT: flash logic at lines 144-148 checks `dart.segment === 50` first (dead code since classifyHit never returns segment:50), then `dart.segment === 25` triggers 'outer-bull' for both bulls. Inner-bull taps score correctly but flash the wrong region (WR-02, visual feedback only) |
-| `e2e/full-match-flow.spec.ts` | FAILED | Spec fails (confirmed). Line 96-97 comment is false. Final visit defers behind dialog which spec never answers. |
+| `src/routes/match/+page.svelte` | VERIFIED | `import { reduce }` at line 6. `handleNumpadVisit` trial reduce at line 116; `prospective.phase === 'match-complete'` check at line 117; immediate dispatch with `dartsAtDouble:0` at line 119; leg-win deferral (`showDartsAtDouble = true`) retained at lines 122-123. No `segment===50` references. |
+| `src/ui/input/Dartboard.svelte` | VERIFIED | Flash logic lines 147-150: `dart.multiplier === 2 && dart.segment === 25` → `'inner-bull'`; `dart.multiplier === 1 && dart.segment === 25` → `'outer-bull'`. Dead `dart.segment === 50` branch absent (confirmed by grep: no matches). |
+| `e2e/full-match-flow.spec.ts` | VERIFIED | Passes: exit 0, 1 passed (1.4s). Lines 96-97 comment accurately describes the real suppression behavior. No dialog click added; assertions unchanged. |
+| `src/engine/board.ts` | VERIFIED | classifyHit inner-bull: `{multiplier:2,segment:25}` (2×25=50 pts). |
+| `src/engine/bust.ts` | VERIFIED | Double-out finish check is `multiplier===2` only; `isBust(50,{m:2,s:25},'double')` returns false. |
+| `src/ui/input/CorrectionWindow.svelte` | VERIFIED | `untrack(() => startTimer())` at line 83; `handleOutsideClick` unconditional confirm at line 72; `Fertig` button in paused branch at line 123; 6 unit tests all passing. |
+| `src/ui/input/ScorePanel.svelte` | VERIFIED | Line 16: `{isActive ? matchStore.remaining : player.remaining}`. |
+| `src/ui/setup/BullOffOrder.svelte` | VERIFIED | Empty-order guard; confirm button disabled when empty. |
+| `src/engine/reducer.ts` | VERIFIED | Pure; returns initialState() for empty player list; used as side-effect-free trial reduce source. |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| `Dartboard.svelte` | `board.ts` | classifyHit({m:2,s:25}) → 50 pts | VERIFIED | Line 7 import + lines 139-140 usage; inner-bull encoding correct |
-| `Dartboard.svelte` | `match.svelte.ts` | dispatch DART_THROWN | VERIFIED | Line 156: matchStore.dispatch({type:'DART_THROWN',dart}) |
-| `bust.ts` | `board.ts` | multiplier*segment scoring | VERIFIED | bust.ts line 20: `const scored = dart.multiplier * dart.segment` — 2*25=50 |
+| `match/+page.svelte` | `reducer.ts` | `reduce(matchStore.state, NUMPAD_VISIT)` trial reduce — prospective.phase check | VERIFIED | Line 6 import; line 116 call; line 117 condition — read-only, never mutates matchStore.state |
+| `match/+page.svelte` | `DartsAtDoubleDialog.svelte` | `showDartsAtDouble` only for leg-win non-match-ending | VERIFIED | Match-complete path skips dialog; only the else-branch at line 122-123 sets `showDartsAtDouble = true` |
+| `Dartboard.svelte` | `board.ts` | classifyHit({m:2,s:25}) → 50 pts → flash 'inner-bull' | VERIFIED | Lines 147-148: multiplier===2 && segment===25 → flashKey='inner-bull' |
 | `CorrectionWindow.svelte` | `match.svelte.ts` | dispatch CONFIRM_VISIT after timer | VERIFIED | Line 61: matchStore.dispatch({type:'CONFIRM_VISIT'}); untrack fix confirmed |
-| `CorrectionWindow.svelte` | `match/+page.svelte` | ondismiss clears pendingCorrection | VERIFIED | ondismiss=dismissCorrection at +page.svelte line 164; dismissCorrection sets pendingCorrection=null |
-| `ScorePanel.svelte` | `match.svelte.ts` | matchStore.remaining (live) | VERIFIED | Line 16: `isActive ? matchStore.remaining : player.remaining` |
-| `CheckoutSuggestion.svelte` | `match.svelte.ts` | matchStore.suggestion | VERIFIED | Same live remaining source — score and suggestion now agree |
-| `BullOffOrder.svelte` | `reducer.ts` | START_MATCH guarded against empty order | VERIFIED | UI guard + reducer defense-in-depth both present |
-| `match/+page.svelte` | `DartsAtDoubleDialog.svelte` | showDartsAtDouble for ALL finishes | BROKEN | No match-win suppression; dialog shown for leg-win and match-win alike |
-| `e2e/full-match-flow.spec.ts` | `DartsAtDoubleDialog.svelte` | Dialog interaction after match-winning visit | NOT_WIRED | Spec never clicks dialog; match-win assertion fails |
+| `ScorePanel.svelte` | `match.svelte.ts` | matchStore.remaining (live mid-visit) | VERIFIED | Line 16: isActive ? matchStore.remaining : player.remaining |
+| `CheckoutSuggestion.svelte` | `match.svelte.ts` | matchStore.suggestion (live remaining) | VERIFIED | Same source as ScorePanel — score and suggestion agree |
+| `e2e/full-match-flow.spec.ts` | `match/+page.svelte` | Full flow: setup → bulloff → match → numpad → win overlay | VERIFIED | exit 0, 1 passed (1.4s) — win overlay heading and Neues Spiel button visible without dialog click |
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 |----------|--------------|--------|--------------------|--------|
-| `ScorePanel.svelte` | `matchStore.remaining` (active) / `player.remaining` (inactive) | matchStore getter subtracts currentVisit | Yes — live mid-visit and committed post-visit | VERIFIED (fixed by plan 01-12) |
-| `CheckoutSuggestion.svelte` | `matchStore.suggestion` | getSuggestion(matchStore.remaining) | Yes — live remaining, bull routes now correct | VERIFIED |
-| `CorrectionWindow.svelte` | `visitDarts`, `visitTotal`, `isBust` | pendingCorrection from +page.svelte effect | Yes — last committed visit | VERIFIED |
+| `ScorePanel.svelte` | `matchStore.remaining` (active) / `player.remaining` (inactive) | matchStore getter subtracts currentVisit | Yes — live mid-visit and committed post-visit | VERIFIED |
+| `CheckoutSuggestion.svelte` | `matchStore.suggestion` | getSuggestion(matchStore.remaining) | Yes — live remaining, bull routes correct | VERIFIED |
+| `CorrectionWindow.svelte` | `visitDarts`, `visitTotal`, `isBust` | pendingCorrection from +page.svelte $effect | Yes — last committed visit data | VERIFIED |
 | `ProfileManager.svelte` | `profiles` | profilesLive() Dexie liveQuery | Yes — real IndexedDB data | VERIFIED |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Check | Result | Status |
 |----------|-------|--------|--------|
-| Inner bull classifyHit returns 50-point encoding | `board.ts line 44: { multiplier: 2, segment: 25 }` → 2×25=50 | Returns 50 pts | PASS |
-| isBust(50, {m:2,s:25}, 'double') — bull finish valid | `bust.ts line 32: multiplier===2 only` → returns false | Valid finish | PASS |
-| CorrectionWindow auto-dismiss fires exactly once after 2.5s | CorrectionWindow.test.ts real-timer test: `toHaveBeenCalledTimes(1)` after 2503ms | 1 call | PASS |
-| CorrectionWindow paused state has Fertig button | `CorrectionWindow.svelte line 123: <button class="fertig-btn">Fertig</button>` in {:else} | Button rendered | PASS |
-| handleOutsideClick unconditional | `CorrectionWindow.svelte line 72: confirm()` with no paused guard | Unconditional | PASS |
-| ScorePanel uses matchStore.remaining for active player | `ScorePanel.svelte line 16: isActive ? matchStore.remaining : player.remaining` | Correct | PASS |
-| BullOffOrder guards empty order | `BullOffOrder.svelte lines 122-126: if (order.length === 0) { goto; return; }` | Guard present | PASS |
-| BullOffOrder confirm button disabled when empty | `BullOffOrder.svelte line 178: disabled={order.length === 0}` | Disabled | PASS |
-| Reducer returns initialState() for empty player list | `reducer.ts lines 94-99: if (orderedPlayers.length === 0) return initialState()` | Safe return | PASS |
-| Dartboard.svelte inner-bull FLASH logic correct | `Dartboard.svelte lines 144-148: dart.segment === 50 check (dead) precedes dart.segment === 25 (fires 'outer-bull')` | Wrong: inner-bull taps flash outer bull | FAIL (WR-02, visual only) |
-| E2E happy-path spec passes | `npx playwright test e2e/full-match-flow.spec.ts` | exit code 1, toBeVisible /gewinnt!/ timed out | FAIL |
-| Unit suite passes (162 tests) | `npx vitest run` | 11 files, 162 tests, all passed | PASS |
-| Production build succeeds | `npx vite build` | ✓ built in 2.58s, wrote site to build/ | PASS |
+| `reduce` imported in match/+page.svelte | `import { reduce }` at line 6 | Found | PASS |
+| Trial reduce present in handleNumpadVisit | `reduce(matchStore.state` at line 116 + `prospective.phase === 'match-complete'` at line 117 | Found | PASS |
+| Match-win dispatches immediately with dartsAtDouble:0 | `matchStore.dispatch({ type: 'NUMPAD_VISIT', total, dartsAtDouble: 0 })` at line 119 | Found | PASS |
+| Leg-win deferral retained | `showDartsAtDouble = true` at line 123 in the else-branch | Found | PASS |
+| Dead `dart.segment === 50` flash branch absent | grep `segment === 50` in Dartboard.svelte | No matches | PASS |
+| Inner-bull flash branch correct | `dart.multiplier === 2 && dart.segment === 25` at line 147 → `flashKey = 'inner-bull'` | Found | PASS |
+| Outer-bull flash branch correct | `dart.multiplier === 1 && dart.segment === 25` at line 149 → `flashKey = 'outer-bull'` | Found | PASS |
+| E2E happy-path spec | `npx playwright test e2e/full-match-flow.spec.ts` | 1 passed (1.4s), exit 0 | PASS |
+| Unit suite | `npx vitest run` | 11 files, 162 tests, all passed | PASS |
+| Production build | `npx vite build` | built in 2.36s, wrote site to build/ | PASS |
+| svelte-check (no new errors) | `npx svelte-check --threshold error` | 1 error in `src/db/profiles.ts` (pre-existing, out-of-scope per 01-07-SUMMARY) | PASS |
+| No debt markers (TBD/FIXME/XXX) in modified files | grep on +page.svelte, Dartboard.svelte, full-match-flow.spec.ts | No matches | PASS |
 
 ### Requirements Coverage
 
@@ -175,16 +117,16 @@ Previous verification (2026-06-11T00:00:00Z): status `gaps_found`, score `2/5`. 
 | ENG-01 (301/401/501, Single/Double Out) | 01-02, 01-04 | VERIFIED | Setup chips and out-rule control; reducer handles all start scores and outRules |
 | ENG-02 (legs/sets config) | 01-02, 01-04 | VERIFIED | Steppers in MatchSetup; reducer handles legsToWin/setsToWin |
 | ENG-03 (1–4 players, turn rotation) | 01-02 | VERIFIED | nextPlayerIndex/legStarterIndex tested; reducer handles 1–4 players |
-| ENG-04 (bust revert + pass turn) | 01-02, 01-10 | VERIFIED | Engine logic correct for all three conditions including Bull finish from remaining=50 |
+| ENG-04 (bust revert + pass turn) | 01-02, 01-10 | VERIFIED | Engine logic correct for all three bust conditions including Bull finish from remaining=50 |
 | ENG-05 (unlimited undo) | 01-02, 01-05 | VERIFIED | Log reset on START_MATCH; CONFIRM_VISIT not in log; UNDO replays cleanly |
-| ENG-06 (bull-off order) | 01-04 | VERIFIED | BullOffOrder dispatches START_MATCH with ordered player list; 0-player guard added |
-| ENG-07 (checkout suggestions) | 01-02, 01-08, 01-12 | VERIFIED | matchStore.suggestion uses live remaining; ScorePanel reads live remaining; bull routes correct |
-| INP-01 (board tap, all segments hittable) | 01-03, 01-06 | VERIFIED | viewBox="-190 -190 780 780"; double ring visible and hittable; polar-math hit detection correct |
-| INP-02 (numpad validation) | 01-02, 01-03 | VERIFIED | IMPOSSIBLE_3DART includes 163, 166 and all others; isValidVisitTotal correct |
-| INP-03 (darts-at-double) | 01-03, 01-12 | VERIFIED | DartsAtDoubleDialog wired; handleDartsAtDoubleConfirm dispatches NUMPAD_VISIT with dartsAtDouble; reducer records value. E2E gap is a spec problem, not an INP-03 correctness problem |
-| INP-04 (correction window) | 01-03, 01-07, 01-11 | VERIFIED | Auto-dismiss fires once (untrack fix); paused state escapable (Fertig + outside-click); per-player visit tracking correct; 6 unit tests all passing |
+| ENG-06 (bull-off order) | 01-04 | VERIFIED | BullOffOrder dispatches START_MATCH; 0-player guard present |
+| ENG-07 (checkout suggestions) | 01-02, 01-08, 01-12 | VERIFIED | matchStore.suggestion uses live remaining; bull routes correct |
+| INP-01 (board tap, all segments hittable) | 01-03, 01-06, 01-13 | VERIFIED | viewBox="-190 -190 780 780"; polar-math hit detection; inner-bull flash fix applied |
+| INP-02 (numpad validation) | 01-02, 01-03 | VERIFIED | IMPOSSIBLE_3DART includes 163, 166 etc; isValidVisitTotal correct |
+| INP-03 (darts-at-double) | 01-03, 01-12, 01-13 | VERIFIED | Dialog deferred for continuing leg wins; match-winning finish dispatches immediately with dartsAtDouble:0 per locked 01-07 decision (win overlay owns screen, no stats consumer in Phase 1) |
+| INP-04 (correction window) | 01-03, 01-07, 01-11 | VERIFIED | Auto-dismiss fires once (untrack fix); paused state escapable (Fertig + outside-click); 6 unit tests passing |
 | INP-05 (wake lock) | 01-03 | VERIFIED | acquireWakeLock + visibilitychange wired in match route $effect |
-| FLOW-01 (full setup flow) | 01-04, 01-12 | VERIFIED | Happy path works end-to-end; 0-player direct-navigation crash path closed at both UI and reducer level |
+| FLOW-01 (full setup flow) | 01-04, 01-12, 01-13 | VERIFIED | E2E happy-path spec passes end-to-end (exit 0); 0-player navigation crash path closed |
 | PROF-01 (profile CRUD) | 01-04 | VERIFIED | ProfileManager mounted in MatchSetup; createProfile/updateProfile/deleteProfile tested |
 | PROF-02 (guests not persisted) | 01-04 | VERIFIED | Guests use isGuest:true; no db.profiles write in guest path |
 
@@ -192,49 +134,39 @@ Previous verification (2026-06-11T00:00:00Z): status `gaps_found`, score `2/5`. 
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| `src/ui/input/Dartboard.svelte` | 144-148 | `dart.segment === 50` flash check precedes `dart.segment === 25` — dead branch (segment 50 is never produced by classifyHit after plan 01-10 fix); inner-bull taps always take the `dart.segment === 25` path and set `flashKey = 'outer-bull'` | WARNING | Visual feedback only — score is correct (50 pts, valid finish). But the amber inner circle never flashes; the outer bull ring flashes instead. Touch confirmation UX is degraded for inner-bull taps. No debt marker; fix is 2 lines. |
-| `e2e/full-match-flow.spec.ts` | 96-97 | Comment "The darts-at-double dialog is suppressed for match-winning visits (win overlay takes over)" describes behavior that does not exist | WARNING | Stale comment; misleads future developers. The real issue is the missing dialog click in the test. |
-| `src/routes/match/+page.svelte` | 96-97, 107 | `handleNumpadVisit` sets `showDartsAtDouble = true` for all finishing visits (leg-win and match-win alike); no match-win suppression path | BLOCKER (E2E red) | E2E spec fails. Scorer must answer the dialog even when the match has ended; the win overlay is blocked until the dialog is confirmed, but the spec never confirms it. |
+| (none) | — | No debt markers (TBD/FIXME/XXX) found in any file modified by plan 01-13 | — | — |
 
-No `TBD`, `FIXME`, or `XXX` markers found in files modified by plans 01-10, 01-11, or 01-12.
+No blockers. The Dartboard flash warning (WR-02) from the previous report is fully resolved — dead `segment===50` branch removed, multiplier-keyed flash logic in place.
 
 ### Human Verification Required
 
-#### 1. Full 2-leg match through the darts-at-double dialog
+#### 1. Multi-leg match with darts-at-double dialog on continuing legs
 
-**Test:** Start a 2-player match with 2 legs to win. Play through scoring down to a numpad-entered finish for each leg win and match win. Answer the darts-at-double dialog when it appears. Observe the correction window and win overlay.
-**Expected:** Match completes end-to-end. Darts-at-double dialog appears after each numpad leg-winning visit. Correction window auto-dismisses after each non-winning visit. Win overlay appears when the match ends.
-**Why human:** The E2E spec currently fails because it never answers the dialog for the match-winning visit. A multi-leg human test covers the full flow the spec misses, and confirms the CorrectionWindow corrections from plans 01-11 are working end-to-end.
+**Test:** Start a 2-player match with 2 legs to win. Score player 1 down to a finishing numpad value (e.g. 32 for D16) and enter it on the numpad. Press Bestätigen.
+**Expected:** The darts-at-double dialog appears (this leg win does not end the match). Click a dialog option (e.g. '1 Dart'). The correction window briefly appears then auto-dismisses. Continue scoring. When one player wins the second leg, the win overlay appears with the player name and Neues Spiel button — no dialog blocks it.
+**Why human:** The E2E spec covers a 1-leg game. The multi-leg flow — dialog on a continuing leg win, then match-win suppression on the final leg — requires live browser interaction to confirm end-to-end.
 
-#### 2. CorrectionWindow paused escape in a real browser
+#### 2. CorrectionWindow paused-state escape in a real browser
 
-**Test:** Start a match, complete a board-input visit. When the correction window appears, tap 'Korrigieren'. Then tap 'Fertig'.
-**Expected:** Window dismisses; the next player's board is immediately accessible. No permanent overlay lock.
-**Why human:** Covered by unit tests but real-browser interaction confirms the CR-03 fix is effective under real Svelte lifecycle conditions.
+**Test:** Start a match. After the first 3-dart board visit, tap 'Korrigieren' in the correction window. Then tap 'Fertig'.
+**Expected:** Correction window dismisses immediately; the board is accessible for the next player. No overlay lock.
+**Why human:** Unit tests cover the CR-03 fix but real-browser confirmation ensures the Svelte lifecycle behaves correctly under actual pointer events and rAF scheduling.
 
-#### 3. Inner-bull flash region (WR-02 — visual only)
+#### 3. Inner-bull flash region visual confirmation
 
-**Test:** Score a player down to 50. Tap the inner bull (center amber circle). Observe which region flashes.
-**Expected (before fix):** Outer bull ring flashes (wrong). The score correctly deducts 50 (correct); win overlay should appear if remaining was exactly 50.
-**Why human:** The Dartboard flash logic has a dead segment===50 branch; inner-bull taps produce flashKey='outer-bull'. Scoring is correct; this is a visual feedback defect that requires browser observation to confirm. Listed as WARNING — does not block goal achievement, but the fix is trivial and should be done before Phase 2.
+**Test:** Score a player down to exactly 50 remaining. Tap the inner bull (amber center circle).
+**Expected:** The amber center circle flashes briefly (inner-bull region). The score deducts 50. If remaining was 50, the win overlay appears.
+**Why human:** The source code change is verified (multiplier===2 && segment===25 gates 'inner-bull') but correct visual flash behavior can only be confirmed in a real browser.
 
 ---
 
 ### Gaps Summary
 
-One gap blocks the E2E acceptance test. One warning requires trivial remediation before Phase 2.
+No gaps. All 5 must-have truths are verified. The two blockers from the previous round (match-win dialog suppression, inner-bull flash region) are fully resolved by plan 01-13. The phase goal is met: a full X01 match can be played from setup to finish with correct bust handling, undo, and checkout suggestions.
 
-**Gap — E2E spec fails (match-winning numpad finish):** `handleNumpadVisit` in `match/+page.svelte` shows the darts-at-double dialog for every finishing visit — there is no distinction between a leg-winning and a match-winning finish. Plan 01-12 (Task 3) correctly deferred the NUMPAD_VISIT dispatch until after the dialog to record `dartsAtDouble` (INP-03), but did not add match-win suppression (described in the spec comment as if it exists). The E2E spec comment on line 96-97 claims the dialog is suppressed for match-winning visits — this is false and the test fails as a result. Confirmed by running the spec: exit code 1, `getByRole('heading', { name: /gewinnt!/ })` — element(s) not found.
-
-**Fix options:**
-- Option A (2 lines, minimal): add one click in the E2E spec after the final `Bestätigen` — `await page.getByRole('button', { name: '1 Dart' }).click()` — then assert the win overlay. Remove the stale comment.
-- Option B (behavioral): implement match-win suppression in `handleNumpadVisit` by checking if the dispatch would produce `phase=match-complete` and dispatching immediately with `dartsAtDouble:0` in that case.
-
-Option A is the lower-risk fix for Phase 1 close; Option B produces better UX (no dialog on the winning dart) and should be considered for a cleanup plan.
-
-**Warning — Dartboard inner-bull flash (WR-02):** `Dartboard.svelte` lines 144-148 check `dart.segment === 50` before `dart.segment === 25`. Since `classifyHit` never produces `segment:50`, the `'inner-bull'` flash branch is unreachable dead code. Inner-bull taps trigger the `segment===25` branch and set `flashKey='outer-bull'`. The score is correct; only the visual flash is wrong. Fix: check `dart.segment === 25 && dart.multiplier === 2` for inner bull before the bare `dart.segment === 25` check. Two lines in `Dartboard.svelte`.
+Three items require human testing before the phase can be fully signed off — they are visual/interactive behaviors that automated checks cannot confirm.
 
 ---
 
-_Verified: 2026-06-11T02:40:00Z_
+_Verified: 2026-06-11T14:10:00Z_
 _Verifier: Claude (gsd-verifier)_

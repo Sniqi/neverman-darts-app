@@ -46,7 +46,6 @@ Identical to Phase 1. Phase 2 adds no new spacing tokens.
 
 | Element | Value | Reason |
 |---------|-------|--------|
-| Panel separator line | 2px | Used as CSS `gap` on `.panels-grid` — creates a thin visible divider between player columns (layout spacing, not a border dimension); readable from 3 m without stealing space |
 | Match header bar height | 40px | Fixed slim bar; not a spacing token but a component dimension |
 | SpectatorChooser touch targets | 48px minimum height | Operated mid-match while a game is in progress |
 
@@ -111,7 +110,7 @@ Dark mode only. Phase 2 extends the Phase 1 token set with two display-specific 
 
 **BUST state:**
 - Active player panel background overlaid with `rgba(192, 57, 43, 0.18)` for 2 s
-- "BUST" label text: `#c0392b` (destructive), weight 700, display-size font
+- "BUST" label text: `#c0392b` (destructive), weight 600, display-size font
 
 **Contrast verification (unchanged from Phase 1):**
 - `#f0f0f0` on `#111318`: 16.2:1 — exceeds WCAG AAA

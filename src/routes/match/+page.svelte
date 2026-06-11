@@ -3,6 +3,7 @@
 	// Complete scoring view: portrait/landscape responsive layout (D-02).
 	// Wires all input components to matchStore. Wake lock acquired on mount.
 	import { matchStore } from '../../stores/match.svelte.js';
+	import { reduce } from '../../engine/reducer.js';
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
 	import VisitStrip from '../../ui/input/VisitStrip.svelte';
@@ -97,9 +98,13 @@
 	let pendingNumpadTotal = $state<number | null>(null);
 	let showDartsAtDouble = $state(false);
 
-	// For a finishing visit (prevRemaining === total), defer the NUMPAD_VISIT dispatch
-	// until after the darts-at-double dialog confirms so dartsAtDouble is recorded.
-	// For non-finishing visits, dispatch immediately (no dialog shown, dartsAtDouble=0).
+	// For a finishing visit (prevRemaining === total), use a side-effect-free trial reduce
+	// to detect whether this finish ends the match (phase === 'match-complete').
+	// Match-winning finish: dispatch immediately with dartsAtDouble:0 — MatchWinOverlay owns
+	// the screen and the dialog (z-index 20) would be unclickable behind it (z-index 100).
+	// Locked 01-07 decision; D-08 scopes the darts-at-double prompt to continuing legs only.
+	// Leg-winning but not match-ending finish: defer until dialog confirms (INP-03 / D-08).
+	// Non-finishing visits: dispatch immediately, no dialog (dartsAtDouble=0 per D-08).
 	function handleNumpadVisit(total: number) {
 		const prevPhase = matchStore.state.phase;
 		const prevRemaining = matchStore.activePlayer?.remaining ?? 0;
@@ -107,9 +112,16 @@
 		const isFinish = prevRemaining === total && prevPhase === 'playing';
 
 		if (isFinish) {
-			// Defer dispatch until dialog confirms — store total for handleDartsAtDoubleConfirm
-			pendingNumpadTotal = total;
-			showDartsAtDouble = true;
+			// Trial reduce: read-only, never mutates matchStore.state (reducer is pure)
+			const prospective = reduce(matchStore.state, { type: 'NUMPAD_VISIT', total });
+			if (prospective.phase === 'match-complete') {
+				// Match-winning visit: dispatch immediately, skip dialog
+				matchStore.dispatch({ type: 'NUMPAD_VISIT', total, dartsAtDouble: 0 });
+			} else {
+				// Leg win that continues the match: defer dispatch until dialog confirms
+				pendingNumpadTotal = total;
+				showDartsAtDouble = true;
+			}
 		} else {
 			// Non-finishing visit: dispatch immediately, no dialog (dartsAtDouble=0 per D-08)
 			matchStore.dispatch({ type: 'NUMPAD_VISIT', total });

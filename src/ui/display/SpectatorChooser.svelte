@@ -3,7 +3,7 @@
 	// Monitor/cast icon in the scoring view toolbar that opens a chooser menu.
 	// D-12: monitor icon always reachable mid-match.
 	// D-13: chooser with two options — PC second window (DISP-01) and tablet fullscreen (DISP-02).
-	// T-02-06: window.open uses 'noopener,noreferrer' (no reverse tabnabbing).
+	// T-02-06: win.opener is nulled manually after open (no reverse tabnabbing).
 	// T-02-07: popup-blocked null-check; no crash on denied fullscreen.
 	// T-02-04: player names / copy rendered via {interpolation} only — no {@html}.
 	import { base } from '$app/paths';
@@ -23,11 +23,12 @@
 	}
 
 	function openSecondWindow() {
-		const win = window.open(`${base}/display`, '_blank', 'noopener,noreferrer');
-		if (!win) {
-			popupBlocked = true;
-		} else {
+		const win = window.open(`${base}/display`, '_blank');
+		if (win) {
+			win.opener = null;
 			close();
+		} else {
+			popupBlocked = true;
 		}
 	}
 

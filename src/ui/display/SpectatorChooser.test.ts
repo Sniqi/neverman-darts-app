@@ -1,22 +1,18 @@
 // src/ui/display/SpectatorChooser.test.ts
 // Browser-mode component tests for SpectatorChooser (D-12, D-13, DISP-01, DISP-02).
-// TDD RED: these tests must fail before SpectatorChooser.svelte is created.
 // Covers:
 //   1. Component is closed initially (menu not in DOM)
 //   2. Clicking monitor icon opens menu with heading "Anzeigemodus"
 //   3. Open menu shows both action buttons
-//   4. "Zweites Fenster öffnen" calls window.open with /display and 'noopener,noreferrer'
-//   5. When window.open returns null, popup-blocked message appears
-//   6. Escape key closes the menu
-//   7. Monitor icon has correct aria-label
+//   4. "Zweites Fenster öffnen" calls window.open with /display URL (no noopener features string)
+//   5. Success case: window.open returns a window object — menu closes, no warning, opener nulled
+//   6. Blocked case: window.open returns null — popup-blocked message appears, menu stays open
+//   7. Escape key closes the menu
+//   8. Monitor icon has correct aria-label
 
 import { render } from 'vitest-browser-svelte';
 import { expect, test, vi, beforeEach, afterEach } from 'vitest';
 import SpectatorChooser from './SpectatorChooser.svelte';
-
-beforeEach(() => {
-	vi.stubGlobal('open', vi.fn().mockReturnValue({ focus: vi.fn() }));
-});
 
 afterEach(() => {
 	vi.unstubAllGlobals();
@@ -27,7 +23,6 @@ test('component is closed initially — menu heading not in DOM', async () => {
 	const container = screen.container;
 
 	// Menu should not be in the DOM on initial render
-	const heading = container.querySelector('h2, [role="heading"]');
 	const headingText = container.textContent ?? '';
 	expect(headingText).not.toContain('Anzeigemodus');
 });
@@ -60,7 +55,11 @@ test('open menu shows two action buttons: "Zweites Fenster öffnen" and "Anzeige
 	}, { timeout: 500 });
 });
 
-test('"Zweites Fenster öffnen" calls window.open with /display URL and noopener,noreferrer', async () => {
+test('"Zweites Fenster öffnen" calls window.open with /display URL and no noopener features string', async () => {
+	// Success stub: returns a window-like object with a writable opener property
+	const fakeWin = { opener: 'original' as unknown, focus: vi.fn() };
+	vi.stubGlobal('open', vi.fn().mockReturnValue(fakeWin));
+
 	const screen = render(SpectatorChooser);
 	const container = screen.container;
 
@@ -77,14 +76,45 @@ test('"Zweites Fenster öffnen" calls window.open with /display URL and noopener
 	expect(secondWindowBtn).toBeTruthy();
 	secondWindowBtn!.click();
 
+	// Called with /display URL and _blank — no noopener features argument
 	expect(window.open).toHaveBeenCalledWith(
 		expect.stringContaining('display'),
-		'_blank',
-		'noopener,noreferrer'
+		'_blank'
 	);
 });
 
-test('popup-blocked message appears when window.open returns null', async () => {
+test('success: window.open returns a window object — menu closes, no popup-blocked warning, opener nulled', async () => {
+	// Success stub: returns a window-like object with a writable opener property
+	const fakeWin = { opener: 'original' as unknown, focus: vi.fn() };
+	vi.stubGlobal('open', vi.fn().mockReturnValue(fakeWin));
+
+	const screen = render(SpectatorChooser);
+	const container = screen.container;
+
+	const iconBtn = container.querySelector('[aria-label="Anzeigemodus öffnen"]') as HTMLButtonElement;
+	iconBtn.click();
+
+	await vi.waitFor(() => {
+		expect(container.textContent).toContain('Zweites Fenster öffnen');
+	}, { timeout: 500 });
+
+	const buttons = Array.from(container.querySelectorAll('button'));
+	const secondWindowBtn = buttons.find(b => b.textContent?.includes('Zweites Fenster öffnen'));
+	secondWindowBtn!.click();
+
+	await vi.waitFor(() => {
+		// Menu closes — heading no longer in DOM
+		expect(container.textContent).not.toContain('Zweites Fenster öffnen');
+	}, { timeout: 500 });
+
+	// Popup-blocked warning must NOT appear
+	expect(container.textContent).not.toContain('Bitte Popups für diese Seite erlauben');
+
+	// Reverse-tabnabbing guard: opener was nulled
+	expect(fakeWin.opener).toBeNull();
+});
+
+test('blocked: window.open returns null — popup-blocked message appears and menu stays open', async () => {
 	// Stub window.open to return null (simulating popup block)
 	vi.stubGlobal('open', vi.fn().mockReturnValue(null));
 
@@ -105,9 +135,14 @@ test('popup-blocked message appears when window.open returns null', async () => 
 	await vi.waitFor(() => {
 		expect(container.textContent).toContain('Bitte Popups für diese Seite erlauben');
 	}, { timeout: 500 });
+
+	// Menu stays open — heading still visible
+	expect(container.textContent).toContain('Zweites Fenster öffnen');
 });
 
 test('pressing Escape closes the open menu', async () => {
+	vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: null, focus: vi.fn() }));
+
 	const screen = render(SpectatorChooser);
 	const container = screen.container;
 

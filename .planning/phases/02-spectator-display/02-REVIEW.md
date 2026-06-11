@@ -1,6 +1,6 @@
 ---
 phase: 02-spectator-display
-reviewed: 2026-06-11T17:05:53Z
+reviewed: 2026-06-11T18:43:23Z
 depth: standard
 files_reviewed: 22
 files_reviewed_list:
@@ -27,182 +27,191 @@ files_reviewed_list:
   - src/ui/display/VisitLine.svelte
   - src/ui/display/VisitLine.test.ts
 findings:
-  critical: 2
-  warning: 10
+  critical: 1
+  warning: 9
   info: 6
-  total: 18
+  total: 16
 status: issues_found
 ---
 
-# Phase 02: Code Review Report
+# Phase 02: Code Review Report (Post-Gap-Closure 02-05)
 
-**Reviewed:** 2026-06-11T17:05:53Z
+**Reviewed:** 2026-06-11T18:43:23Z
 **Depth:** standard
 **Files Reviewed:** 22
 **Status:** issues_found
 
 ## Summary
 
-Reviewed the Phase 2 spectator-display implementation: sync stores (publisher/subscriber), display route, six display UI components, the SpectatorChooser entry point, engine additions (averages, legStartVisitIndex), and the associated unit/component/e2e tests.
+Re-review after gap-closure plan 02-05. Verdict on the four targeted changes:
 
-Two critical defects undermine the phase's core deliverable. First, the BroadcastChannel publisher posts a Svelte 5 `$state` proxy, which structured clone cannot serialize — the resulting `DataCloneError` is silently swallowed, so **live sync (DISP-05) never functions**; the spectator only updates on reload/reopen. The e2e suite happens to test only the reload path, which is exactly why this slipped through. Second, the leg-win watcher effect on the display route reads and reassigns `$state` arrays on every run, producing an infinite effect-update loop (`effect_update_depth_exceeded`) whenever a match is active.
+1. **`match.svelte.ts` → `$state.snapshot(this.state)` on `postMessage`** — Verified correct. The proxy is now unwrapped to a plain object, eliminating the swallowed `DataCloneError`. Prior CR-01 is **resolved**. One residual asymmetry remains: the adjacent `localStorage.setItem(..., JSON.stringify(this.state))` still serializes the raw proxy (see WR-08).
+2. **`display/+page.svelte` `prevLegsWon`/`prevSetsWon` → plain `let`** — Verified correct. The trackers are read and reassigned only inside the effect; as non-reactive `let`s they no longer self-retrigger the effect. Prior CR-02 (infinite loop) is **resolved**. A latent baseline-desync remains in the same logic (see CR-01 below).
+3. **`SpectatorChooser.openSecondWindow()` → drop `noopener`, manual `win.opener = null`** — The popup-block false-positive (prior WR-02) is **resolved**: `window.open(url, '_blank')` now returns a usable window handle. The manual opener-null is best-effort and unguarded against a non-writable `opener` (see WR-02).
+4. **`e2e/spectator-sync.spec.ts` live no-reload test (Test 3)** — Added and genuinely exercises the live BroadcastChannel path. Prior WR-09 is **resolved**. One assertion-strength gap remains (see WR-09).
 
-Beyond those, there is a cluster of correctness defects in displayed statistics (match average wrong for every multi-leg match, bust visits undercounting darts, numpad finishes always counted as 3 darts, numpad visit totals shown wrong after leg 1 and for consecutive numpad visits), a guaranteed false-positive "popup blocked" message caused by `noopener` semantics, and a BUST flash that fires at the wrong time. The pure reducer and the static presentation components (IdleScreen, LegWinBanner, MatchHeader, VisitLine) are otherwise solid; no security issues found (no `{@html}`, no injection surfaces, same-origin-only channels).
+The three gap-closure fixes land correctly and introduced no regressions I can identify. The single remaining Critical (CR-01) is the leg-win banner detection that survived 02-05 untouched: it infers leg/set wins by diffing reconstructed counts on the receiver, which is timing-dependent under fire-and-forget BroadcastChannel and can miss or spuriously fire the D-09 banner. The remaining warnings are pre-existing correctness defects in displayed statistics (match average wrong across legs, bust/numpad dart counts, set-starter rotation, numpad visit-total reconstruction) and input robustness (undo desync, snapshot shape validation) that 02-05 did not scope. No security issues found: same-origin channels only, all user text rendered via `{interpolation}` (no `{@html}`), no injection surfaces.
 
 ## Critical Issues
 
-### CR-01: BroadcastChannel live sync is silently dead — `postMessage` is called with a Svelte `$state` proxy
-
-**File:** `src/stores/match.svelte.ts:29-36`
-**Issue:** `MatchStore.state` is a class-field `$state` in Svelte 5, which wraps the state object in a deeply reactive `Proxy`. `ch.postMessage(this.state)` runs the structured clone algorithm on that proxy. Per the HTML spec, structured clone throws `DataCloneError` for Proxy exotic objects (they carry `[[ProxyHandler]]`/`[[ProxyTarget]]` internal slots) — the same well-known failure as posting a Vue `reactive()` object. The surrounding `try/catch` then swallows the error on **every dispatch**, so no message is ever delivered and the failure is invisible. The spectator display therefore never receives live updates; it only shows fresh state via the localStorage snapshot on connect/reload. This is the primary DISP-05 requirement.
-
-Neither test layer can catch this: the unit tests replace `BroadcastChannel` with a mock that passes the object by reference (no structured clone), and both e2e tests reload the display page instead of asserting a live update (see WR-09). The e2e file's own header comment ("the reliable path for DISP-05 is the localStorage snapshot handshake") documents the symptom of this bug.
-
-**Fix:**
-```ts
-// dispatch():
-try {
-	const ch = new BroadcastChannel(BC_CHANNEL);
-	ch.postMessage($state.snapshot(this.state)); // unwrap the reactive proxy
-	ch.close();
-} catch {
-	// ...
-}
-```
-`$state.snapshot()` is exactly the documented escape hatch for passing runes state to `structuredClone`/`postMessage`. Then add a real live-sync assertion to the e2e suite (update display without reloading it) so a regression cannot hide behind the catch block again.
-
-### CR-02: Infinite `$effect` update loop on the display route — `prevLegsWon`/`prevSetsWon` are `$state` that the effect reads and reassigns every run
+### CR-01: Leg-win banner baseline desyncs under live BroadcastChannel sync
 
 **File:** `src/routes/display/+page.svelte:34-71`
-**Issue:** The leg-win watcher effect reads `prevLegsWon` / `prevSetsWon` (lines 49, 52, 58) and unconditionally reassigns both with **freshly created arrays** at the end of every run (lines 69-70). Because the new arrays are new references, the `$state` signals always register as changed, which reschedules the same effect, which assigns new arrays again — an unbounded self-retriggering loop. Svelte 5 aborts this with the `effect_update_depth_exceeded` runtime error as soon as the effect body gets past the early return, i.e. whenever `matchState` is non-null and not in `setup` — the normal operating condition of the display. After the root effect errors, the page's reactivity is broken (banner logic and any subsequent effect-driven updates stop). The e2e tests still pass because the initial DOM (with the hydrated score) renders before effects flush and the tests only assert static text after a reload.
+**Issue:**
+The banner watcher seeds `prevLegsWon`/`prevSetsWon` to `[]` and only populates them at the end of the effect (lines 69-70). The guard at line 49 (`prevLegsWon.length === s.players.length`) suppresses detection until the second observed state. This interacts badly with fire-and-forget BroadcastChannel delivery (now that live sync actually works post-02-05):
 
-**Fix:** These trackers are only ever used inside the effect — they need no reactivity at all. Declare them as plain variables:
+- The display hydrates from the localStorage snapshot on `connect()` — which may already be a post-leg-win state — then receives live deltas. The publisher (`match.svelte.ts:30-36`) fires exactly one message per `dispatch()` and `close()`s immediately; there is no buffering or replay. Only display tabs open at fire time receive it.
+- If the display is opened *after* a leg win, `prevLegsWon` is seeded from the already-incremented snapshot, so the banner for that leg **never shows**.
+- If the display reloads (re-seeding `prevLegsWon` to length 0), the next live message re-runs the diff against a zero-length baseline; once seeded, a subsequent identical-count message will not re-fire — but a state that arrives between seed and the next leg can leave the baseline pointing at the wrong leg, so a banner can fire for a leg that was already decided, or be skipped.
+
+The banner is the headline D-09 spectator feature, and its visibility is timing-dependent rather than deterministic. 02-05 fixed the loop in this block but left the detection mechanism unchanged, so this is now the dominant correctness risk in the live path it just enabled.
+
+**Fix:** Drive the banner from an explicit serialized signal instead of receiver-side count inference. Preferred — have the publisher tag leg/set transitions with a monotonic id the display reacts to idempotently:
 ```ts
-let prevLegsWon: number[] = [];
-let prevSetsWon: number[] = [];
+// match.svelte.ts: on a leg/set win, include e.g.
+//   state.lastWin = { playerId, kind: 'leg' | 'set', seq }
+// display: show the banner whenever `seq` changes — replay-safe, skip-safe.
 ```
-(Alternatively wrap the reads/writes in `untrack`, but plain `let` is simpler and correct.) Same pattern note for `legWinMessage`: it is read (line 42) and written (lines 43, 55) in the same effect, which is acceptable only because the writes converge — keep that in mind when editing.
+If inference must stay on the receiver, seed the baseline once from the hydrated snapshot *without* showing a banner, so "already won at connect" cannot be confused with "won just now":
+```ts
+$effect(() => {
+  const s = matchState;
+  if (!s || s.phase === 'setup') return;
+  if (prevLegsWon.length === 0) {                 // first observation: seed only
+    prevLegsWon = s.players.map(p => p.legsWon);
+    prevSetsWon = s.players.map(p => p.setsWon);
+    return;
+  }
+  // ...existing diff + dismiss logic...
+});
+```
 
 ## Warnings
 
 ### WR-01: "Ø Match" is mathematically wrong for every multi-leg match; shows 0.0 on the sets match-win screen
 
 **File:** `src/engine/averages.ts:58-74`, `src/ui/display/PlayerPanel.svelte:36-39`, `src/ui/display/MatchWinDisplay.svelte:35-40`
-**Issue:** `matchAverage(visits, startScore, remaining)` computes `scored = startScore - remaining`, which only captures the **current leg's** scoring, while `visits` (the denominator) spans **all legs** (the reducer never resets `visits`, only `remaining`). From leg 2 onward the displayed match average is severely understated. Example: a player wins a 501 leg in 15 darts three times (legsToWin=3). At match-complete: scored = 501−0 = 501, darts = 45 → shown average 33.4 instead of ~100.2. Worse, in sets mode the match-complete path resets every player's `remaining` to `startScore` (reducer.ts:276-281), so `scored = 0` and the match-win screen shows **0.0** for everyone. The doc comment in `averages.ts` acknowledges the limitation ("handled in Phase 4"), but `MatchWinDisplay` ships this number under the label "Ø Match" today, and the match-win screen is by definition shown only after multiple legs — i.e., the displayed value is wrong in essentially every real match.
-**Fix:** Compute total scored from the visits themselves instead of `startScore - remaining`, e.g. accumulate per-visit scored amounts (dart visits: sum of darts unless bust; numpad visits need their total persisted — see WR-06), or track a cumulative `totalScored` per player in `PlayerState`. At minimum, do not render "Ø Match" from this formula on the match-win screen until the cross-leg accumulation exists.
+**Issue:** `matchAverage(visits, startScore, remaining)` computes `scored = startScore - remaining`, which captures only the **current leg's** scoring, while `visits` (the denominator) spans **all legs** (the reducer resets `remaining` but not `visits`). From leg 2 onward the displayed match average is severely understated. Worse, in sets mode the set-win path resets every player's `remaining` to `startScore` (reducer.ts:276-281), so at match-complete `scored = startScore - startScore = 0` and `MatchWinDisplay` shows **0.0** for every player under the "Ø Match" label — the most prominent stat on the final screen. The `averages.ts` comment admits this ("handled in Phase 4"), but the wrong value is rendered to users in Phase 2.
+**Fix:** Compute total scored from the visits themselves (sum per-visit points across all legs; numpad visits need their total persisted — see WR-04), or carry a cumulative `totalScored` per player. At minimum, return `null` (rendered `—`) from `matchAverage` once any leg is complete rather than render a confidently-wrong figure.
 
-### WR-02: `window.open(..., 'noopener,noreferrer')` returns `null` on success — popup-blocked message fires every time
+### WR-02: `win.opener = null` is unguarded and may throw on a non-writable opener
 
-**File:** `src/ui/display/SpectatorChooser.svelte:25-32`
-**Issue:** Per spec (and in Chrome/Edge/Firefox), when `noopener` is in the features string, `window.open` returns `null` **even when the window opens successfully**. So `if (!win) popupBlocked = true` triggers the "Bitte Popups für diese Seite erlauben" warning on every successful open of the second window, and the chooser menu never closes (the `else close()` branch is unreachable). The popup-blocked detection (T-02-07) is fundamentally incompatible with `noopener`. The component test masks this by stubbing `window.open` to return an object (`SpectatorChooser.test.ts:18`), encoding the wrong assumption.
-**Fix:** `/display` is same-origin app content, so the practical options are: (a) open without `noopener` in the features string and immediately null the opener reference is not needed since you keep the return value only for the null check — i.e. `const win = window.open(url, '_blank'); if (win) { win.opener = null; close(); } else { popupBlocked = true; }` — this preserves the no-reverse-tabnabbing guarantee AND a working popup-block check; or (b) keep `noopener` and remove the unreliable null check entirely. Update the test stub to match real browser behavior.
+**File:** `src/ui/display/SpectatorChooser.svelte:26-32`
+**Issue:** The 02-05 change relies on `win.opener = null` to preserve reverse-tabnabbing protection after dropping `noopener`. For `/display` (same-origin) this is usually writable, but `opener` can be a read-only accessor depending on browser/context; the assignment would then throw, and because it sits before `close()` with no try/catch, the chooser menu would stay open after a successful open. The test (`SpectatorChooser.test.ts:88`) uses a plain object with a writable `opener`, so it cannot detect this. Note also that nulling `opener` after the fact does not retract access the opened document already had during its initial script execution — for same-origin content this is acceptable defense-in-depth, but the guarantee is weaker than `noopener` provided.
+**Fix:**
+```ts
+if (win) {
+  try { win.opener = null; } catch { /* opener not writable — non-fatal */ }
+  close();
+} else {
+  popupBlocked = true;
+}
+```
 
-### WR-03: BUST flash never appears at bust time in multi-player games; instead it strobes during the player's next turn
+### WR-03: BUST flash never appears at bust time in multi-player games; strobes during the player's next turn
 
 **File:** `src/ui/display/PlayerPanel.svelte:88-109`
-**Issue:** The flash is gated on `isActive && lastCompletedVisit?.bust === true`. But the reducer passes the turn immediately on a bust (reducer.ts:157), so by the time the display receives the state, the busted player has `isActive === false` — the flash never shows when the bust happens (except in 1-player games). One full rotation later, when that player becomes active again and their last completed visit is still the bust, `isBust` turns true and BUST appears — at the start of their **next** turn. Additionally, when the 2s timer clears `showBust`, the effect re-runs (it reads `showBust`), finds `isBust && !showBust` true again, and re-shows the overlay — so BUST flashes on/off every 2 seconds for the entire duration of that next turn until a new visit is recorded.
-**Fix:** Detect a *new* bust visit rather than deriving from `isActive`: track the previous `player.visits.length` (plain variable), and trigger the flash once when the length increases and the newest visit has `bust === true`, independent of `isActive`. Guard re-triggering with that count, not with `showBust`.
+**Issue:** The flash is gated on `isActive && lastCompletedVisit?.bust === true`. The reducer passes the turn immediately on a bust (reducer.ts:157), so when the display receives the state the busted player is no longer active — the flash never shows at bust time (except in 1-player games). One full rotation later, when that player is active again with the bust still as their last visit, `isBust` becomes true and BUST appears at the start of their **next** turn. When the 2s timer clears `showBust`, the effect re-runs (it reads `showBust`), finds `isBust && !showBust` true again, and re-shows — so BUST strobes every 2s for the whole next turn.
+**Fix:** Detect a *new* bust visit independent of `isActive`: track previous `player.visits.length` (plain variable), trigger once when the count increases and the newest visit has `bust === true`. Guard re-triggering with the count, not with `showBust`.
 
 ### WR-04: Numpad visit total in the visit line is wrong for consecutive numpad visits and after the first leg
 
 **File:** `src/ui/display/PlayerPanel.svelte:61-81`
-**Issue:** Two independent defects in `completedTotal`:
-1. Prior numpad visits contribute 0 to `priorScored` (admitted "degenerate case" fallback), so for a player using numpad mode — which the app deliberately remembers per player (D-07), making consecutive numpad visits the *normal* case — the line shows the cumulative leg total, not the visit total. E.g. two 60-visits: displays "120" after the second visit instead of "60".
-2. `priorVisits` spans **all legs** (`player.visits.slice(0, -1)`) while `totalScored = startScore - remaining` covers only the current leg. From leg 2 onward, prior-leg dart scores are subtracted from a current-leg-only figure, driving the result negative and clamping to `Math.max(0, …)` — the line shows "0" for numpad visits.
-**Fix:** The root cause is that numpad visit totals are not persisted on the `Visit` (darts is `[]`). Add `total?: number` (or persist synthetic darts) to numpad visits in the reducer; then this fragile reconstruction disappears entirely. As an interim fix, at minimum slice from `legStartIndex` instead of 0.
+**Issue:** Two defects in `completedTotal`:
+1. Prior numpad visits contribute 0 to `priorScored` (the admitted "degenerate case" fallback, lines 75-77). Since the app deliberately remembers numpad mode per player (D-07), consecutive numpad visits are the *normal* case — so e.g. two 60-visits display "120" after the second instead of "60".
+2. `priorVisits` spans **all legs** (`player.visits.slice(0, -1)`) while `totalScored = startScore - remaining` covers only the current leg. From leg 2 onward, prior-leg dart scores are subtracted from a current-leg-only figure, driving the result negative and clamping to `Math.max(0, …)` → the line shows "0".
+**Fix:** Persist the numpad visit total on the `Visit` in the reducer (add `total?: number`), then `completedTotal = lastCompletedVisit?.total ?? null` removes all reconstruction. Interim: slice from `legStartIndex` instead of 0.
 
-### WR-05: Bust visits with 1 or 2 darts are not counted as 3 darts thrown — violates the module's own documented rule
+### WR-05: Bust visits with 1 or 2 darts are not counted as 3 darts thrown — violates the module's own rule
 
 **File:** `src/engine/averages.ts:18-20`
-**Issue:** The file header states "Bust visits: count as 3 darts thrown, 0 scored" (standard darts convention), but `totalDartsThrown` computes `v.darts.length > 0 ? v.darts.length : 3`. A board-mode bust on dart 1 or dart 2 (entirely possible: overshoot or reach 1 on the first dart) stores a visit with 1-2 darts, which counts as 1-2 — undercounting the denominator and inflating the average. The test suite's `bustVisit()` helper always uses exactly 3 darts, so this gap is untested.
+**Issue:** The header states "Bust visits: count as 3 darts thrown, 0 scored," but `totalDartsThrown` computes `v.darts.length > 0 ? v.darts.length : 3`. A board-mode bust on dart 1 or 2 (overshoot/reach-1 on the first dart is possible) stores a 1-2 dart visit, counted as 1-2 — undercounting the denominator and inflating the average. The test helper `bustVisit()` always uses 3 darts, so this is untested.
 **Fix:**
 ```ts
-return visits.reduce(
-	(sum, v) => sum + (v.bust || v.darts.length === 0 ? 3 : v.darts.length),
-	0
-);
+return visits.reduce((sum, v) => sum + (v.bust || v.darts.length === 0 ? 3 : v.darts.length), 0);
 ```
-Add a test with a 1-dart bust visit.
+Add a 1-dart bust test.
 
-### WR-06: `dartsUsed` is collected, logged, then dropped — numpad finishes always count as 3 darts in averages
+### WR-06: `dartsUsed` is collected, logged, then dropped — numpad finishes always count as 3 darts
 
 **File:** `src/engine/reducer.ts:210, 226-239`, `src/engine/types.ts:12-16`
-**Issue:** `applyNumpadVisit` destructures `dartsUsed = 3` and never uses it (dead variable). The finishing visit is stored as `darts: []`, and `totalDartsThrown` treats empty-dart visits as 3 darts. So a 1- or 2-dart numpad finish — the entire point of the `DartsAtDoubleDialog` asking "wie viele Darts?" — is counted as 3 darts, understating leg and match averages on every short finish. The data survives only in the event log, where nothing reads it. The `Visit` interface has no field to carry it.
-**Fix:** Add `dartsUsed?: number` to `Visit`, store it in the finishing numpad visit, and make `totalDartsThrown` prefer `v.dartsUsed ?? (v.darts.length || 3)`. Remove the unused destructuring otherwise.
+**Issue:** `applyNumpadVisit` destructures `dartsUsed = 3` (line 210) but never uses it — dead variable. The finishing visit is stored as `darts: []`, and `totalDartsThrown` treats empty-dart visits as 3 darts. So a 1- or 2-dart numpad finish — the entire purpose of `DartsAtDoubleDialog` asking how many darts — is counted as 3, understating leg/match averages on every short finish. The value survives only in the event log, which nothing reads. `Visit` has no field to carry it.
+**Fix:** Add `dartsUsed?: number` to `Visit`, store it on the finishing numpad visit, and make `totalDartsThrown` prefer `v.dartsUsed ?? (v.darts.length || 3)`. Otherwise remove the dead destructuring.
 
 ### WR-07: Set-win path hardcodes `totalLegsCompleted = 0` — player 0 starts the first leg of every set
 
 **File:** `src/engine/reducer.ts:292-294`
-**Issue:** After a set win (match continues), `const totalLegsCompleted = 0` forces `nextLegStarter = 0`. Combined with within-set starter computation summing `legsWon` (which is reset to 0 at each set start), the starter sequence is identical every set: player 0, player 1, … Player 0 systematically throws first in every set's first leg — a material advantage. Standard darts alternates the thrower continuously across legs (and alternates set starters).
-**Fix:** Track a cumulative leg counter on `MatchState` (e.g. `legsCompleted: number`, incremented on every leg win, never reset), and derive `legStarterIndex(legsCompleted, numPlayers)` from it in both the set-win and leg-win paths.
+**Issue:** After a set win that continues the match, `const totalLegsCompleted = 0` forces `nextLegStarter = legStarterIndex(0, n) = 0`. Combined with the within-set starter being derived from summed `legsWon` (reset to 0 each set), the starter sequence repeats identically every set: player 0 always throws first in each set's opening leg — a material advantage. Standard darts alternates the thrower continuously.
+**Fix:** Track a cumulative leg counter on `MatchState` (e.g. `legsCompleted`, incremented on every leg win, never reset) and derive the starter from it in both the set-win and leg-win paths.
 
-### WR-08: Snapshot/channel payloads are trusted without shape validation — schema drift crashes the display route
+### WR-08: localStorage publish still serializes the raw reactive proxy (asymmetric with the 02-05 snapshot fix)
 
-**File:** `src/stores/display.svelte.ts:33-46`, `src/routes/display/+page.svelte:25, 133`
-**Issue:** `JSON.parse(raw) as MatchState` only guards against *syntactically* invalid JSON. Valid JSON of the wrong shape (a snapshot persisted by an older/newer app version after a schema change — e.g. one without `legStartVisitIndex`, or with `players` missing) passes the cast, and the route then dereferences `matchState.players.reduce(...)` and `matchState.legStartVisitIndex[player.id]`, throwing a TypeError that takes down the spectator page until localStorage is manually cleared. `MatchState` *will* evolve (Phase 4 adds stats). The same applies to `e.data` from the BroadcastChannel listener (line 44-46). The store's security comment claims T-02-01 is satisfied by the try/catch, which is misleadingly incomplete.
-**Fix:** Add a minimal structural guard before accepting either source, e.g.:
+**File:** `src/stores/match.svelte.ts:40`
+**Issue:** 02-05 changed the BroadcastChannel publish to `$state.snapshot(this.state)` but left `localStorage.setItem(LS_SNAPSHOT, JSON.stringify(this.state))` serializing the raw proxy. `JSON.stringify` tolerates the Svelte proxy today, so it does not throw — but the two sync paths now produce payloads differently, and the persistence path relies on the exact proxy→JSON coercion the team just stopped trusting for `postMessage`. If a future field holds a non-plain value, this fails silently in the `catch` and the cold-start snapshot stops updating with no signal.
+**Fix:** Snapshot once, reuse for both sinks:
 ```ts
-function isMatchState(v: unknown): v is MatchState {
-	return !!v && typeof v === 'object'
-		&& Array.isArray((v as MatchState).players)
-		&& typeof (v as MatchState).phase === 'string'
-		&& typeof (v as MatchState).legStartVisitIndex === 'object';
-}
+const snap = $state.snapshot(this.state);
+try { const ch = new BroadcastChannel(BC_CHANNEL); ch.postMessage(snap); ch.close(); } catch {}
+try { localStorage.setItem(LS_SNAPSHOT, JSON.stringify(snap)); } catch {}
 ```
-Optionally version the snapshot key (`neverman-match-snapshot-v1`) so schema changes invalidate old data automatically.
 
-### WR-09: e2e suite never exercises the live BroadcastChannel path; Test 1 is a strict subset of Test 2
+### WR-09: Live-sync e2e (Test 3) can pass even if the BroadcastChannel path is broken
 
-**File:** `e2e/spectator-sync.spec.ts:60-110`
-**Issue:** Both tests verify only the localStorage-hydration path (open or reload the display page after a visit). No test asserts that an already-open display updates **without** a reload — the actual "live sync" half of DISP-05. This is precisely the gap that lets CR-01 (broken `postMessage`) ship undetected. Additionally, lines 60-79 (Test 1) are a verbatim subset of lines 84-99 (Test 2's first half) — Test 1 adds no coverage.
-**Fix:** Replace Test 1 with a live-sync test: open `/display`, assert 501 visible, enter a visit on the scoring page, then assert 321 appears on the display **without** calling `reload()`.
+**File:** `e2e/spectator-sync.spec.ts:118-143`
+**Issue:** Test 3 is intended to guard against `DataCloneError` regressions on the live path, but the display also hydrates from the **localStorage snapshot** written synchronously by every `dispatch()` (`match.svelte.ts:40`). Opening before the dart registers the BroadcastChannel listener, but the final `getByText('321')` assertion does not prove the update arrived *via* the channel — if live sync silently regressed, an incidental re-read of localStorage or a future `storage`-event fallback could still surface 321 and the test stays green. The test's stated purpose is not actually pinned.
+**Fix:** Make the path-specific: after the display hydrates, clear/block the localStorage snapshot in the display tab (or spy on the channel) so the only route to 321 is a received message. Alternatively assert on a value reachable only via a delta the snapshot never held at open time.
 
 ### WR-10: Correction window silently skipped after UNDO — visit counts never sync downward
 
 **File:** `src/routes/match/+page.svelte:66-88`
-**Issue:** `lastVisitCounts[player.id]` only ever increases. After an UNDO that removes a completed visit, `player.visits.length` drops below the recorded count, but the record is not corrected. The player's next completed visit then satisfies `visits.length > prevCount === false` (e.g. 1 > 1), so no correction window appears for that visit — the 2.5s review/undo affordance silently disappears exactly after a correction was made, the moment it matters most.
-**Fix:** In the watcher effect, when `player.visits.length < prevCount`, write the lower value back: `lastVisitCounts = { ...lastVisitCounts, [player.id]: player.visits.length }`.
+**Issue:** `lastVisitCounts[player.id]` only ever increases (line 79). After an UNDO that removes a completed visit, `player.visits.length` drops below the recorded count, but the record is not corrected. The player's next completed visit then fails `visits.length > prevCount` (e.g. 1 > 1 is false), so no correction window appears for that visit — the 2.5s review/undo affordance vanishes exactly after a correction was made, when it matters most.
+**Fix:** In the watcher, when `player.visits.length < prevCount`, write the lower value back:
+```ts
+if (player.visits.length < prevCount) {
+  lastVisitCounts = { ...lastVisitCounts, [player.id]: player.visits.length };
+}
+```
 
 ## Info
 
-### IN-01: `'leg-complete'` phase is dead — never produced by the reducer; comment references it misleadingly
+### IN-01: `'leg-complete'` phase is dead code; two comments describe a transition the reducer never makes
 
-**File:** `src/engine/types.ts:42`, `src/routes/match/+page.svelte:98`
-**Issue:** The reducer transitions leg wins directly to `'playing'` or `'match-complete'`; no code path ever sets `'leg-complete'`. The comment in `match/+page.svelte` ("We detect this by watching for phase 'leg-complete'") describes a mechanism that does not exist (the code actually uses `prevRemaining === total`).
-**Fix:** Either remove `'leg-complete'` from the union or document it as reserved; fix the stale comment.
+**File:** `src/engine/types.ts:42`, `src/routes/display/+page.svelte:48`, `src/routes/match/+page.svelte:97-98`
+**Issue:** The reducer transitions leg wins directly to `'playing'` or `'match-complete'`; no path sets `'leg-complete'`. The display comment ("transitioning back to 'playing' (leg-complete → playing)") and the match-page comment ("watching for phase 'leg-complete' after a NUMPAD_VISIT") both describe a mechanism that does not exist — the match page actually uses a trial `reduce()` checking `match-complete`, and the display uses count-diffing. Stale comments actively mislead.
+**Fix:** Remove `'leg-complete'` from the union (or mark reserved), and correct both comments to describe the real mechanisms.
 
 ### IN-02: Board-mode winning and bust visits hardcode `dartsAtDouble: 0`
 
 **File:** `src/engine/reducer.ts:143-147, 165`
-**Issue:** A board-entered winning dart is by definition a dart at a double (double-out), and busts at ≤50 often involve double attempts, yet both visit records store `dartsAtDouble: 0`. Phase 4 checkout statistics computed from visits will be wrong for board-mode play.
-**Fix:** For the winning visit, record at least `dartsAtDouble: 1` (the finishing dart); consider deriving attempts from darts thrown while remaining ≤ 50 with an even score.
+**Issue:** A board-entered winning dart is by definition a dart at a double (double-out), and busts at low scores often involve double attempts, yet both visit records store `dartsAtDouble: 0`. Phase 4 checkout statistics derived from visits will be wrong for board-mode play.
+**Fix:** Record at least `dartsAtDouble: 1` on the winning visit; consider deriving attempts from darts thrown while remaining ≤ 50.
 
-### IN-03: A new BroadcastChannel is constructed and torn down on every dispatch; snapshot serializes the full event log
+### IN-03: A new BroadcastChannel is constructed and torn down on every dispatch; snapshot includes the full event log
 
-**File:** `src/stores/match.svelte.ts:31-33, 40`
-**Issue:** Channel churn per dart is unnecessary; a single lazily-created module-level channel suffices and removes any risk of a queued message being dropped by an immediate `close()`. The localStorage snapshot also includes `eventLog`, which grows with every dart over a long match — harmless today but worth noting before Phase 4 piles stats on.
+**File:** `src/stores/match.svelte.ts:30-33, 40`
+**Issue:** Channel churn per dart is unnecessary; a single lazily-created module-level channel suffices and removes any risk of an immediate `close()` dropping a just-queued message. The localStorage snapshot also serializes `eventLog`, which grows with every dart — harmless now but worth noting before Phase 4.
 **Fix:** Create the channel once (guarded by try/catch) and reuse it.
 
 ### IN-04: SpectatorChooser outside-click handler queries its own elements via global `document.querySelector`
 
-**File:** `src/ui/display/SpectatorChooser.svelte:45-52`
-**Issue:** `.chooser-menu`/`.chooser-icon-btn` are looked up document-wide; any other element with those classes (or a second component instance) breaks the dismissal logic.
-**Fix:** Use `bind:this` element references and `element.contains(target)`.
+**File:** `src/ui/display/SpectatorChooser.svelte:46-52`
+**Issue:** `.chooser-menu` / `.chooser-icon-btn` are looked up document-wide; another element with those classes (or a second instance) would break dismissal.
+**Fix:** Use `bind:this` element references with `element.contains(target)`.
 
 ### IN-05: Display-route exit timer not cleared on unmount; leg-win banner can leak into a new match
 
 **File:** `src/routes/display/+page.svelte:79-108, 37-45`
-**Issue:** (a) `exitTimerId` is only cleared via `exitToMatch`; navigating away by other means leaves the timeout pending and writing `$state` after destroy. (b) `legWinMessage` is cleared only on `currentVisit.length > 0`; if a *new* match is started while the banner is up, the banner persists over the fresh 501 board until the first dart.
-**Fix:** Add an `$effect` teardown (or `onDestroy`) clearing the timer; also clear `legWinMessage` when `eventLog.length <= 1` / players reset (new match detected).
+**Issue:** (a) `exitTimerId` is cleared only via `exitToMatch`; navigating away by other means leaves the timeout pending and writing `$state` after destroy. (b) `legWinMessage` is cleared only on `currentVisit.length > 0`; if a *new* match starts while the banner is up, it persists over the fresh 501 board until the first dart.
+**Fix:** Add an `$effect` teardown clearing the timer; also clear `legWinMessage` when a new match is detected (e.g. `eventLog.length <= 1` or all `remaining === startScore`).
 
 ### IN-06: Invalid finishing total opens the darts-at-double dialog, then the visit is silently dropped
 
 **File:** `src/routes/match/+page.svelte:109-130`
-**Issue:** If `remaining` equals an impossible total (e.g. 179) and the player enters exactly that, `isFinish` is true, the trial reduce returns unchanged state (`phase` still `'playing'`), so the code takes the "leg win that continues the match" branch and shows the dialog; on confirm, the reducer rejects the visit and nothing happens — confusing dead-end UX.
-**Fix:** After the trial reduce, also verify the visit was accepted (e.g. `prospective !== matchStore.state` or `prospective.players[idx].remaining === 0`) before showing the dialog; otherwise treat as invalid input.
+**Issue:** If `remaining` equals an impossible total (e.g. 179) and the player enters it, `isFinish` is true, the trial `reduce()` returns unchanged state (`phase` still `'playing'`), so the "leg win that continues the match" branch shows the dialog; on confirm, the reducer rejects the visit and nothing happens — a confusing dead end.
+**Fix:** After the trial reduce, verify the visit was accepted (e.g. `prospective.players[idx].remaining === 0`) before showing the dialog; otherwise treat as invalid input.
 
 ---
 
-_Reviewed: 2026-06-11T17:05:53Z_
+_Reviewed: 2026-06-11T18:43:23Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_

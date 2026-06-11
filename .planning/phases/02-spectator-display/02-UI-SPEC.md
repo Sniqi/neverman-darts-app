@@ -46,7 +46,7 @@ Identical to Phase 1. Phase 2 adds no new spacing tokens.
 
 | Element | Value | Reason |
 |---------|-------|--------|
-| Panel separator line | 2px | Thin visible divider between player columns — readable from 3 m without stealing space |
+| Panel separator line | 2px | Used as CSS `gap` on `.panels-grid` — creates a thin visible divider between player columns (layout spacing, not a border dimension); readable from 3 m without stealing space |
 | Match header bar height | 40px | Fixed slim bar; not a spacing token but a component dimension |
 | SpectatorChooser touch targets | 48px minimum height | Operated mid-match while a game is in progress |
 
@@ -62,13 +62,12 @@ Typography is tuned for legibility on a 27" monitor at 3 m (DISP-04 requirement)
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Remaining score (Display) | `clamp(4rem, 8vw, 12rem)` | 700 | 1.0 | Dominant per-panel number — the primary at-a-glance value from 3 m |
+| Remaining score (Display) | `clamp(4rem, 8vw, 12rem)` | 600 | 1.0 | Dominant per-panel number — the primary at-a-glance value from 3 m |
 | Player name (Heading) | `clamp(1.5rem, 3vw, 4rem)` | 600 | 1.1 | Per-panel player name above the score |
-| Legs/sets won (Subheading) | `clamp(1rem, 2vw, 2.5rem)` | 600 | 1.1 | Legs/sets tally below player name |
-| Stats + visit line (Body) | `clamp(0.875rem, 1.5vw, 1.75rem)` | 400 | 1.3 | Leg avg, match avg, visit line, checkout suggestion |
+| Stats + visit line (Body) | `clamp(0.875rem, 1.5vw, 1.75rem)` | 400 | 1.3 | Leg avg, match avg, visit line, checkout suggestion; legs/sets tally uses this size at weight 600 to differentiate from the stats line |
 | Match header bar (Label) | `clamp(0.75rem, 1.2vw, 1.5rem)` | 400 | 1.2 | Game mode, out rule, format, current leg string |
 
-**Weight rules:** Only 2 weights are used — 400 (regular) and 600/700 (bold). The remaining score uses 700 for maximum visual weight; all other emphasis uses 600.
+**Weight rules:** Exactly 2 weights — 400 (regular) and 600 (bold). The remaining score's visual dominance comes from its display-scale font size; it uses 600 consistent with all other bold elements. The legs/sets tally is rendered at Body size and weight 600 to distinguish it from the stats/visit line at weight 400.
 
 **Letter spacing:** Remaining score uses `letter-spacing: -0.02em` to tighten the large display number. No other elements use non-default letter spacing.
 
@@ -256,6 +255,8 @@ All copy in German, consistent with Phase 1.
 | Idle screen app name | Neverman Darts |
 | Idle screen status | Warte auf Match… |
 | Monitor icon aria-label | Anzeigemodus öffnen |
+| Fullscreen toggle icon aria-label (PC, enter fullscreen) | Vollbild aktivieren |
+| Fullscreen toggle icon aria-label (PC, exit fullscreen) | Vollbild beenden |
 | Chooser menu heading | Anzeigemodus |
 | Second window option | Zweites Fenster öffnen |
 | Tablet fullscreen option | Anzeige hier im Vollbild |
@@ -326,6 +327,7 @@ All copy in German, consistent with Phase 1.
 | Contrast | All text on display surfaces meets WCAG AA minimum 4.5:1 (all verified above — all exceed 8:1). BUST destructive tint is decorative; the "BUST" label text meets contrast independently. |
 | Screen reader (display) | Display is a read-only dashboard — not the primary interaction surface. Use `role="status" aria-live="polite"` on the remaining score so score changes are announced if a screen reader is present. |
 | Keyboard (chooser menu) | Tab + Enter navigable. Escape dismisses the menu. Focus returns to the monitor icon on dismiss. |
+| Fullscreen toggle button (PC) | `position: fixed; top: 8px; right: 8px` icon button; `aria-label` toggles between "Vollbild aktivieren" (when not fullscreen) and "Vollbild beenden" (when fullscreen). Must update on `fullscreenchange` event. |
 | Fullscreen API denial | If `requestFullscreen()` is denied (device/permission), display works correctly in normal browser window. No crash, no empty UI. |
 | No `{@html}` | Player names and all state-derived strings rendered via `{interpolation}` only — Svelte auto-escape, consistent with Phase 1 security pattern T-03-04. |
 

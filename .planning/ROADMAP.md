@@ -81,7 +81,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The spectator view is readable on a 27" monitor from 3 m (large typography, high contrast, dark mode) with correct layouts for 1–4 players
   4. The spectator window updates live on every dart entry and automatically re-syncs its state when closed and reopened or reloaded mid-match
 
-**Plans:** 5/5 plans complete
+**Plans:** 5/6 plans complete (02-06 gap closure pending)
 **UI hint**: yes
 Plans:
 **Wave 1**
@@ -103,6 +103,10 @@ Plans:
 **Wave 5 — Gap closure (verification 2026-06-11)** *(closes the 2 blockers + WR-02 from 02-VERIFICATION.md: dead live BroadcastChannel sync + infinite leg-win effect loop + popup-blocked false positive)*
 
 - [x] 02-05-PLAN.md — Restore live sync ($state.snapshot publisher, CR-01/DISP-05), fix infinite $effect loop (CR-02), fix SpectatorChooser popup-blocked false positive (WR-02/DISP-01), add live no-reload e2e test (Wave 5)
+
+**Wave 6 — Gap closure (UAT 2026-06-11)** *(closes the 1 DISP-02 UAT gap from 02-UAT.md Test 4: tablet "Vollbild aktivieren" prompt hidden during an active match)*
+
+- [ ] 02-06-PLAN.md — Widen the tablet fullscreen prompt to appear mid-match via a fullscreen-intent query flag, without regressing the PC second window (DISP-02) (Wave 6)
 
 ### Phase 3: Persistence & Data
 

@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 01-12-PLAN.md
-last_updated: "2026-06-11T00:51:25.306Z"
-last_activity: 2026-06-10 -- Phase 01 execution started
+last_updated: "2026-06-11T11:50:16.028Z"
+last_activity: 2026-06-11 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 13
+  completed_plans: 13
   percent: 17
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 01 (playable-x01-match) — EXECUTING
-Plan: 4 of 12
+Plan: 2 of 13
 Status: Ready to execute
-Last activity: 2026-06-10 -- Phase 01 execution started
+Last activity: 2026-06-11 -- Phase 01 execution started
 
 Progress: [█████████░] 89%
 
@@ -64,6 +64,7 @@ Progress: [█████████░] 89%
 | Phase 01-playable-x01-match P10 | 8min | 2 tasks | 6 files |
 | Phase 01-playable-x01-match P11 | 3min | 2 tasks | 2 files |
 | Phase 01-playable-x01-match P12 | 8min | 3 tasks | 6 files |
+| Phase 01-playable-x01-match P13 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,8 @@ Recent decisions affecting current work:
 - [Phase 01-07]: Darts-at-double dialog suppressed for match-winning visits (win overlay owns screen)
 - [Phase 01-08]: remaining getter subtracts currentVisit running total for live display; reducer stays committed at visit end only (CR-06 / ENG-07)
 - [Phase ?]: Collapsible Profile verwalten toggle chosen over always-visible section to keep setup screen uncluttered
+- [Phase ?]: Trial reduce for match-win detection: import pure reduce() from engine, compute prospective state before dispatch decision — read-only, no mutation (01-13)
+- [Phase ?]: Flash key keyed on multiplier not segment: multiplier===2 && segment===25 → inner-bull; segment===50 branch was dead code since 01-10 (01-13)
 
 ### Pending Todos
 
@@ -111,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-11T00:05:29.045Z
+Last session: 2026-06-11T11:50:16.022Z
 Stopped at: Completed 01-12-PLAN.md
 Resume file: None

@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Player can undo any dart or completed visit, including a leg- or set-winning throw, without corrupting leg/set counts
   5. Checkout suggestions appear for the next 1–3 darts when a finish is possible; bogey numbers and scores above 170 show no suggestion; the screen stays awake throughout the match
 
-**Plans:** 13 plans (12 complete; 01-13 gap closure planned)
+**Plans:** 13/13 plans complete
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Walking Skeleton: scaffold SvelteKit + adapter-static + Dexie + Vitest, real profile read/write + one wired dartboard tap, failing E2E baseline, SKELETON.md
@@ -66,7 +66,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 6 — Gap closure (re-verification round 3, 2026-06-11)** *(closes the 2 remaining defects from 01-VERIFICATION.md score 4/5: E2E-blocking match-win dialog regression + inner-bull flash region)*
 
-- [ ] 01-13-PLAN.md — Restore match-win darts-at-double suppression via trial reduce so the E2E happy-path passes (CR-01); fix Dartboard inner-bull flash region, remove dead segment===50 branch (WR-02)
+- [x] 01-13-PLAN.md — Restore match-win darts-at-double suppression via trial reduce so the E2E happy-path passes (CR-01); fix Dartboard inner-bull flash region, remove dead segment===50 branch (WR-02)
 
 ### Phase 2: Spectator Display
 
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Playable X01 Match | 12/13 | Gap closure | - |
+| 1. Playable X01 Match | 13/13 | Complete   | 2026-06-11 |
 | 2. Spectator Display | 0/? | Not started | - |
 | 3. Persistence & Data | 0/? | Not started | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |

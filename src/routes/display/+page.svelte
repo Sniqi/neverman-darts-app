@@ -75,6 +75,13 @@
 	// Guard document access — the route has ssr:false but fullscreen API must
 	// only be called in browser context inside $effect / click handlers.
 	let isFullscreen = $state(false);
+
+	// Read the tablet-fullscreen intent flag once at mount (fixed for page lifetime).
+	// SpectatorChooser's goToDisplayFullscreen() sets ?fullscreen=1; openSecondWindow()
+	// does NOT — so a PC second window never carries this flag and cannot show the prompt.
+	const tabletFullscreenIntent =
+		typeof window !== 'undefined' &&
+		new URLSearchParams(window.location.search).get('fullscreen') === '1';
 	let showExit = $state(false);
 	let exitTimerId: ReturnType<typeof setTimeout> | null = null;
 
@@ -166,8 +173,10 @@
 	{/if}
 </button>
 
-<!-- Tablet fullscreen prompt (D-14, DISP-02): shown on first load when not fullscreen -->
-{#if !isFullscreen && (matchState === null || matchState.phase === 'setup')}
+<!-- Tablet fullscreen prompt (D-14, DISP-02): shown when not fullscreen AND either idle/setup
+     OR the tablet-fullscreen intent flag is set (?fullscreen=1, only set by SpectatorChooser's
+     goToDisplayFullscreen — PC second window has no flag and is never affected). -->
+{#if !isFullscreen && (matchState === null || matchState.phase === 'setup' || tabletFullscreenIntent)}
 	<button class="fullscreen-prompt" onclick={activateFullscreen}>
 		Vollbild aktivieren
 	</button>

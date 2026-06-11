@@ -34,7 +34,7 @@
 
 	function goToDisplayFullscreen() {
 		close();
-		goto(`${base}/display`);
+		goto(`${base}/display?fullscreen=1`);
 	}
 
 	function handleKeydown(e: KeyboardEvent) {

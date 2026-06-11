@@ -13,7 +13,7 @@
 			<div class="player-name">{player.name}</div>
 			<div class="score-row">
 				<span class="remaining" class:remaining-active={isActive} class:remaining-inactive={!isActive}>
-					{player.remaining}
+					{isActive ? matchStore.remaining : player.remaining}
 				</span>
 				{#if isActive}
 					<CheckoutSuggestion />

@@ -5,16 +5,17 @@
 //   - src/stores/match.svelte.ts publishes on 'neverman-match' channel
 //   - src/stores/display.svelte.ts is mounted on /display
 //
-// Note: BroadcastChannel live delivery between Playwright pages requires both
-// pages to be open in the same browser context AND the Svelte reactive scheduler
-// to process updates from async callbacks. In the Playwright preview-server setup,
-// the reliable path for DISP-05 is the localStorage snapshot handshake:
-// MatchStore.dispatch() writes every state to localStorage synchronously, and
-// DisplayStore.connect() reads it on mount. Both tests verify this via opening/
-// reloading the display page after a visit (which is the primary re-hydration path).
+// Both sync paths are now covered:
+//   - Live BroadcastChannel path (Test 3): /display open before dart, asserts update without reload.
+//     Guards against DataCloneError regressions in the postMessage publisher.
+//   - localStorage snapshot path (Tests 1 & 2): /display opened/reloaded after a dart.
+//
+// BroadcastChannel live delivery between Playwright pages requires both pages to be
+// open in the SAME browser context. Tests use context.newPage() to share a context.
 //
 // Test 1: display opened AFTER a visit — re-hydrates from snapshot (primary path)
 // Test 2: display opened THEN scoring page enters a visit, display reloads — re-hydrates
+// Test 3: display opened BEFORE a visit — live BroadcastChannel update without reload (DISP-05)
 import { test, expect } from 'playwright/test';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -106,5 +107,37 @@ test('DISP-05: display re-hydrates current score after reload mid-match', async 
 	await displayPage.reload();
 	await expect(
 		displayPage.getByText('141')
+	).toBeVisible({ timeout: 5000 });
+});
+
+// ── Test 3: Live BroadcastChannel sync without reload (DISP-05) ───────────
+// Opens /display BEFORE the dart is entered so the BroadcastChannel listener
+// is registered first, then asserts the score updates live with no reload.
+// Guards against DataCloneError regressions in the postMessage publisher.
+
+test('DISP-05: open /display updates live on dart entry without reload', async ({ context }) => {
+	// 1. Open scoring page and start a match
+	const scoringPage = await context.newPage();
+	await setupAndStartMatch(scoringPage);
+
+	// 2. Open display page in the SAME context BEFORE entering any darts
+	//    This ensures the BroadcastChannel listener is registered before the message fires
+	const displayPage = await context.newPage();
+	await displayPage.setViewportSize({ width: 1280, height: 800 });
+	await displayPage.goto('/display');
+
+	// 3. Assert starting remaining 501 is visible — confirms listener is registered
+	// Use exact: true to avoid ambiguity with the header bar "501 Double Out …"
+	await expect(
+		displayPage.getByText('501', { exact: true })
+	).toBeVisible({ timeout: 5000 });
+
+	// 4. Enter a dart visit on the scoring page: 180 → remaining becomes 321
+	await enterNumpadVisit(scoringPage, 180);
+
+	// 5. Assert display shows 321 WITHOUT calling displayPage.reload()
+	//    This proves the live BroadcastChannel path is working
+	await expect(
+		displayPage.getByText('321')
 	).toBeVisible({ timeout: 5000 });
 });

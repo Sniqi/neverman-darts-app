@@ -11,7 +11,12 @@ findings:
   warning: 2
   info: 2
   total: 4
-status: issues_found
+status: addressed
+resolution:
+  WR-01: "resolved in commit ede8637 — hasEnteredFullscreen latch; re-verified in real browser (fullscreen round-trip → prompt stays hidden, scoreboard unobstructed)"
+  WR-02: "accepted as latent — documented load-bearing assumption (cross-route entry only); not triggerable today"
+  IN-01: "accepted — intentional defense-in-depth, harmless"
+  IN-02: "deferred — no automated test added (out of gap-closure scope); DISP-02 covered by real-browser UAT re-verification"
 ---
 
 # Phase 02 (Plan 02-06): Code Review Report
@@ -37,6 +42,8 @@ The remaining findings are robustness and UX-durability concerns, not correctnes
 ## Warnings
 
 ### WR-01: Amber prompt re-appears over the live scoreboard whenever fullscreen is exited mid-match (tablet)
+
+**✅ RESOLVED (commit `ede8637`).** Per user decision, added a `hasEnteredFullscreen` latch (set in the `fullscreenchange` handler) and gated the intent term: `... || (tabletFullscreenIntent && !hasEnteredFullscreen)`. Re-verified in a real browser — genuine fullscreen entry via a trusted click, then exit, confirms the prompt stays hidden and the scoreboard is unobstructed; first-arrival prompt and PC no-flag no-regression both still hold; 221 tests + build green. Original finding retained below for the record.
 
 **File:** `src/routes/display/+page.svelte:179`
 **Issue:** `tabletFullscreenIntent` is fixed `true` for the entire page lifetime on the tablet path, and the prompt condition is `!isFullscreen && (... || tabletFullscreenIntent)`. After the user taps the prompt and enters fullscreen (`isFullscreen` → `true`, prompt hides), any subsequent fullscreen *exit* — via the top-right `.fullscreen-toggle`, the browser/OS gesture, or Android system back — flips `isFullscreen` back to `false` and the large bottom-center amber button **re-renders on top of the active scoreboard and stays there for the rest of the match.** This is exactly the "amber prompt obstructing the live scoreboard" outcome the plan's `design_decision` set out to avoid; the design only proved the PC window is unaffected, not that the tablet window is unobstructed after a fullscreen round-trip. Note the `.exit-btn` ("Zurück zur Eingabe") leaves via `goto('/match')` rather than just exiting fullscreen, so the common exit path avoids this — but a manual fullscreen exit that keeps the user on `/display` does not.

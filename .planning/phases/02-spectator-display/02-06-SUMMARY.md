@@ -59,7 +59,7 @@ completed: "2026-06-11"
 ## Files Created/Modified
 
 - `src/ui/display/SpectatorChooser.svelte` — `goToDisplayFullscreen()` now navigates to `` `${base}/display?fullscreen=1` ``; `openSecondWindow()` left unchanged (no query flag on PC path)
-- `src/routes/display/+page.svelte` — Reads `fullscreen=1` flag once at mount from `window.location.search` as a plain `const`; `.fullscreen-prompt` render condition widened to `!isFullscreen && (matchState === null || matchState.phase === 'setup' || tabletFullscreenIntent)` with an inline comment explaining that the PC second window never carries the flag
+- `src/routes/display/+page.svelte` — Reads `fullscreen=1` flag once at mount from `window.location.search` as a plain `const`; `.fullscreen-prompt` render condition widened to `!isFullscreen && (matchState === null || matchState.phase === 'setup' || (tabletFullscreenIntent && !hasEnteredFullscreen))`. The `hasEnteredFullscreen` latch (added in the code-review follow-up, commit `ede8637`) prevents the prompt from re-rendering over the live scoreboard after a mid-match fullscreen round-trip (WR-01); an inline comment explains both the PC-no-flag and latch rationale.
 
 ## Decisions Made
 
@@ -83,7 +83,24 @@ Verification was performed by the orchestrator via a real Playwright browser ses
 | PC path: navigated to `/display` (no flag) with same playing match | `.fullscreen-prompt` ABSENT; only `.fullscreen-toggle` present | **PASS** — amber prompt not rendered; small toggle icon present |
 | Idle: `/display` with no flag, no match state | `.fullscreen-prompt` present on idle "Warte auf Match…" screen | **PASS** — existing behavior unchanged |
 
-**Caveat:** Actual fullscreen entry (tapping the prompt to call `document.documentElement.requestFullscreen()`) was not exercised under Playwright automation — the Fullscreen API requires a real user gesture and cannot be triggered programmatically in headless mode. However, this plan only widened the prompt's *render condition*; the `onclick={activateFullscreen}` wiring is pre-existing, untouched behavior from Plan 02-04. Only console error observed was an unrelated favicon.ico 404.
+**Caveat (superseded by the WR-01 follow-up below):** the original Task 2 check did not exercise actual fullscreen entry. During the code-review follow-up, a real fullscreen round-trip WAS exercised in the browser (trusted click → `document.fullscreenElement` became non-null → exit), so fullscreen entry is now confirmed working. Only console error observed throughout was an unrelated favicon.ico 404.
+
+## Post-Review Follow-Up — WR-01 latch (commit `ede8637`)
+
+A scoped code review of this gap-closure diff (`02-06-REVIEW.md`, 0 critical) surfaced **WR-01**: because `tabletFullscreenIntent` is sticky for the page lifetime, exiting fullscreen mid-match (top-right toggle, Android back, or OS gesture — but NOT the "Zurück zur Eingabe" button, which leaves `/display`) re-rendered the amber prompt over the live scoreboard. The plan was silent on this case; per user decision, a `hasEnteredFullscreen` latch was added (set in the `fullscreenchange` handler) and ANDed onto the intent term so the prompt nudges only until the first successful fullscreen entry.
+
+Re-verified in a real browser:
+
+| Scenario | Expected | Result |
+|----------|----------|--------|
+| First mid-match arrival (`/display?fullscreen=1`, latch false) | Prompt shows | **PASS** |
+| Tap prompt → real fullscreen entry | `document.fullscreenElement` set; prompt hides; latch set | **PASS** (trusted click granted fullscreen) |
+| Exit fullscreen, stay on `/display` (toggle / OS gesture) | Prompt stays hidden; scoreboard unobstructed; toggle remains | **PASS** — WR-01 fixed |
+| PC `/display` no-flag, playing match | Prompt absent | **PASS** (no regression) |
+
+`svelte-check` clean for the changed file; 221 unit + 48 browser tests pass; production build green. Remaining review items are advisory: WR-02 (latent same-route-nav staleness — documented assumption), IN-01 (harmless dead SSR guard), IN-02 (no automated test for the prompt matrix — deferred, covered by real-browser UAT).
+
+**Unrelated pre-existing issue flagged (not fixed — out of scope):** `npm run check` reports 1 type error at `src/db/profiles.ts:24` (`id: number | undefined` not assignable to `number` — Dexie auto-increment typing), introduced in phase-01 commit `1dc6dd9`. Confirmed pre-existing (present with this plan's edits stashed); recommend addressing during Phase 03 persistence work.
 
 ## Known Stubs
 

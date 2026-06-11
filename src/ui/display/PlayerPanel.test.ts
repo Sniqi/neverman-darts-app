@@ -9,6 +9,9 @@
 //   4. Shows "—" when player has no visits yet (legAverage/matchAverage returns null)
 //   5. Remaining score element carries display-scale font class (DISP-04)
 //   6. With setsEnabled shows sets and legs; without setsEnabled shows legs only
+//   7. Checkout route shown for active player on a finishing remaining (D-06)
+//   8. Checkout route NOT shown for active player on non-finishing remaining (>170 or bogey)
+//   9. BUST label shown when active player's last visit is a bust (D-08)
 
 import { render } from 'vitest-browser-svelte';
 import { expect, test } from 'vitest';
@@ -152,4 +155,108 @@ test('with setsEnabled shows sets and legs; without setsEnabled shows legs only'
 	// With sets: both shown
 	expect(setsScreen.container.textContent).toContain('S:');
 	expect(setsScreen.container.textContent).toContain('L:');
+});
+
+// --- D-06: Checkout route ---
+
+test('active player on 40 (double-out) shows checkout route "D20"', async () => {
+	const playerOn40: PlayerState = {
+		id: 'p3',
+		name: 'Charlie',
+		isGuest: false,
+		remaining: 40,
+		legsWon: 0,
+		setsWon: 0,
+		visits: [],
+	};
+	const screen = render(PlayerPanel, {
+		player: playerOn40,
+		isActive: true,
+		config: config501Double,
+		legStartIndex: 0,
+		currentVisit: [],
+	});
+	// getSuggestion(40, 'double') = ['D20']
+	expect(screen.container.textContent).toContain('D20');
+});
+
+test('active player on 501 shows no checkout route', async () => {
+	const screen = render(PlayerPanel, {
+		player: playerNoVisits, // remaining: 501
+		isActive: true,
+		config: config501Double,
+		legStartIndex: 0,
+		currentVisit: [],
+	});
+	// 501 > 170 → no route
+	const text = screen.container.textContent ?? '';
+	// Should not contain a checkout route string like D20, T20, Bull
+	expect(text).not.toMatch(/^D\d+$/m);
+	// The checkout route section should not exist or be empty
+	const routeEl = screen.container.querySelector('.checkout-route');
+	expect(routeEl).toBeFalsy();
+});
+
+test('active player on 169 (bogey) shows no checkout route', async () => {
+	const playerOn169: PlayerState = {
+		id: 'p4',
+		name: 'Dave',
+		isGuest: false,
+		remaining: 169,
+		legsWon: 0,
+		setsWon: 0,
+		visits: [],
+	};
+	const screen = render(PlayerPanel, {
+		player: playerOn169,
+		isActive: true,
+		config: config501Double,
+		legStartIndex: 0,
+		currentVisit: [],
+	});
+	const routeEl = screen.container.querySelector('.checkout-route');
+	expect(routeEl).toBeFalsy();
+});
+
+test('inactive player on a finishing remaining shows no checkout route', async () => {
+	const playerOn40: PlayerState = {
+		id: 'p5',
+		name: 'Eve',
+		isGuest: false,
+		remaining: 40,
+		legsWon: 0,
+		setsWon: 0,
+		visits: [],
+	};
+	const screen = render(PlayerPanel, {
+		player: playerOn40,
+		isActive: false, // NOT active
+		config: config501Double,
+		legStartIndex: 0,
+		currentVisit: [],
+	});
+	const routeEl = screen.container.querySelector('.checkout-route');
+	expect(routeEl).toBeFalsy();
+});
+
+// --- D-08: BUST flash ---
+
+test('active player with last visit bust=true shows BUST label', async () => {
+	const playerBust: PlayerState = {
+		id: 'p6',
+		name: 'Frank',
+		isGuest: false,
+		remaining: 180,
+		legsWon: 0,
+		setsWon: 0,
+		visits: [{ darts: [{ multiplier: 3, segment: 20 }, { multiplier: 3, segment: 20 }, { multiplier: 3, segment: 20 }], dartsAtDouble: 0, bust: true }],
+	};
+	const screen = render(PlayerPanel, {
+		player: playerBust,
+		isActive: true,
+		config: config501Double,
+		legStartIndex: 0,
+		currentVisit: [],
+	});
+	expect(screen.container.textContent).toContain('BUST');
 });

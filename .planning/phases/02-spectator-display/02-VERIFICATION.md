@@ -1,245 +1,259 @@
 ---
 phase: 02-spectator-display
-verified: 2026-06-11T18:00:00Z
-status: gaps_found
-score: 3/4 roadmap success criteria verified
+verified: 2026-06-11T19:30:00Z
+status: human_needed
+score: 5/5 must-haves verified
 overrides_applied: 0
-gaps:
-  - truth: "Spectator window stays in sync live on every dart entry (DISP-05 live path)"
-    status: failed
-    reason: >
-      ch.postMessage(this.state) in MatchStore.dispatch() posts a Svelte 5 $state proxy directly.
-      The structured-clone algorithm throws DataCloneError on every dispatch. The surrounding
-      try/catch swallows it silently. No message ever reaches the display page's BroadcastChannel
-      listener. The e2e suite tests ONLY the localStorage snapshot hydration path (both tests
-      open or reload the display page after the visit, never asserting a live update on an
-      already-open window). Live sync has been dead since Plan 02 shipped.
-    artifacts:
-      - path: "src/stores/match.svelte.ts"
-        issue: "Line 32: ch.postMessage(this.state) — this.state is a $state proxy; must be $state.snapshot(this.state)"
-      - path: "e2e/spectator-sync.spec.ts"
-        issue: "Neither test asserts live update without page navigation; broken live path cannot be caught by current suite"
-    missing:
-      - "Replace ch.postMessage(this.state) with ch.postMessage($state.snapshot(this.state)) in dispatch()"
-      - "Add a live-sync e2e test: open /display, enter a dart on /match, assert updated score without reload"
-  - truth: "Leg/set win banner and legWinMessage effect do not cause infinite update loop"
-    status: failed
-    reason: >
-      src/routes/display/+page.svelte lines 34-35 declare prevLegsWon and prevSetsWon as $state([]).
-      Lines 69-70 unconditionally reassign both with freshly created arrays at the end of every
-      effect run. New array references always register as changed $state signals, which reschedule
-      the same effect, which assigns new arrays again — an unbounded self-retriggering loop.
-      Svelte 5 aborts with effect_update_depth_exceeded whenever matchState is non-null and not in
-      'setup' phase, i.e. the normal operating state of the spectator display during any active match.
-      After the effect errors the leg-win banner logic and all subsequent effect-driven updates stop.
-      The e2e tests still pass because they assert static text after hydration, before effects fully
-      flush into error state.
-    artifacts:
-      - path: "src/routes/display/+page.svelte"
-        issue: "Lines 34-35: prevLegsWon and prevSetsWon declared as $state([]); lines 69-70 assign new arrays each run, causing infinite loop"
-    missing:
-      - "Change 'let prevLegsWon: number[] = $state([])' to 'let prevLegsWon: number[] = []' (plain variable, not reactive)"
-      - "Change 'let prevSetsWon: number[] = $state([])' to 'let prevSetsWon: number[] = []' (plain variable, not reactive)"
+re_verification:
+  previous_status: gaps_found
+  previous_score: 3/4
+  gaps_closed:
+    - "CR-01: BroadcastChannel publisher now posts $state.snapshot(this.state) — DataCloneError eliminated, live sync restored"
+    - "CR-02: prevLegsWon/prevSetsWon changed to plain let variables — infinite effect loop eliminated"
+    - "WR-02: SpectatorChooser.openSecondWindow() drops noopener from features string, nulls win.opener manually — popup-blocked false positive fixed"
+    - "Live no-reload e2e test added (Test 3) guarding the BroadcastChannel path against regression"
+  gaps_remaining: []
+  regressions: []
 human_verification:
-  - test: "Verify live BroadcastChannel sync after fix"
-    expected: "On /display (already open), entering a dart on /match updates the displayed remaining score within ~200ms without any page reload"
-    why_human: "Requires two real browser windows or tabs open simultaneously; cannot verify without a running dev server"
-  - test: "Verify leg-win banner appears without runtime crash"
-    expected: "After winning a leg, a full-screen 'Leg für [Name]!' banner appears on /display; no console errors; banner dismisses on first dart of next leg"
-    why_human: "effect_update_depth_exceeded is a runtime Svelte error visible in the browser console — requires running the app through a leg win"
-  - test: "Verify SpectatorChooser popup-blocked behavior"
-    expected: "Clicking 'Zweites Fenster öffnen' opens /display in a new window and the chooser menu closes; the 'Bitte Popups für diese Seite erlauben' message appears ONLY if the window was actually blocked, not on every successful open"
-    why_human: "WR-02 from code review: window.open with noopener returns null even on success, so popupBlocked fires every time and close() is never called — requires human confirmation in a real browser (Chrome/Edge)"
-  - test: "End-of-phase spectator display review (PLAN 02-04 Task 3)"
-    expected: "All 8 verification steps from the plan's how-to-verify section pass: TV grid visible from 3m, active panel distinct, live dart-by-dart update, BUST flash, leg/match-win overlays, idle screen, tablet fullscreen, German copy"
-    why_human: "Visual layout, readability at distance, touch behavior, fullscreen API, and font scale cannot be verified by static analysis"
+  - test: "Live BroadcastChannel sync in two real browser windows (DISP-05)"
+    expected: "Open /display in a second tab or window (do not reload it). Enter a dart on /match. The remaining score on /display decrements live within ~200 ms with no page navigation."
+    why_human: "Requires two live browser windows simultaneously; BroadcastChannel delivery is a runtime browser behavior that static analysis and file checks cannot observe."
+
+  - test: "Leg-win banner appears without runtime crash (CR-02 / D-09)"
+    expected: "Play a match to a leg win. On /display, a full-screen 'Leg fur [Name]!' banner appears. Browser console shows NO effect_update_depth_exceeded error. Banner dismisses on the first dart of the next leg."
+    why_human: "The effect_update_depth_exceeded error is a Svelte 5 runtime abort visible only in a running browser. Cannot be caught by svelte-check or static analysis."
+
+  - test: "SpectatorChooser popup behavior in a real browser (DISP-01 / WR-02)"
+    expected: "In Chrome/Edge with popups allowed for localhost, click 'Zweites Fenster offnen'. /display opens in a new window, the chooser menu closes, and 'Bitte Popups fur diese Seite erlauben' does NOT appear. The message appears only if the browser genuinely blocks the popup."
+    why_human: "window.open return-value behavior and popup-block detection is browser-runtime-dependent. The component test stubs window.open; real behavior must be confirmed in Chrome/Edge."
+
+  - test: "Tablet fullscreen prompt shows during an active match (DISP-02 implementation gap)"
+    expected: "After navigating to /display via 'Anzeige hier im Vollbild' while a match is in progress (matchState.phase === 'playing'), the 'Vollbild aktivieren' prompt OR the PC toggle in the top-right is sufficient to enter fullscreen. Confirm the user can reach fullscreen without returning to the idle screen."
+    why_human: "The 'Vollbild aktivieren' prompt is conditionally rendered only when matchState is null or phase === 'setup' (display/+page.svelte line 170). During an active match the prompt is hidden. The PC toggle (top-right icon) remains visible as a fallback. Whether this meets DISP-02's intent — 'switch the app into a fullscreen display view' — requires human judgment on the UX."
+
+  - test: "End-of-phase spectator display visual review (Plan 02-04 Task 3, all 8 steps)"
+    expected: |
+      1. Open scoring view, start a match; tap monitor icon, choose 'Zweites Fenster offnen'.
+      2. Confirm TV grid: equal-split panels, active player clearly distinct (accent border + glow + brighter, others dimmed) from ~3 m.
+      3. Enter darts: score counts down live mid-visit, darts fill 'T20 - - -' one by one, checkout route shows on a finish, BUST flashes red ~2 s then reverts.
+      4. Win a leg: full-screen 'Leg fur [Name]!' banner holds until next dart; win match: persistent '[Name] gewinnt!' display.
+      5. Reload /display mid-match: re-hydrates current scoreboard.
+      6. Open /display before match: idle screen auto-switches when match starts.
+      7. Touch device or emulation: 'Anzeige hier im Vollbild' -> tap 'Vollbild aktivieren' -> true fullscreen -> tap -> 'Zuruck zur Eingabe' appears, auto-hides 3s -> tap returns to scoring.
+      8. Confirm German copy and dark-mode legibility.
+    why_human: "Visual layout at distance, touch interaction, fullscreen API, animation timings, font scale legibility — none verifiable by static analysis."
 ---
 
 # Phase 02: Spectator Display Verification Report
 
-**Phase Goal:** A live spectator view shows all match state legibly on a 27" monitor from 3 m, opening as a second window on PC or as in-app fullscreen on tablet, and stays in sync automatically
-**Verified:** 2026-06-11T18:00:00Z
-**Status:** gaps_found
-**Re-verification:** No — initial verification
+**Phase Goal:** A live spectator view shows all match state legibly on a 27" monitor from 3 m, opening as a second window on PC or as in-app fullscreen on tablet, and stays in sync automatically (updates live on every dart entry; re-syncs automatically when closed/reopened or reloaded mid-match).
+**Verified:** 2026-06-11T19:30:00Z
+**Status:** human_needed
+**Re-verification:** Yes — after gap closure plan 02-05 (commits eef1047, 3652a84, 67baa65, 04381a9)
+
+## Summary
+
+All three BLOCKER/WARNING gaps from the previous verification are confirmed closed in the codebase:
+
+- **CR-01 CLOSED:** `match.svelte.ts` line 32 now reads `ch.postMessage($state.snapshot(this.state))`. The `$state.snapshot()` call confirmed present. No raw `this.state` argument to postMessage.
+- **CR-02 CLOSED:** `display/+page.svelte` lines 34-35 now declare `let prevLegsWon: number[] = []` and `let prevSetsWon: number[] = []` as plain variables. No `$state()` wrapper on either tracker. The self-triggering loop is eliminated.
+- **WR-02 CLOSED:** `SpectatorChooser.svelte` `openSecondWindow()` calls `window.open(`${base}/display`, '_blank')` with no `noopener` features string. `win.opener = null` is set on a truthy result (preserving T-02-06 reverse-tabnabbing guard). `close()` is called on success; `popupBlocked = true` only on genuine `null` return.
+- **Live e2e guard ADDED:** `e2e/spectator-sync.spec.ts` now contains 3 tests. Test 3 ("DISP-05: open /display updates live on dart entry without reload") opens /display before entering a dart, asserts `501` is visible, enters a 180 visit, then asserts `321` WITHOUT calling `displayPage.reload()`.
+
+All five automated must-haves from Plan 02-05 are VERIFIED. No regressions detected.
+
+Automated checks pass. The phase now requires human verification for live runtime behavior, visual legibility, and one DISP-02 prompt-condition question.
+
+---
+
+## Re-verification Delta
+
+| Gap from Previous Verification | Now | Evidence |
+|---|---|---|
+| CR-01: ch.postMessage(this.state) — DataCloneError | CLOSED | Line 32: `ch.postMessage($state.snapshot(this.state))` — grep confirmed |
+| CR-02: prevLegsWon/prevSetsWon as $state — infinite loop | CLOSED | Lines 34-35: `let prevLegsWon: number[] = []`, `let prevSetsWon: number[] = []` — plain variables confirmed |
+| WR-02: noopener causes null return on success — false popup warning | CLOSED | window.open called without features string; win.opener = null on success — grep confirmed |
+| Missing live e2e test | CLOSED | 3 tests present; Test 3 asserts 321 without reload — confirmed |
+
+---
 
 ## Goal Achievement
 
-### Observable Truths (from ROADMAP Success Criteria)
+### Observable Truths (Phase Must-Haves)
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| SC-1 | On PC, player can click a button to open the spectator view as a second browser window | VERIFIED | SpectatorChooser.svelte mounted in match/+page.svelte (lines 15, 201); window.open(`${base}/display`, '_blank', 'noopener,noreferrer') in openSecondWindow(). NOTE: popup-blocked detection fires incorrectly on every successful open (WR-02 / see human verification) |
-| SC-2 | On tablet, player can switch to fullscreen display view showing all match state | VERIFIED | display/+page.svelte has Vollbild aktivieren prompt + activateFullscreen() handler; SpectatorChooser "Anzeige hier im Vollbild" navigates to /display; Zurück zur Eingabe button exits and returns to /match |
-| SC-3 | Spectator view is readable from 3 m, correct 1–4 player layouts | VERIFIED (automated) | PlayerPanel.svelte: remaining score clamp(4rem,8vw,12rem), player name clamp(1.5rem,3vw,4rem); panels-grid repeat(var(--player-count),1fr); dark background #111318; active panel accent border + glow; DISP-04 layout correct |
-| SC-4 | Spectator window updates live on every dart and re-syncs on reload | FAILED — BLOCKER | Live BroadcastChannel path broken (CR-01). localStorage reload path works. See Gaps. |
+| T1 | Live BroadcastChannel sync: dart on /match updates open /display without reload (DISP-05) | VERIFIED (code) / NEEDS HUMAN (runtime) | `ch.postMessage($state.snapshot(this.state))` in dispatch(); Test 3 in spectator-sync.spec.ts proves the live path with no-reload assertion; runtime confirmation requires two live windows |
+| T2 | Leg-win watcher runs without effect_update_depth_exceeded (CR-02) | VERIFIED (code) / NEEDS HUMAN (runtime) | prevLegsWon/prevSetsWon are plain variables — no self-triggering loop possible; runtime crash confirmation requires playing to a leg win |
+| T3 | SpectatorChooser second-window opens correctly, menu closes, no false popup warning (DISP-01 / WR-02) | VERIFIED (code + component test) / NEEDS HUMAN (real browser) | openSecondWindow() calls window.open without noopener; win.opener = null on success; close() called; SpectatorChooser.test.ts covers both success and blocked cases (8 tests); real popup blocking requires a browser |
+| T4 | Live no-reload e2e test guards against DataCloneError regression | VERIFIED | Test 3 "DISP-05: open /display updates live on dart entry without reload" present; asserts 321 without displayPage.reload(); 3 total tests confirmed |
+| T5 | All prior verified must-haves from Plans 01-04 are not regressed | VERIFIED | Checked: $state.snapshot() change is additive; plain-var change only removes $state wrapper; SpectatorChooser template unchanged; all existing artifacts still present and wired |
 
-**Score: 3/4 roadmap success criteria verified (1 FAILED — BLOCKER)**
+**Score: 5/5 automated must-haves verified**
+
+---
+
+### ROADMAP Success Criteria
+
+| SC | Truth | Status | Evidence |
+|----|-------|--------|----------|
+| SC-1 (DISP-01) | On PC, player can click a button to open the spectator view as a second browser window | VERIFIED (code) / NEEDS HUMAN | SpectatorChooser mounted in match/+page.svelte (lines 15, 201); openSecondWindow() uses window.open(_blank) + win.opener=null; popup false-positive fixed; real browser behavior requires human |
+| SC-2 (DISP-02) | On tablet, player can switch to fullscreen display view showing all match state | VERIFIED with OBSERVATION | requestFullscreen() in activateFullscreen() + toggleFullscreen() from click handlers; Zurück zur Eingabe exits; NOTE: "Vollbild aktivieren" prompt is only rendered when matchState is null/setup (line 170); during active match only the PC toggle (top-right icon) provides fullscreen entry — see human verification item 4 |
+| SC-3 (DISP-03/04) | Spectator view is readable from 3 m, correct 1-4 player layouts, all data shown | VERIFIED (automated) | PlayerPanel: name, remaining-score clamp(4rem,8vw,12rem), legs/sets, legAvg, matchAvg, checkoutRoute, VisitLine, BUST flash; panels-grid repeat(var(--player-count),1fr); dark #111318; active accent border + glow; MatchHeader with mode/format/leg; IdleScreen "Warte auf Match..." |
+| SC-4 (DISP-05) | Spectator window updates live on every dart and re-syncs on reload | VERIFIED (code + e2e) / NEEDS HUMAN (runtime) | Publisher: $state.snapshot(); Subscriber: BroadcastChannel listener in connect(); e2e: 3 tests covering snapshot (Test 1, 2) and live no-reload (Test 3); live runtime confirmation requires two windows |
+
+**Score: 4/4 ROADMAP success criteria verified (all pass automated checks; runtime items need human)**
+
+---
 
 ### Requirement Coverage
 
-| Requirement | Description | Status | Evidence / Gap |
-|-------------|-------------|--------|----------------|
-| DISP-01 | PC second window | VERIFIED with WARNING | SpectatorChooser.svelte present and mounted; window.open with noopener. WR-02: popup-blocked detection always fires (noopener returns null on success). Human verification required. |
-| DISP-02 | Tablet fullscreen view | VERIFIED | requestFullscreen() from click handlers; Zurück zur Eingabe exit; tablet prompt on idle screen |
-| DISP-03 | Display shows scores, legs/sets, names, active player, last visit, leg avg, match avg | VERIFIED | PlayerPanel: name, liveRemaining, legsWon/setsWon, legAvg, matchAvg, checkoutRoute, VisitLine; MatchHeader: mode/format/leg bar |
-| DISP-04 | Readable from 3 m, 1–4 player layouts | VERIFIED (automated) | clamp() typography; dark mode; equal-fraction grid; active highlight. Full visual confirmation human-only. |
-| DISP-05 | Live sync + auto re-sync on reload | FAILED — BLOCKER | Live BroadcastChannel path broken (CR-01 confirmed). Re-sync on reload/reopen works via localStorage. "Updates live on every dart" is not satisfied. |
+| Requirement | Plans | Description | Status | Evidence |
+|-------------|-------|-------------|--------|----------|
+| DISP-01 | 02-04, 02-05 | PC second window opens /display | VERIFIED + HUMAN NEEDED | SpectatorChooser wired in /match; window.open + win.opener=null; WR-02 fixed; popup behavior needs real browser |
+| DISP-02 | 02-04 | Tablet in-app fullscreen view | VERIFIED with OBSERVATION | requestFullscreen() from user gesture; Zurück exit; PC toggle always available; "Vollbild aktivieren" prompt condition restricts to idle — human confirmation needed that tablet UX is acceptable |
+| DISP-03 | 02-01, 02-02, 02-03 | Display shows scores, legs/sets, names, active player, last visit, leg avg, match avg | VERIFIED | All data present in PlayerPanel + MatchHeader + VisitLine; checkout route via getSuggestion(); BUST flash; LegWinBanner; MatchWinDisplay |
+| DISP-04 | 02-02 | Readable from 3 m, 1-4 player layouts | VERIFIED (automated) / HUMAN for visual | clamp() typography; dark mode; equal-fraction grid; full visual confirmation human-only |
+| DISP-05 | 02-01, 02-02, 02-04, 02-05 | Live sync + re-sync on reload/reopen | VERIFIED (code + e2e) / HUMAN (runtime) | $state.snapshot() fix + 3-test e2e suite (snapshot path x2 + live no-reload x1) |
+
+**REQUIREMENTS.md status alignment:**
+- DISP-01: marked Complete in REQUIREMENTS.md — CONFIRMED
+- DISP-02: marked Pending in REQUIREMENTS.md — code is present (requestFullscreen implemented); "Pending" status in REQUIREMENTS.md appears to reflect human-verify not yet completed rather than missing code; recommend updating to Complete after human verification step 4 (item 7) passes
+- DISP-03: marked Complete — CONFIRMED
+- DISP-04: marked Complete — CONFIRMED
+- DISP-05: marked Complete — CONFIRMED (after 02-05 fix)
+
+---
 
 ### Required Artifacts
 
-| Artifact | Expected | Status | Details |
-|----------|----------|--------|---------|
-| `src/engine/averages.ts` | legAverage, matchAverage, computeAverage | VERIFIED | All three exports present; bust/numpad = 3 darts convention implemented (note WR-05: bust visits with 1-2 darts not counted as 3 — data accuracy gap, not a phase-goal blocker) |
-| `src/engine/types.ts` | legStartVisitIndex on MatchState | VERIFIED | Field present at line 44 as `Record<string, number>` |
-| `src/stores/display.svelte.ts` | DisplayStore with localStorage hydration + BroadcastChannel subscriber | VERIFIED (subscriber wired; publisher broken) | connect() hydrates from localStorage correctly; BroadcastChannel listener registered; publisher in match.svelte.ts posts a proxy (CR-01) |
-| `src/stores/match.svelte.ts` | BroadcastChannel publisher + localStorage snapshot in dispatch() | STUB — broken | Publisher exists but posts Svelte $state proxy; DataCloneError silently swallowed; no messages delivered |
-| `src/routes/display/+page.svelte` | Spectator route shell | VERIFIED with BLOCKER | Route exists; connects displayStore; renders TV grid; idle/active branch; BUT leg-win $effect has infinite loop (CR-02) |
-| `src/ui/display/PlayerPanel.svelte` | One player column with all display data | VERIFIED | Props-driven; name, liveRemaining, legs/sets, averages, checkout, VisitLine, BUST flash |
-| `src/ui/display/MatchHeader.svelte` | Slim header bar | VERIFIED | 40px bar; mode, out rule, format, current leg |
-| `src/ui/display/IdleScreen.svelte` | Warte auf Match… waiting screen | VERIFIED | "Neverman Darts" + "Warte auf Match…" centered on dark background |
-| `src/ui/display/VisitLine.svelte` | Live dart slots + completed visit line | VERIFIED | Three-slot live line; formatDart from VisitStrip; numpad total-only path |
-| `src/ui/display/LegWinBanner.svelte` | Full-screen leg/set win banner | VERIFIED (component) | Prop-driven; message/subtitle; accent color; fixed overlay z-10. Infinite loop in parent effect (CR-02) prevents correct delivery during match. |
-| `src/ui/display/MatchWinDisplay.svelte` | Persistent match winner display | VERIFIED (component) | Winner name, standing, per-player matchAverage |
-| `src/ui/display/SpectatorChooser.svelte` | Monitor icon + chooser menu | VERIFIED with WARNING | Present; noopener/noreferrer; both options wired. WR-02: popup detection broken. |
-| `e2e/spectator-sync.spec.ts` | DISP-05 e2e now green | PARTIAL | Both tests pass but only verify localStorage snapshot path; live BroadcastChannel path untested and broken |
+| Artifact | Status | Details |
+|----------|--------|---------|
+| `src/engine/averages.ts` | VERIFIED | computeAverage, legAverage, matchAverage present; bust/numpad = 3 darts logic implemented |
+| `src/engine/types.ts` | VERIFIED | legStartVisitIndex: Record<string,number> on MatchState |
+| `src/stores/display.svelte.ts` | VERIFIED | connect() hydrates from localStorage; BroadcastChannel listener; cleanup returned |
+| `src/stores/match.svelte.ts` | VERIFIED | $state.snapshot(this.state) in postMessage; localStorage snapshot; both in try/catch |
+| `src/routes/display/+page.svelte` | VERIFIED | displayStore.connect() in $effect; TV grid; idle/active branch; legWinMessage watcher (plain vars); fullscreen controls |
+| `src/ui/display/PlayerPanel.svelte` | VERIFIED | Name, liveRemaining, legs/sets, legAvg, matchAvg, checkoutRoute, VisitLine, BUST flash; all prop-driven |
+| `src/ui/display/MatchHeader.svelte` | VERIFIED | Slim 40px header; mode/outRule/format/currentLeg |
+| `src/ui/display/IdleScreen.svelte` | VERIFIED | "Neverman Darts" + "Warte auf Match..." |
+| `src/ui/display/VisitLine.svelte` | VERIFIED | Three-slot live line; formatDart; numpad total-only |
+| `src/ui/display/LegWinBanner.svelte` | VERIFIED | Prop-driven; message/subtitle; fixed overlay z-10 |
+| `src/ui/display/MatchWinDisplay.svelte` | VERIFIED | Winner + standing + per-player matchAverage; no dedicated component test by design (covered by e2e match-completion flow) |
+| `src/ui/display/SpectatorChooser.svelte` | VERIFIED | window.open(_blank) + win.opener=null; both options wired; popup-blocked on genuine null only |
+| `e2e/spectator-sync.spec.ts` | VERIFIED | 3 tests; snapshot path (Tests 1+2); live no-reload path (Test 3 asserts 321 without reload) |
+
+---
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
-| `src/stores/match.svelte.ts` dispatch() | BroadcastChannel('neverman-match').postMessage | `ch.postMessage(this.state)` | BROKEN | Posts raw $state proxy; DataCloneError on every call; silently swallowed by try/catch |
-| `src/stores/match.svelte.ts` dispatch() | localStorage('neverman-match-snapshot') | `localStorage.setItem(LS_SNAPSHOT, JSON.stringify(this.state))` | WIRED | Works correctly; JSON.stringify serializes the proxy value |
-| `src/routes/display/+page.svelte` | displayStore.connect() | `$effect(() => displayStore.connect())` | WIRED | Line 17; cleanup returned and used |
-| `src/routes/display/+page.svelte` | leg-win $effect | `prevLegsWon = $state([])` + reassign | BROKEN | Infinite update loop (CR-02); effect_update_depth_exceeded |
-| `src/ui/display/PlayerPanel.svelte` | averages.ts | legAverage / matchAverage | WIRED | Lines 31-38; correct slicing with legStartIndex |
-| `src/ui/display/PlayerPanel.svelte` | checkout.ts getSuggestion() | line 45 | WIRED | getSuggestion(liveRemaining, config.outRule) |
-| `src/ui/display/SpectatorChooser.svelte` | window.open | `window.open(..., 'noopener,noreferrer')` | WIRED (broken null check) | Opens window correctly; null-check always fires positive due to noopener spec behavior |
-| `src/routes/match/+page.svelte` | SpectatorChooser | imported and rendered line 201 | WIRED | |
+| `match.svelte.ts dispatch()` | `BroadcastChannel('neverman-match').postMessage` | `$state.snapshot(this.state)` | WIRED + FIXED | Line 32: ch.postMessage($state.snapshot(this.state)); DataCloneError eliminated |
+| `match.svelte.ts dispatch()` | `localStorage('neverman-match-snapshot')` | `JSON.stringify(this.state)` in try/catch | WIRED | Unchanged and correct |
+| `display/+page.svelte` | `displayStore.connect()` | `$effect(() => displayStore.connect())` | WIRED | Line 17; cleanup returned and used |
+| `display/+page.svelte` legWinMessage watcher | `prevLegsWon / prevSetsWon` plain vars | `let prevLegsWon: number[] = []` | WIRED + FIXED | Lines 34-35 plain; no self-triggering loop |
+| `PlayerPanel.svelte` | `averages.ts` | legAverage / matchAverage | WIRED | Lines 31-38; legStartIndex slice applied |
+| `PlayerPanel.svelte` | `checkout.ts getSuggestion()` | `getSuggestion(liveRemaining, config.outRule)` | WIRED | Checkout route for active player |
+| `SpectatorChooser.svelte` | `window.open` | `window.open(${base}/display, '_blank')` + `win.opener = null` | WIRED + FIXED | No noopener in features string; opener nulled on success |
+| `match/+page.svelte` | `SpectatorChooser` | imported and rendered line 201 | WIRED | Confirmed via grep |
+| `e2e/spectator-sync.spec.ts Test 3` | `/display remaining score` | `displayPage.getByText('321')` without reload | WIRED | Live BroadcastChannel path proven in e2e |
+
+---
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 |----------|---------------|--------|-------------------|--------|
-| `display/+page.svelte` | matchState | displayStore.state via localStorage hydration | Yes (on mount/reload) | FLOWING (snapshot path) |
-| `display/+page.svelte` | matchState | displayStore.state via BroadcastChannel | No — DataCloneError swallowed | DISCONNECTED (live path) |
-| `PlayerPanel.svelte` | liveRemaining | player.remaining from synced MatchState | Yes (from snapshot) | FLOWING (snapshot only) |
-
-### Behavioral Spot-Checks
-
-Step 7b skipped for the /display route rendering path — requires a running dev server with two open windows to observe BroadcastChannel behavior. Observable static checks performed instead:
-
-| Behavior | Check | Result | Status |
-|----------|-------|--------|--------|
-| postMessage posts serializable value | `grep -n "postMessage" src/stores/match.svelte.ts` | `ch.postMessage(this.state)` — raw proxy, no snapshot() | FAIL |
-| prevLegsWon is plain variable | `grep -n "prevLegsWon.*state" src/routes/display/+page.svelte` | `let prevLegsWon: number[] = $state([])` — is $state | FAIL |
-| No {@html} in display components | `grep -rn "{@html" src/ui/display/` | 0 matches | PASS |
-| SpectatorChooser mounted | `grep -n "SpectatorChooser" src/routes/match/+page.svelte` | Lines 15 (import) and 201 (render) | PASS |
-| requestFullscreen in display route | `grep -n "requestFullscreen" src/routes/display/+page.svelte` | Lines 93, 98 from click handlers | PASS |
-| panels-grid equal-fraction layout | `grep -n "repeat(var(--player-count)" src/routes/display/+page.svelte` | Line 195 | PASS |
-| legStartVisitIndex in reducer | `grep -n "legStartVisitIndex" src/engine/reducer.ts` | Lines 39, 102–116, 308, 345 — set at initialState, applyStartMatch, handleLegWin | PASS |
-
-### Critical Findings from Code Review — Independent Verification
-
-#### CR-01: BroadcastChannel live sync silently dead (CONFIRMED BLOCKER)
-
-**Codebase evidence:**
-- `src/stores/match.svelte.ts` line 32: `ch.postMessage(this.state)`
-- `this.state` is declared as `state = $state<MatchState>(initialState())` (class field, Svelte 5 reactive proxy)
-- No `$state.snapshot()` call anywhere in this file
-- `try/catch` at lines 30-37 silently swallows the DataCloneError
-- `e2e/spectator-sync.spec.ts` header comment (lines 8-14) explicitly documents the workaround: "the reliable path for DISP-05 is the localStorage snapshot handshake" — the test file itself documents the bug symptom
-- Neither e2e test asserts live update without page navigation
-
-**Verdict: CONFIRMED BLOCKER.** The phase goal states "stays in sync automatically" — the automatic live-sync path is dead. Only the snapshot-on-reload path works. DISP-05 "updates live on every dart entry" is not satisfied.
-
-**Fix:** `ch.postMessage($state.snapshot(this.state))` — `$state.snapshot()` is the documented Svelte 5 escape hatch for passing runes state to structuredClone/postMessage.
-
-#### CR-02: Infinite $effect update loop on leg-win watcher (CONFIRMED BLOCKER)
-
-**Codebase evidence:**
-- `src/routes/display/+page.svelte` lines 34-35: `let prevLegsWon: number[] = $state([])` and `let prevSetsWon: number[] = $state([])`
-- Lines 69-70: `prevLegsWon = s.players.map(p => p.legsWon)` and `prevSetsWon = s.players.map(p => p.setsWon)` inside the same `$effect`
-- `.map()` creates a new array reference on every call
-- New array reference on a `$state` variable registers as changed and reschedules the effect
-- The effect body accesses `prevLegsWon` (lines 49, 52, 58) — reading reactive state that the same effect writes
-- Result: effect_update_depth_exceeded whenever matchState is non-null and phase is not 'setup'
-- e2e tests assert text content after hydration; Svelte effects flush after DOM assertions in Playwright, so the loop does not affect test assertions but would crash a real browser session
-
-**Verdict: CONFIRMED BLOCKER.** The leg-win banner (D-09) never fires correctly during a live match. After the error, all effect-driven updates on the display route stop.
-
-**Fix:** Declare as plain variables: `let prevLegsWon: number[] = []` and `let prevSetsWon: number[] = []`.
-
-#### WR-02: popup-blocked detection fires on every successful window.open (CONFIRMED WARNING)
-
-**Codebase evidence:**
-- `src/ui/display/SpectatorChooser.svelte` line 26: `window.open(\`${base}/display\`, '_blank', 'noopener,noreferrer')`
-- Lines 27-31: `if (!win) { popupBlocked = true; } else { close(); }`
-- Per HTML spec (and Chrome/Edge/Firefox): when `noopener` is in the features string, `window.open` returns `null` even when the window opens successfully
-- The `else { close(); }` branch is therefore unreachable — the chooser menu never auto-closes after a successful open
-- "Bitte Popups für diese Seite erlauben" message appears on every successful open
-
-**Verdict: CONFIRMED WARNING.** DISP-01 functionality is degraded — the window opens but the UX is broken (false error message, menu stays open).
-
-### Anti-Patterns Found
-
-| File | Line | Pattern | Severity | Impact |
-|------|------|---------|----------|--------|
-| `src/stores/match.svelte.ts` | 32 | `ch.postMessage(this.state)` — posts Svelte $state proxy | BLOCKER | Live BroadcastChannel sync never delivers; DataCloneError silently swallowed |
-| `src/routes/display/+page.svelte` | 34-35 | `prevLegsWon/prevSetsWon` declared as `$state` but written inside their own $effect | BLOCKER | Infinite effect_update_depth_exceeded loop whenever a match is active |
-| `src/ui/display/SpectatorChooser.svelte` | 27 | `if (!win)` null-check after `window.open(..., 'noopener,...')` | WARNING | noopener always returns null; popup-blocked message fires on success; menu never closes |
-| `src/engine/averages.ts` | 19 | `v.darts.length > 0 ? v.darts.length : 3` — bust with 1-2 darts counted as 1-2 | WARNING | Averages inflated for early-bust visits; not a phase-goal blocker (Phase 4 refines stats) |
-
-### Human Verification Required
-
-#### 1. Live BroadcastChannel sync after CR-01 fix
-
-**Test:** After applying the $state.snapshot() fix, open /display in a second tab. Enter a dart on /match. Without reloading or reopening /display, observe whether the remaining score on /display updates within ~200ms.
-**Expected:** Remaining score on /display decrements live without any page navigation.
-**Why human:** Requires two live browser windows; the live-update path cannot be verified by static analysis or file checks.
-
-#### 2. Leg-win banner after CR-02 fix
-
-**Test:** Play a match to a leg win. Observe the /display tab.
-**Expected:** Full-screen "Leg für [Name]!" banner appears; browser console shows no `effect_update_depth_exceeded` error; banner dismisses when the first dart of the next leg is thrown.
-**Why human:** Runtime Svelte error requires a running browser session; cannot be caught by grep or type-check.
-
-#### 3. SpectatorChooser popup-blocked behavior
-
-**Test:** In Chrome, with popups allowed for localhost, click "Zweites Fenster öffnen" in the chooser.
-**Expected:** A second window opens at /display, the chooser menu closes, and "Bitte Popups für diese Seite erlauben" does NOT appear.
-**Why human:** WR-02 behavior is browser-spec-dependent (noopener + window.open return value); requires a real browser. Needs WR-02 fix before this step will pass.
-
-#### 4. End-of-phase spectator display visual review (from Plan 02-04 Task 3)
-
-**Test:** `npm run dev`. Walk through all 8 steps from Plan 02-04 Task 3:
-1. Open scoring view, start a match; tap monitor icon, choose "Zweites Fenster öffnen"
-2. Confirm TV grid: equal-split panels, active player clearly distinct (accent border + glow + brighter, others dimmed) from ~3 m
-3. Enter darts: score counts down live mid-visit, darts fill "T20 · – · –" one by one, checkout route shows on a finish, BUST flashes red ~2 s then reverts
-4. Win a leg: full-screen "Leg für [Name]!" banner holds until next dart; win match: persistent "[Name] gewinnt!" display
-5. Reload /display mid-match: re-hydrates current scoreboard
-6. Open /display before match: idle screen auto-switches when match starts
-7. Touch device / emulation: "Anzeige hier im Vollbild" → tap "Vollbild aktivieren" → true fullscreen → tap → "Zurück zur Eingabe" appears, auto-hides 3s → tap returns to scoring
-8. Confirm German copy and dark-mode legibility
-**Expected:** All 8 steps pass.
-**Why human:** Visual layout at distance, touch interaction, fullscreen API, animation timings, font scale legibility — none verifiable by static analysis.
-
-### Gaps Summary
-
-Two blockers prevent the phase goal from being fully achieved:
-
-**Blocker 1 (CR-01) — Live BroadcastChannel sync broken:** `MatchStore.dispatch()` posts a Svelte 5 `$state` reactive proxy to `BroadcastChannel.postMessage()`. The structured-clone algorithm throws `DataCloneError` on every call. The `try/catch` swallows it silently. The spectator display receives no live updates — it only shows fresh state via the localStorage snapshot when the page is opened or reloaded. The phase goal "stays in sync automatically" and DISP-05 "updates live on every dart entry" are not met. The e2e test suite documented this workaround explicitly in the file header and tests only the snapshot path.
-
-**Blocker 2 (CR-02) — Infinite effect loop on leg-win watcher:** `prevLegsWon` and `prevSetsWon` are declared as `$state` reactive variables but are unconditionally reassigned with new arrays at the end of every run of the `$effect` that reads them. Svelte 5 raises `effect_update_depth_exceeded` and aborts reactivity on the display route during any active match. The leg-win banner (D-09) cannot function.
-
-Both fixes are surgical one-liners:
-1. `ch.postMessage($state.snapshot(this.state))` in `match.svelte.ts`
-2. `let prevLegsWon: number[] = []` and `let prevSetsWon: number[] = []` in `display/+page.svelte`
-
-An additional warning (WR-02) requires the `SpectatorChooser` popup-blocked detection to be corrected: open without noopener in features string (null the opener reference manually), or keep noopener and remove the null-check with a different detection approach.
-
-After fixes, all four human verification items above must be confirmed before the phase can be marked passed.
+| `display/+page.svelte` | matchState (snapshot path) | displayStore.state via localStorage.getItem(SNAPSHOT_KEY) in connect() | Yes — MatchState from dispatch()-written snapshot | FLOWING |
+| `display/+page.svelte` | matchState (live path) | displayStore.state via BroadcastChannel message handler; publisher posts $state.snapshot() | Yes — plain MatchState received via postMessage | FLOWING (after CR-01 fix) |
+| `PlayerPanel.svelte` | liveRemaining | player.remaining minus currentVisit running total | Yes — derived from synced MatchState | FLOWING |
+| `PlayerPanel.svelte` | legAvg / matchAvg | legAverage() / matchAverage() from averages.ts on player.visits | Yes — pure computation over real visit data | FLOWING |
 
 ---
 
-_Verified: 2026-06-11T18:00:00Z_
+### Behavioral Spot-Checks
+
+| Behavior | Check | Result | Status |
+|----------|-------|--------|--------|
+| postMessage posts serializable value | File read: match.svelte.ts line 32 | `ch.postMessage($state.snapshot(this.state))` — $state.snapshot present, raw this.state absent | PASS |
+| prevLegsWon/prevSetsWon are plain variables | File read: display/+page.svelte lines 34-35 | `let prevLegsWon: number[] = []` and `let prevSetsWon: number[] = []` — no $state() wrapper | PASS |
+| SpectatorChooser no noopener in features | Grep: SpectatorChooser.svelte | `window.open(${base}/display, '_blank')` with no third argument; 'noopener' absent from file | PASS |
+| win.opener = null present | Grep: SpectatorChooser.svelte | `win.opener = null` on truthy result | PASS |
+| No {@html} in display components | Grep: src/ui/display/ | 0 actual usage matches (only comments mentioning the prohibition) | PASS |
+| SpectatorChooser mounted | Grep: match/+page.svelte | Import line 15, render line 201 | PASS |
+| requestFullscreen in display route | Grep: display/+page.svelte | Lines 93, 98 — from click handlers (user gesture) | PASS |
+| panels-grid equal-fraction layout | Grep: display/+page.svelte | `repeat(var(--player-count), 1fr)` at line 195 | PASS |
+| legStartVisitIndex in reducer | Grep: reducer.ts | 7 occurrences — set at initialState, applyStartMatch, handleLegWin | PASS |
+| 3 e2e tests with live test | File read: spectator-sync.spec.ts | 3 test() calls; Test 3 asserts 321 without reload; "without reload" phrase present | PASS |
+| e2e Test 3 asserts 501 before dart | File read: spectator-sync.spec.ts lines 131-133 | `displayPage.getByText('501', { exact: true })` before enterNumpadVisit | PASS |
+
+---
+
+### Anti-Patterns Found
+
+| File | Pattern | Severity | Impact |
+|------|---------|----------|--------|
+| `src/routes/display/+page.svelte` line 170 | "Vollbild aktivieren" prompt condition `matchState === null \|\| matchState.phase === 'setup'` hides prompt during active match | INFO | Tablet user navigating to /display during a match (via "Anzeige hier im Vollbild") sees only the PC toggle (top-right) for fullscreen entry — the dedicated tablet prompt is absent. The PC toggle is functional but less prominent. DISP-02 is satisfied by the available control but the UX differs from Plan 04 spec intent. No code change required; human judgment needed on acceptability. |
+| `src/engine/averages.ts` | Bust visits with only 1-2 darts counted at their actual dart count, not 3 | INFO | Average marginally inflated on early-bust visits. Pre-existing; out of scope for this phase (Phase 4 refines stats). Not a phase-goal blocker. |
+
+No TBD / FIXME / XXX / HACK / PLACEHOLDER markers found in files modified by this phase.
+
+---
+
+### Human Verification Required
+
+#### 1. Live BroadcastChannel sync in two real browser windows (DISP-05)
+
+**Test:** `npm run dev` (or `npm run preview`). Open `/match` and start a match. Open `/display` in a second browser tab or window (do NOT reload it after opening). Enter a dart on `/match` via the numpad. Observe `/display`.
+**Expected:** The remaining score on `/display` decrements live within ~200 ms, with no page reload or navigation.
+**Why human:** BroadcastChannel message delivery is a runtime browser behavior. The e2e test (Test 3) runs in a headless Playwright context where same-context pages share the channel. A real user scenario with two separate visible browser windows requires manual confirmation.
+
+#### 2. Leg-win banner appears without runtime crash (CR-02 / D-09)
+
+**Test:** With the app running, play a match to a leg win (score from 501 to 0 with a valid double-out). Observe the `/display` tab and open browser DevTools console.
+**Expected:** A full-screen "Leg fur [Name]!" banner appears on `/display`. Browser console shows NO `effect_update_depth_exceeded` error. Banner dismisses automatically when the first dart of the next leg is thrown.
+**Why human:** The `effect_update_depth_exceeded` error is a Svelte 5 runtime abort visible only in a running browser. svelte-check and static analysis cannot observe reactive cycle behavior.
+
+#### 3. SpectatorChooser popup behavior in a real browser (DISP-01 / WR-02)
+
+**Test:** In Chrome or Edge with popups allowed for localhost, start a match, tap the monitor icon, click "Zweites Fenster offnen".
+**Expected:** A new `/display` window opens. The chooser menu closes automatically. "Bitte Popups fur diese Seite erlauben" does NOT appear. Then block popups for localhost in browser settings and repeat — the warning SHOULD appear.
+**Why human:** window.open return-value semantics depend on the real browser popup policy. The component test stubs window.open; only a real browser can confirm the WR-02 fix works end-to-end.
+
+#### 4. Tablet fullscreen prompt during active match (DISP-02 clarification)
+
+**Test:** Start a match, then tap the monitor icon and choose "Anzeige hier im Vollbild" to navigate to `/display`. Observe whether "Vollbild aktivieren" appears.
+**Expected (spec intent):** The user can enter fullscreen. Determine whether the PC toggle in the top-right corner is sufficient, or whether the dedicated "Vollbild aktivieren" prompt should also appear during an active match.
+**Why human:** The prompt condition `matchState === null || matchState.phase === 'setup'` (display/+page.svelte line 170) hides the prompt when a match is active. The PC toggle remains available. Whether this meets DISP-02 ("switch the app into a fullscreen display view") requires UX judgment. If the PC toggle is deemed insufficient for tablet use, the condition should be widened to `!isFullscreen`.
+
+#### 5. End-of-phase spectator display visual review (Plan 02-04 Task 3, all 8 steps)
+
+**Test:** `npm run dev`. Run through all 8 steps from the plan:
+1. Open scoring view, start a match; tap monitor icon, choose "Zweites Fenster offnen". Confirm TV grid with equal-split panels.
+2. Confirm active player is clearly distinct (accent border + glow + brighter; others dimmed) from ~3 m distance.
+3. Enter darts one-by-one. Confirm: score counts down live mid-visit, darts fill "T20 -- --" one by one, checkout route shows on a finish, BUST flashes red ~2 s then reverts.
+4. Win a leg: confirm full-screen "Leg fur [Name]!" banner holds until next dart. Win match: confirm persistent "[Name] gewinnt!" display with final standing + Ø Match.
+5. Reload `/display` mid-match. Confirm it re-hydrates the current scoreboard (no idle flash, no crash).
+6. Open `/display` before any match starts. Confirm idle "Warte auf Match..." screen, then auto-switch when a match starts.
+7. On a touch device or touch emulation: choose "Anzeige hier im Vollbild", tap "Vollbild aktivieren" -> confirm true fullscreen. Tap display -> "Zuruck zur Eingabe" appears and auto-hides ~3 s. Tap it -> returns to scoring.
+8. Confirm German copy throughout and dark-mode/high-contrast legibility.
+**Expected:** All 8 steps pass.
+**Why human:** Visual layout at distance, font scale legibility, touch interaction, fullscreen API behavior, animation timings — none verifiable by static analysis.
+
+---
+
+### Gaps Summary
+
+No automated blockers remain. The three BLOCKER/WARNING gaps from the prior verification are confirmed closed by code inspection:
+
+- CR-01 (BroadcastChannel DataCloneError): CLOSED. `$state.snapshot()` is in place.
+- CR-02 (infinite $effect loop): CLOSED. Plain variable declarations confirmed.
+- WR-02 (popup-blocked false positive): CLOSED. `noopener` removed from features string; `win.opener = null` guards reverse-tabnabbing.
+
+The phase transitions to `human_needed`. Five human verification items must be confirmed before marking the phase passed. Items 1-3 are direct confirmations of the three gap-closure fixes in a running browser. Item 4 is a UX judgment call on the DISP-02 tablet prompt condition. Item 5 is the deferred Plan 02-04 Task 3 end-of-phase review.
+
+---
+
+_Verified: 2026-06-11T19:30:00Z_
 _Verifier: Claude (gsd-verifier)_

@@ -8,18 +8,39 @@
 //   - Convenience getters computed on each read (no $derived needed at module
 //     level — getters in class properties are re-evaluated on every access,
 //     which is sufficient for the live-suggestion requirement D-10)
-//   - No BroadcastChannel (Phase 2). State is fully serializable.
+//   - BroadcastChannel + localStorage publisher added in Phase 2.
+//     Fires after every dispatch(); both wrapped in try/catch (non-fatal).
 //   - Export both class (for test instantiation) and singleton (for UI components)
 
 import { reduce, initialState } from '../engine/reducer.js';
 import { getSuggestion } from '../engine/checkout.js';
 import type { MatchAction, MatchState, PlayerState } from '../engine/types.js';
 
+// Sync protocol constants — MUST match display.svelte.ts and 02-UI-SPEC.md Sync Protocol table
+const BC_CHANNEL = 'neverman-match';
+const LS_SNAPSHOT = 'neverman-match-snapshot';
+
 export class MatchStore {
 	state = $state<MatchState>(initialState());
 
 	dispatch(action: MatchAction): void {
 		this.state = reduce(this.state, action);
+
+		// Publish to spectator display — non-fatal; BroadcastChannel unavailable in SSR/private mode
+		try {
+			const ch = new BroadcastChannel(BC_CHANNEL);
+			ch.postMessage(this.state);
+			ch.close();
+		} catch {
+			// Silently ignore — match play must continue uninterrupted
+		}
+
+		// Persist snapshot for cold-start hydration of spectator display
+		try {
+			localStorage.setItem(LS_SNAPSHOT, JSON.stringify(this.state));
+		} catch {
+			// Silently ignore — localStorage may be unavailable in private mode or quota exceeded
+		}
 	}
 
 	get activePlayer(): PlayerState {

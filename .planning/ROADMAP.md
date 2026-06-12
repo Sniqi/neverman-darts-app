@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Playable X01 Match** - Complete end-to-end X01 match playable in-browser with touch input, undo, checkout suggestions, and match setup (completed 2026-06-10)
 - [x] **Phase 2: Spectator Display** - Live second-window and in-app fullscreen view showing all scores, readable at 3 m (completed 2026-06-11)
 - [x] **Phase 3: Persistence & Data** - Match survives reload/crash; player profiles and match history stored; JSON export/import (completed 2026-06-12)
-- [ ] **Phase 4: Statistics & Achievements** - Full per-match and lifetime stats; personal records detected and celebrated live
+- [x] **Phase 4: Statistics & Achievements** - Full per-match and lifetime stats; personal records detected and celebrated live (completed 2026-06-12)
 - [ ] **Phase 5: Audio & Auto-Pause** - Caller voice announces scores; sound effects on 180s and records; auto-pause countdown between legs
 - [ ] **Phase 6: PWA & Deployment** - Installable offline-capable PWA on GitHub Pages with update prompt and German dark-mode UI
 
@@ -149,7 +149,7 @@ Plans:
   4. Player can view a statistics dashboard with charts (score distribution, average trend, darts per leg, win rate)
   5. When a new personal record is set during play, an overlay/animation appears on both the input and spectator views and the record is permanently stored
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 **Mode:** mvp (vertical slices) · **UI hint**: yes
 
 **Wave 1**
@@ -164,7 +164,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 — shares match route, needs computeLifetimeStats)*
 
-- [ ] 04-05-PLAN.md — Record detection + celebration (ACHV-01..03, D-03..D-08): MatchStore detection + preload, neverman-record channel, RecordOverlay on both views, win-banner fold-in
+- [x] 04-05-PLAN.md — Record detection + celebration (ACHV-01..03, D-03..D-08): MatchStore detection + preload, neverman-record channel, RecordOverlay on both views, win-banner fold-in
 
 ### Phase 5: Audio & Auto-Pause
 
@@ -206,6 +206,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
-| 4. Statistics & Achievements | 4/5 | In Progress|  |
+| 4. Statistics & Achievements | 5/5 | Complete   | 2026-06-12 |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |
 | 6. PWA & Deployment | 0/? | Not started | - |

@@ -58,9 +58,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Achievements
 
-- [ ] **ACHV-01**: App detects new personal records during play (e.g. new highest visit score, new highest checkout)
-- [ ] **ACHV-02**: New records are celebrated live with an overlay/animation on both views
-- [ ] **ACHV-03**: Achievements/records are stored permanently in the player's statistics
+- [x] **ACHV-01**: App detects new personal records during play (e.g. new highest visit score, new highest checkout)
+- [x] **ACHV-02**: New records are celebrated live with an overlay/animation on both views
+- [x] **ACHV-03**: Achievements/records are stored permanently in the player's statistics
 
 ### Audio
 
@@ -144,9 +144,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAT-05 | Phase 4 | Complete |
 | STAT-07 | Phase 4 | Pending |
 | STAT-08 | Phase 4 | Pending |
-| ACHV-01 | Phase 4 | Pending |
-| ACHV-02 | Phase 4 | Pending |
-| ACHV-03 | Phase 4 | Pending |
+| ACHV-01 | Phase 4 | Complete |
+| ACHV-02 | Phase 4 | Complete |
+| ACHV-03 | Phase 4 | Complete |
 | AUD-01 | Phase 5 | Pending |
 | AUD-02 | Phase 5 | Pending |
 | AUD-03 | Phase 5 | Pending |

@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-06-12T14:18:42.176Z"
+last_updated: "2026-06-12T14:30:51.787Z"
 last_activity: 2026-06-12 -- Phase 04 execution started
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 27
-  completed_plans: 26
-  percent: 50
+  completed_plans: 27
+  percent: 67
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 04 (statistics-achievements) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-06-12 -- Phase 04 execution started
 
@@ -76,6 +76,7 @@ Progress: [█████████░] 89%
 | Phase 04 P01 | 8min | 3 tasks | 5 files |
 | Phase 04-statistics-achievements P02 | 3min | 3 tasks | 3 files |
 | Phase 04-statistics-achievements P04 | 2min | 2 tasks | 3 files |
+| Phase 04 P05 | 8min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,8 @@ Recent decisions affecting current work:
 - [Phase ?]: D-10/D-11/D-12: exportDB single JSON, importInto clearTablesBeforeImport replace-all, ConfirmDialog backdropDismiss=false
 - [Phase ?]: first9Average legScored computed inline in StatDrawer — board visits summed exactly, non-closing numpad visits skipped (unrecoverable per 04-01 visitScoresFromState limitation)
 - [Phase ?]: StatDrawer open state is component-local $state — resets to closed on navigation without route-level wiring
+- [Phase ?]: guards first-ever record for brand-new players
+- [Phase ?]: Pitfall 5 T-04-12 mitigation
 
 ### Pending Todos
 
@@ -133,6 +136,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-12T14:18:42.170Z
+Last session: 2026-06-12T14:30:44.287Z
 Stopped at: Completed 04-02-PLAN.md
 Resume file: None

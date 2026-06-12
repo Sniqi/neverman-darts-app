@@ -37,9 +37,10 @@ const KEY_MAP: Record<keyof AudioPrefs, string> = {
  */
 export function loadAudioPrefs(): AudioPrefs {
 	try {
+		const rawLang = localStorage.getItem(KEY_MAP.callerLang);
 		return {
 			callerEnabled: localStorage.getItem(KEY_MAP.callerEnabled) === 'true',
-			callerLang: (localStorage.getItem(KEY_MAP.callerLang) as 'de' | 'en') ?? 'de',
+			callerLang: (rawLang === 'de' || rawLang === 'en') ? rawLang : 'de',
 			sfxEnabled: localStorage.getItem(KEY_MAP.sfxEnabled) === 'true',
 			pauseEnabled: localStorage.getItem(KEY_MAP.pauseEnabled) !== 'false', // default true
 			pauseLegs: Number(localStorage.getItem(KEY_MAP.pauseLegs)) || 5,

@@ -208,11 +208,11 @@ describe('MatchStore', () => {
 
 		beforeEach(async () => {
 			await db.matches.clear();
+			const store: Record<string, string> = {};
 			vi.stubGlobal('localStorage', {
-				_store: {} as Record<string, string>,
-				getItem(key: string) { return this._store[key] ?? null; },
-				setItem(key: string, val: string) { this._store[key] = val; },
-				removeItem(key: string) { delete this._store[key]; },
+				getItem: (key: string) => store[key] ?? null,
+				setItem: (key: string, val: string) => { store[key] = val; },
+				removeItem: (key: string) => { delete store[key]; },
 			});
 		});
 

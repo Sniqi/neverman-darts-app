@@ -1,10 +1,15 @@
 <script lang="ts">
 	// src/routes/history/+page.svelte
-	// Match history list — shell (Plan 03-01, Task 2).
-	// Filled in by Plan 03-02 with liveQuery + MatchRecord rows.
+	// Match history list (STAT-06, D-04, D-06).
+	// Displays completed matches newest-first via liveQuery readable.
+	// Security T-03-05: player names rendered via HistoryRow {interpolation} — no {@html}.
 
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import { matchesLive } from '../../db/matches.js';
+	import HistoryRow from '../../ui/history/HistoryRow.svelte';
+
+	const matches = matchesLive();
 </script>
 
 <div class="screen">
@@ -19,8 +24,18 @@
 	</header>
 
 	<div class="content">
-		<p class="empty-heading">Noch keine Spiele.</p>
-		<p class="empty-body">Spiele ein Match und es erscheint hier.</p>
+		{#if $matches.length === 0}
+			<div class="empty-state">
+				<p class="empty-heading">Noch keine Spiele.</p>
+				<p class="empty-body">Spiele ein Match und es erscheint hier.</p>
+			</div>
+		{:else}
+			<ul class="match-list">
+				{#each $matches as record (record.id)}
+					<HistoryRow {record} />
+				{/each}
+			</ul>
+		{/if}
 	</div>
 </div>
 
@@ -69,6 +84,11 @@
 	}
 
 	.content {
+		padding: 0;
+	}
+
+	/* Empty state */
+	.empty-state {
 		padding: var(--space-xl, 32px) var(--space-md, 16px);
 		display: flex;
 		flex-direction: column;
@@ -91,5 +111,12 @@
 		font-weight: 400;
 		margin: 0;
 		color: #888888;
+	}
+
+	/* Match list */
+	.match-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
 	}
 </style>

@@ -120,12 +120,12 @@ Plans:
   2. Player can browse past matches in a match history list showing results and key stats
   3. Player can export all profiles, history, and stats as a JSON file and import that file on another device or after clearing browser data
 
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 **Mode:** mvp (vertical slices) · **UI hint**: yes
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Start screen hub (D-07) + crash-resume slice (FLOW-03): loadUnfinishedMatch, MatchStore.restore, ResumePrompt, reusable ConfirmDialog, new-match warning (D-02), resume E2E
+- [x] 03-01-PLAN.md — Start screen hub (D-07) + crash-resume slice (FLOW-03): loadUnfinishedMatch, MatchStore.restore, ResumePrompt, reusable ConfirmDialog, new-match warning (D-02), resume E2E
 
 **Wave 2** *(blocked on Wave 1 — shares match.svelte.ts)*
 
@@ -191,7 +191,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
-| 3. Persistence & Data | 0/3 | Planned | - |
+| 3. Persistence & Data | 1/3 | In Progress|  |
 | 4. Statistics & Achievements | 0/? | Not started | - |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |
 | 6. PWA & Deployment | 0/? | Not started | - |

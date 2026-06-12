@@ -258,7 +258,7 @@ describe('computeLifetimeStats', () => {
 		const state = makeMatchState('alice', 'bob');
 		// Manually remove legCompleted to simulate legacy blob
 		const p = state.players[0] as PlayerState;
-		delete (p as Record<string, unknown>)['legCompleted'];
+		delete (p as unknown as Record<string, unknown>)['legCompleted'];
 		const r = makeRecord(state, 'alice') as MatchRecord;
 		r.id = 1;
 

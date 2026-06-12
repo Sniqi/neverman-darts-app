@@ -2,6 +2,7 @@
 	// src/routes/match/+page.svelte
 	// Complete scoring view: portrait/landscape responsive layout (D-02).
 	// Wires all input components to matchStore. Wake lock acquired on mount.
+	import { onMount } from 'svelte';
 	import { matchStore } from '../../stores/match.svelte.js';
 	import { reduce } from '../../engine/reducer.js';
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
@@ -13,8 +14,18 @@
 	import StatDrawer from '../../ui/input/StatDrawer.svelte';
 	import DartsAtDoubleDialog from '../../ui/input/DartsAtDoubleDialog.svelte';
 	import MatchWinOverlay from '../../ui/overlays/MatchWinOverlay.svelte';
+	import RecordOverlay from '../../ui/overlays/RecordOverlay.svelte';
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
+
+	// ── Record detection preload (ACHV-01 / D-09) ─────────────────────────────
+	// Load lifetime stats for profile players once at match start so #detectRecords
+	// has a comparison baseline. Guard: only load when players are present.
+	onMount(() => {
+		if (matchStore.state.players.length > 0) {
+			matchStore.loadRecords(matchStore.state);
+		}
+	});
 
 	// ── Wake lock (INP-05) ─────────────────────────────────────────────────
 	$effect(() => {
@@ -199,7 +210,25 @@
 	onconfirm={handleDartsAtDoubleConfirm}
 />
 
-<MatchWinOverlay />
+<!-- D-08: when records coincide with a win, fold into the win overlay as a badge.
+     Otherwise mount a standalone RecordOverlay that auto-dismisses after 2.5s. -->
+{#if matchStore.isMatchComplete}
+	<MatchWinOverlay
+		recordBadge={matchStore.pendingRecords.length > 0
+			? matchStore.pendingRecords.map(r => r.text).join(' · ')
+			: null}
+	/>
+{:else}
+	<MatchWinOverlay />
+{/if}
+
+{#if matchStore.pendingRecords.length > 0 && matchStore.state.phase === 'playing'}
+	<RecordOverlay
+		records={matchStore.pendingRecords.map(r => r.text)}
+		ondismiss={() => { matchStore.pendingRecords = []; }}
+	/>
+{/if}
+
 <SpectatorChooser />
 
 <style>

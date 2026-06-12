@@ -6,6 +6,13 @@
 	import { base } from '$app/paths';
 	import { matchStore } from '../../stores/match.svelte.js';
 
+	interface Props {
+		/** D-08: record text folded into the overlay when a record coincides with match win. */
+		recordBadge?: string | null;
+	}
+
+	let { recordBadge = null }: Props = $props();
+
 	// Winner is the last active player when match completed
 	let winnerName = $derived(
 		matchStore.isMatchComplete ? matchStore.activePlayer?.name ?? '' : ''
@@ -21,6 +28,9 @@
 		<div class="win-content">
 			<h1 class="win-heading">{winnerName} gewinnt!</h1>
 			<p class="win-body">Das Spiel ist beendet.</p>
+			{#if recordBadge}
+				<p class="record-badge">{recordBadge}</p>
+			{/if}
 			<button class="new-game-btn" onclick={newGame}>
 				Neues Spiel
 			</button>
@@ -66,6 +76,13 @@
 		font-size: 16px;
 		color: #f0f0f0;
 		margin: 0;
+	}
+
+	.record-badge {
+		margin: var(--space-sm, 8px) 0 0;
+		font-size: 16px;
+		font-weight: 400;
+		color: #e8a020;
 	}
 
 	.new-game-btn {

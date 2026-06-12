@@ -9,9 +9,11 @@
 	interface Props {
 		message: string | null;
 		subtitle?: string | null;
+		/** D-08: record text folded into the banner when a record coincides with a leg win. */
+		recordBadge?: string | null;
 	}
 
-	let { message, subtitle = null }: Props = $props();
+	let { message, subtitle = null, recordBadge = null }: Props = $props();
 </script>
 
 {#if message !== null}
@@ -22,6 +24,9 @@
 			</p>
 			{#if subtitle}
 				<p class="banner-subtitle">{subtitle}</p>
+			{/if}
+			{#if recordBadge}
+				<p class="record-badge">{recordBadge}</p>
 			{/if}
 		</div>
 	</div>
@@ -66,5 +71,12 @@
 		font-size: clamp(1rem, 2vw, 2.5rem);
 		font-weight: 400;
 		color: var(--text, #f0f0f0);
+	}
+
+	.record-badge {
+		margin: var(--space-sm, 8px) 0 0;
+		font-size: 16px;
+		font-weight: 400;
+		color: #e8a020;
 	}
 </style>

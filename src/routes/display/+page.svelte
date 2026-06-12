@@ -6,15 +6,41 @@
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { displayStore } from '../../stores/display.svelte.js';
+	import { BC_RECORD_CHANNEL } from '../../lib/sync-constants.js';
 	import MatchHeader from '../../ui/display/MatchHeader.svelte';
 	import PlayerPanel from '../../ui/display/PlayerPanel.svelte';
 	import IdleScreen from '../../ui/display/IdleScreen.svelte';
 	import LegWinBanner from '../../ui/display/LegWinBanner.svelte';
 	import MatchWinDisplay from '../../ui/display/MatchWinDisplay.svelte';
+	import RecordOverlay from '../../ui/overlays/RecordOverlay.svelte';
 
 	// Connect the display store and subscribe to live updates.
 	// $effect returns the cleanup function which closes the BroadcastChannel.
 	$effect(() => displayStore.connect());
+
+	// ── Record channel subscription (ACHV-02 / Pitfall 5) ────────────────────
+	// Subscribes to BC_RECORD_CHANNEL independently of the match-state channel so
+	// record payloads never reach displayStore.state (T-04-12).
+	// When a win banner is showing (leg or match), fold records into the badge (D-08).
+	let recordStrings = $state<string[]>([]);
+
+	$effect(() => {
+		let ch: BroadcastChannel;
+		try {
+			ch = new BroadcastChannel(BC_RECORD_CHANNEL);
+			ch.addEventListener('message', (e: MessageEvent) => {
+				const data = e.data as { type: string; records: string[] };
+				if (data?.type === 'record-event' && Array.isArray(data.records)) {
+					recordStrings = data.records;
+				}
+			});
+		} catch {
+			// BroadcastChannel unavailable (SSR / private mode) — skip silently
+		}
+		return () => {
+			try { ch?.close(); } catch { /* ignore */ }
+		};
+	});
 
 	// Use matchState to avoid naming conflict with the $state rune.
 	let matchState = $derived(displayStore.state);
@@ -149,12 +175,29 @@
 		</div>
 
 		<!-- Overlay layers: match-win (z-20) takes precedence over leg banner (z-10) -->
+		<!-- D-08: when records arrive coincident with a win, fold into the banner badge;
+		     when no win is showing, RecordOverlay handles the celebration (z-50). -->
 		{#if matchState.phase === 'match-complete'}
-			<MatchWinDisplay state={matchState} />
+			<MatchWinDisplay
+				state={matchState}
+				recordBadge={recordStrings.length > 0 ? recordStrings.join(' · ') : null}
+			/>
 		{:else if legWinMessage !== null}
-			<LegWinBanner message={legWinMessage} subtitle={legWinSubtitle} />
+			<LegWinBanner
+				message={legWinMessage}
+				subtitle={legWinSubtitle}
+				recordBadge={recordStrings.length > 0 ? recordStrings.join(' · ') : null}
+			/>
 		{/if}
 	</div>
+{/if}
+
+<!-- Record celebration overlay (z-50): shown when no win banner is active (D-08) -->
+{#if recordStrings.length > 0 && matchState !== null && matchState.phase !== 'match-complete' && legWinMessage === null}
+	<RecordOverlay
+		records={recordStrings}
+		ondismiss={() => { recordStrings = []; }}
+	/>
 {/if}
 
 <!-- Layer 3: fullscreen controls (z-index 30) — outside the conditional so always rendered -->

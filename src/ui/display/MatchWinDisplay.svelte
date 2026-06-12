@@ -6,14 +6,16 @@
 	// No navigation button — persists until a new match starts (phase flips to 'playing').
 	// No dedicated component test by design — pure prop component; matchAverage is
 	// unit-tested in averages.test.ts; render covered by Plan-04 e2e match-completion flow.
-	import { matchAverage } from '../../engine/averages.js';
+	import { matchAverageCrossLeg } from '../../engine/averages.js';
 	import type { MatchState } from '../../engine/types.js';
 
 	interface Props {
 		state: MatchState;
+		/** D-08: record text folded into the banner when a record coincides with match win. */
+		recordBadge?: string | null;
 	}
 
-	let { state }: Props = $props();
+	let { state, recordBadge = null }: Props = $props();
 
 	// Winner is the player at activePlayerIndex when phase === 'match-complete'
 	// (the reducer sets activePlayerIndex to the winner on match completion).
@@ -31,10 +33,12 @@
 		}
 	});
 
-	// Per-player match averages formatted to one decimal
+	// Per-player match averages using cross-leg accumulator (RESEARCH State of the Art).
+	// matchAverageCrossLeg correctly handles multi-leg matches where remaining resets.
 	let playerAverages = $derived(
 		state.players.map(pl => {
-			const val = matchAverage(pl.visits, state.config.startScore, pl.remaining);
+			const legStartIdx = state.legStartVisitIndex[pl.id] ?? 0;
+			const val = matchAverageCrossLeg(pl, legStartIdx, state.config.startScore);
 			return val !== null ? val.toFixed(1) : '—';
 		})
 	);
@@ -46,6 +50,9 @@
 			<span class="winner-name">{winner?.name ?? ''}</span> gewinnt!
 		</h1>
 		<p class="win-standing">{standingText}</p>
+		{#if recordBadge}
+			<p class="record-badge">{recordBadge}</p>
+		{/if}
 		<div class="averages-row">
 			{#each state.players as player, i (player.id)}
 				<div class="player-avg">
@@ -101,6 +108,13 @@
 		font-weight: 400;
 		color: var(--text, #f0f0f0);
 		margin: 0;
+	}
+
+	.record-badge {
+		margin: var(--space-sm, 8px) 0 0;
+		font-size: 16px;
+		font-weight: 400;
+		color: #e8a020;
 	}
 
 	.averages-row {

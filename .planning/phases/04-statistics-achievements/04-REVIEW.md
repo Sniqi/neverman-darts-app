@@ -1,9 +1,9 @@
 ---
 phase: 04-statistics-achievements
-reviewed: 2026-06-12T00:00:00Z
+reviewed: 2026-06-12T17:09:00Z
 depth: standard
-iteration: 2
-files_reviewed: 24
+iteration: 3
+files_reviewed: 16
 files_reviewed_list:
   - src/engine/types.ts
   - src/engine/reducer.ts
@@ -12,178 +12,129 @@ files_reviewed_list:
   - src/lib/sync-constants.ts
   - src/stores/match.svelte.ts
   - src/stores/display.svelte.ts
-  - src/ui/stats/StatCard.svelte
   - src/ui/input/StatDrawer.svelte
-  - src/ui/stats/ScoreDistributionChart.svelte
-  - src/ui/stats/AverageTrendChart.svelte
-  - src/ui/stats/DartsPerLegChart.svelte
   - src/ui/stats/ProfileStatDashboard.svelte
   - src/ui/history/MatchStatBreakdown.svelte
   - src/ui/history/PlayerStatRow.svelte
   - src/ui/overlays/RecordOverlay.svelte
-  - src/ui/display/LegWinBanner.svelte
   - src/ui/display/MatchWinDisplay.svelte
   - src/ui/overlays/MatchWinOverlay.svelte
   - src/routes/match/+page.svelte
   - src/routes/display/+page.svelte
-  - src/routes/stats/+page.svelte
-  - src/routes/+page.svelte
-  - src/routes/history/[id]/+page.svelte
 findings:
-  critical: 1
-  warning: 4
-  info: 3
-  total: 8
-status: issues_found
+  critical: 0
+  warning: 0
+  info: 0
+  total: 0
+status: clean
 ---
 
-# Phase 4: Code Review Report (Iteration 2 — Re-Review)
+# Phase 4: Code Review Report (Final Re-Review — iteration 3)
 
-**Reviewed:** 2026-06-12
+**Reviewed:** 2026-06-12T17:09:00Z
 **Depth:** standard
-**Files Reviewed:** 24
-**Status:** issues_found
+**Files Reviewed:** 16
+**Status:** clean
 
 ## Summary
 
-This is a re-review confirming the prior BLOCKER (CR-01) and 7 warnings.
+Final adversarial re-review of the auto fix/re-review loop (iteration 3), focused on
+the three confirmation points raised by the workflow. The iteration-2 fixes are correct
+and complete; no new BLOCKER or WARNING-severity correctness issues were introduced. All
+291 unit tests pass (62 in `averages.test.ts`, including dedicated regression tests for
+the loser double-count and the mid-leg live path).
 
-**Confirmed resolved:**
-- **CR-01** (legCompleted only recorded for winner): genuinely fixed. `handleLegWinFromPlayers` (reducer.ts:302-306) now maps over ALL players and appends a `legCompleted` entry for each at leg close, using each player's `startScore - remaining`. UNDO replay rebuilds it correctly because legCompleted is derived purely from replayed state (full log replay from `initialState()` reconstructs `legStartVisitIndex` at every step). Lost legs are no longer dropped from lifetime stats. The set-win branch (reducer.ts:311-347) correctly carries `legCompleted` across set boundaries via spread while resetting `legsWon`.
-- **WR-01** numpad checkout scoring, **WR-02/WR-03** visit reconstruction / leg-boundary drift, **WR-04** pendingRecords clearing, **WR-05** record-broadcast sequencing, **WR-07** snapshot validation: all verified resolved in the respective files.
+This phase is **clean** of Critical/Warning issues.
 
-**NOT resolved — new regression introduced by the WR-06 fix:** The WR-06 guard in `matchAverageCrossLeg` only special-cases `remaining === 0` (the winner). For **losers** of a completed match — whose `remaining > 0` — the final leg is double-counted. Because CR-01 now (correctly) records the loser's final leg into `legCompleted`, and three call sites pass `visits.length` as `currentLegStartIdx`, the loser's final-leg score is added a second time with zero darts. This inflates every loser's displayed match average on the history detail, the spectator match-win display, and the match-average record-detection path. See CR-01 (this iteration) below. The unit test for WR-06 only covers the winner (remaining=0) and never exercises the loser path, which is why the regression slipped through.
+### Confirmation 1 — `matchAverageCrossLeg` loser double-count resolved AND mid-leg StatDrawer still correct
 
-## Critical Issues
+**Confirmed.** The guard now gates on the current-leg slice being empty
+(`curDarts === 0`, averages.ts:114) instead of `remaining === 0`:
 
-### CR-01: `matchAverageCrossLeg` double-counts the final leg for losers on completed matches
+- **Completed match, loser:** The reducer captures every player's final leg into
+  `legCompleted` for winner AND loser (`handleLegWinFromPlayers`, reducer.ts:302-306),
+  and `legStartVisitIndex` is left pointing at the final leg's start on match-complete.
+  All three average callers pass `currentLegStartIdx = player.visits.length`, so
+  `curVisits = visits.slice(visits.length) = []` → `curDarts === 0` → the function
+  returns `prevScored / prevDarts` from `legCompleted` only. The loser's final leg is
+  counted exactly once. The old `remaining === 0` guard only caught the winner (whose
+  remaining is 0) and let the loser's `curScored = startScore - remaining > 0` be added
+  on top of `legCompleted`, doubling the loser's average. Now fixed.
+  Covered by the dedicated test `averages.test.ts:285` (LOSER, remaining>0).
 
-**File:** `src/engine/averages.ts:109-120` (consumed by `src/ui/history/PlayerStatRow.svelte:39`, `src/ui/display/MatchWinDisplay.svelte:44`, `src/stores/match.svelte.ts:245`)
+- **Mid-leg live StatDrawer:** `StatDrawer.svelte:68` passes the real
+  `legStart = state.legStartVisitIndex[player.id]`. While a leg is in progress, the
+  current leg is NOT yet in `legCompleted` and has committed visits, so `curDarts > 0`
+  → the current-leg contribution (`curScored = startScore - player.remaining`) is
+  included. Covered by `averages.test.ts:301-312`
+  (`matchAverageCrossLeg(player, 2, 501) === 60` with an in-progress current leg).
 
-**Issue:**
-The WR-06 fix guards only on `player.remaining === 0`:
+- **New-leg boundary (after a leg closes, before any dart in the next leg):** `legStart`
+  equals `visits.length`, slice is empty, `curDarts === 0` → returns the
+  `legCompleted`-only average. Correct — shows accumulated completed legs until the next
+  dart lands. No regression.
 
-```ts
-if (player.remaining === 0) {
-    if (prevDarts === 0) return null;
-    return (prevScored / prevDarts) * 3;   // winner: correct, no double count
-}
-// falls through for losers (remaining > 0):
-const curVisits = player.visits.slice(currentLegStartIdx); // = [] when idx = visits.length
-const curDarts = ...;                                       // = 0
-const curScored = startScore - player.remaining;            // > 0  ← the final leg, AGAIN
-const totalScored = prevScored + curScored;                 // double-counted
-```
+- **Mid-visit (darts in `currentVisit`, visit not yet committed):** `player.remaining`
+  holds the start-of-visit value and uncommitted darts are absent from `player.visits`,
+  so both `curScored` and `curDarts` exclude the in-flight darts consistently. Correct.
 
-On a completed match every player's final leg is already in `legCompleted` (the CR-01 fix records it for ALL players, including losers). The three call sites pass `currentLegStartIdx = player.visits.length` deliberately so the current-leg *visit slice* is empty — but `curScored = startScore - remaining` is **not** derived from that slice; it is the loser's final-leg points, which `prevScored` already contains. Result: `totalScored` includes the final leg twice while `totalDarts` includes it once.
+### Confirmation 2 — the three callers are consistent with the new contract
 
-Concrete trace (1-leg, 501 match, loser B finished with remaining 100 after `Db` darts):
-- `legCompleted = [{ dartsThrown: Db, scored: 401 }]` → `prevDarts = Db`, `prevScored = 401`
-- `remaining = 100 ≠ 0` → guard skipped; `curDarts = 0`, `curScored = 501 - 100 = 401`
-- result = `((401 + 401) / Db) * 3` = **double** the correct `(401 / Db) * 3`.
+**Confirmed.** All consumers of completed/persisted player state pass
+`player.visits.length` so the current-leg slice is empty and the contract holds:
 
-Every loser's "Ø Match" is wrong (roughly doubled in the scored numerator) in:
-- the match history detail (`PlayerStatRow`),
-- the spectator match-win screen (`MatchWinDisplay`),
-- the match-average record detection (`#detectRecords`), which can fire a false "Bester Match-Schnitt" record for a loser.
+- `PlayerStatRow.svelte:39` — `matchAverageCrossLeg(player, player.visits.length, config.startScore)`.
+- `MatchWinDisplay.svelte:44` — `matchAverageCrossLeg(pl, pl.visits.length, state.config.startScore)`.
+- `match.svelte.ts:255` (record detection, match-complete branch) —
+  `matchAverageCrossLeg(nextPlayer, nextPlayer.visits.length, next.config.startScore)`.
 
-Note `db/stats.ts` is NOT affected: it computes the per-match average directly from `legCompleted` only (stats.ts:124-133) and never calls `matchAverageCrossLeg` for completed matches. That is the correct pattern and confirms the right fix.
+The live path (`StatDrawer.svelte:68`) deliberately passes the real `legStart` to include
+the in-progress leg. `db/stats.ts:125-134` computes the per-match average directly from
+`legCompleted` (no current-leg contribution), which is exactly equivalent to the
+`curDarts === 0` branch — fully consistent. Note: the callers passing `visits.length`
+rather than relying on `legStartVisitIndex` makes them robust to the reducer's
+set-win/match-complete branch (reducer.ts:320-328) not refreshing `legStartVisitIndex`.
 
-**Fix:** Skip the current-leg contribution whenever the current-leg slice is empty, not only when `remaining === 0`. Drive the guard off the slice itself so it is correct for winners and losers alike:
+### Confirmation 3 — no new regressions from the iteration-2 fixes
 
-```ts
-const completed = player.legCompleted ?? [];
-const prevDarts = completed.reduce((s, l) => s + l.dartsThrown, 0);
-const prevScored = completed.reduce((s, l) => s + l.scored, 0);
+**Confirmed.** Reviewed all iteration-2 changes:
 
-const curVisits = player.visits.slice(currentLegStartIdx);
-const curDarts = curVisits.reduce((s, v) => s + (v.darts.length > 0 ? v.darts.length : 3), 0);
+- **`highestCheckout()` extraction (WR-02, averages.ts:340-359):** Behavior-preserving.
+  The body is identical to the former `MatchStatBreakdown` copy (`null` initial,
+  `best === null || score > best`). Rewiring `db/stats.ts:158` to
+  `hc !== null && hc > highestCheckoutVal` is equivalent to the prior inline `> 0`
+  semantics (a checkout always clears a positive remaining, so `null` and `0` never
+  collide). The documented numpad non-closing-visit `running` limitation is pre-existing
+  (RESEARCH Pitfall 2), not introduced here.
 
-// Only add the current leg when it actually has uncommitted visits. On a completed
-// match the callers pass visits.length, so curVisits is empty for EVERY player
-// (winner and loser); the final leg lives solely in legCompleted.
-if (curDarts === 0) {
-    if (prevDarts === 0) return null;
-    return (prevScored / prevDarts) * 3;
-}
+- **`isValidMatchState()` extraction (display.svelte.ts:25-35):** Applied identically to
+  BOTH ingress paths — localStorage hydration (line 59) and the live BroadcastChannel
+  handler (line 73). No divergence; both reject empty `players` and out-of-range
+  `activePlayerIndex` before the render loops.
 
-const curScored = startScore - player.remaining;
-const totalDarts = prevDarts + curDarts;
-const totalScored = prevScored + curScored;
-if (totalDarts === 0) return null;
-return (totalScored / totalDarts) * 3;
-```
+- **Numpad record delta non-negative guard (WR-03, match.svelte.ts:176-177):**
+  `delta >= 0 ? delta : null` correctly degrades a hypothetical negative delta to
+  "no record" rather than firing a bogus celebration. Defensive and harmless on the
+  current reducer (which never resets `remaining` on a non-closing numpad dispatch).
 
-This preserves the live mid-leg StatDrawer behaviour (mid-leg `curDarts > 0`, so the current leg is still counted) while eliminating the loser double-count. Add a regression test that asserts a loser's average on a completed match equals the `legCompleted`-only ratio (the existing WR-06 test only covers the winner at `remaining === 0`).
+- **`visitScoresFromState` structural leg-boundary detection (WR-03, averages.ts:208-278)**
+  and **WR-05 record sequence ids** (`match.svelte.ts:289-290` /
+  `display/+page.svelte:29,39-48`): reviewed; logic is sound and consistent across the
+  scorer/display boundary (monotonic `seq`, `<= lastRecordSeq` drop, append-within-window).
 
-## Warnings
+**Test evidence:** `npx vitest run --project=unit` → 14 files, 291 tests passed.
 
-### WR-01: WR-06 unit coverage is winner-only — the loser path is untested
+## Narrative Findings (AI reviewer)
 
-**File:** `src/engine/averages.test.ts:269-284`
+No Critical or Warning findings.
 
-**Issue:** The single "does not double-count the final leg on a completed match" test constructs a player with `remaining: 0` (the winner). The loser case (`remaining > 0` on a completed match) — the exact condition under which CR-01 above manifests — has no test. The blind spot is what allowed the regression to ship in iteration 1's fix.
-
-**Fix:** Add a test mirroring the winner test but with `remaining > 0` and the loser's final leg present in `legCompleted`, asserting the result equals `(prevScored / prevDarts) * 3` (no current-leg contribution). Include it in the same `describe` block so future refactors of `matchAverageCrossLeg` keep both paths covered.
-
-### WR-02: Highest-checkout reconstruction duplicated in three places with drift risk
-
-**File:** `src/db/stats.ts:160-176`, `src/ui/history/MatchStatBreakdown.svelte:24-42`, `src/stores/match.svelte.ts:215-236`
-
-**Issue:** The "walk visits per leg, reset `running` at leg boundary, take the larger of board-sum or `running` for `wasCheckout` visits" logic is hand-copied into three components. They are currently consistent, but the leg-boundary reset (`if (running <= 0) running = startScore`) is a subtle invariant; any future change to one copy (e.g. switching to legCompleted-driven boundaries like `visitScoresFromState` already does) will silently diverge the history breakdown from the lifetime dashboard. This is the same class of boundary-drift bug WR-03 just fixed inside `visitScoresFromState`.
-
-**Fix:** Extract a single `highestCheckout(player, startScore): number | null` into `averages.ts` (next to `highestVisit`) and import it in all three call sites. Prefer driving the boundary off `legCompleted` (as `visitScoresFromState` now does) so all reconstruction helpers share one boundary policy.
-
-### WR-03: Record-detection numpad visit-score uses `prevPlayer.remaining` across a possible leg reset
-
-**File:** `src/stores/match.svelte.ts:165-168`
-
-**Issue:**
-```ts
-visitScore = nextLegCount > prevLegCount
-    ? prevPlayer.remaining
-    : prevPlayer.remaining - nextPlayer.remaining;
-```
-For a non-checkout numpad visit, `prevPlayer.remaining - nextPlayer.remaining` assumes `nextPlayer.remaining` is still in the same leg as `prevPlayer.remaining`. That holds for the no-leg-close branch here. But this relies on the reducer never resetting `remaining` on a non-leg-closing numpad dispatch — true today, yet undocumented at this call site. If a numpad visit ever both fails to increment `legCompleted` and resets remaining (e.g. a future bust-on-numpad path), `visitScore` would be negative and a spurious record could fire. Low likelihood, but the coupling is implicit.
-
-**Fix:** Add an assertion/guard: `const delta = prevPlayer.remaining - nextPlayer.remaining; visitScore = nextLegCount > prevLegCount ? prevPlayer.remaining : (delta >= 0 ? delta : null);` so a negative delta degrades to "no record" instead of a bogus celebration.
-
-### WR-04: `DisplayStore` BroadcastChannel message handler has no shape validation
-
-**File:** `src/stores/display.svelte.ts:58-60`
-
-**Issue:** WR-07 added validation for the localStorage hydration path (connect()), but the live BroadcastChannel handler assigns `this.state = e.data` with no validation. A malformed or partial `MatchState` posted on the channel (e.g. a future protocol change, or a stray same-origin sender) would reach the render loops the WR-07 guard was specifically added to protect (`repeat(0, 1fr)` grid, `players[activePlayerIndex]` out of range). The two ingress paths are inconsistent.
-
-**Fix:** Extract the WR-07 shape check from `connect()` into a `isValidMatchState(parsed)` helper and apply it in the message handler too: `if (isValidMatchState(e.data)) this.state = e.data;`.
-
-## Info
-
-### IN-01: `matchAverage()` retained but superseded and misleading
-
-**File:** `src/engine/averages.ts:58-74`
-
-**Issue:** `matchAverage()` is documented (lines 64-70) as producing wrong results for multi-leg matches and is superseded by `matchAverageCrossLeg`. It is still exported. Keeping a known-incorrect function exported invites a future caller to pick it by name. No current Phase 4 file imports it.
-
-**Fix:** Either remove it or rename to make the single-leg-only contract explicit (e.g. `currentLegMatchAverage`). Not urgent — flagged so it does not become a footgun.
-
-### IN-02: `totalLegsCompleted = 0` dead local in set-win branch
-
-**File:** `src/engine/reducer.ts:331-332`
-
-**Issue:** `const totalLegsCompleted = 0; const nextLegStarter = legStarterIndex(totalLegsCompleted, numPlayers);` — the variable is a constant 0 with a comment; it reads as if it could vary. Minor clarity nit.
-
-**Fix:** Inline: `const nextLegStarter = legStarterIndex(0, numPlayers);` with the existing comment.
-
-### IN-03: Score-band reconstruction silently omits non-closing numpad visits
-
-**File:** `src/engine/averages.ts:247-251`, `src/ui/input/StatDrawer.svelte:54-61`
-
-**Issue:** Non-closing numpad visit scores cannot be reconstructed (no per-visit remaining is persisted) and are omitted from band counts and first-9 scoring. This is a known/documented limitation (RESEARCH Pitfall 2), not a new defect — flagged so it is not mistaken for a band-counting bug during QA. A numpad-entered 180 that does NOT close a leg will not appear in the "180er" count, whereas a board-entered or leg-closing numpad 180 will.
-
-**Fix:** None required for v1 (documented limitation). If band accuracy for numpad play becomes important, persist a per-visit `scored` field on `Visit` rather than reconstructing.
+The previously-documented INFO items (single-point trend-chart threshold, accent-band
+intent, comment cleanup, dead props) were re-examined and are not actual bugs; they
+remain out of scope per the re-review instructions. The known pre-existing
+`src/db/profiles.ts:24` type error is Phase 3 debt and out of scope.
 
 ---
 
-_Reviewed: 2026-06-12_
+_Reviewed: 2026-06-12T17:09:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_

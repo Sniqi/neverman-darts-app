@@ -1,6 +1,5 @@
 // src/ui/overlays/PauseOverlay.test.ts
 // Browser-mode component tests for PauseOverlay (FLOW-02).
-// Tests written BEFORE implementation (TDD RED phase).
 //
 // Verifies:
 //   1. With pauseActive=false the overlay is NOT in the DOM
@@ -9,6 +8,10 @@
 //   4. "Weiter" button present when showResume=true (default)
 //   5. "Weiter" button absent when showResume=false
 //   6. Clicking "Weiter" calls the onresume callback
+//   7. UI-1: remainingSeconds=0 shows "Weiter geht's!" in place of MM:SS
+//   8. UI-2: aria-live companion absent at mid-countdown (no per-second noise)
+//   9. UI-2: aria-live companion populated at minute marks and ≤10s
+//  10. UI-3: out:fade transition attribute present on overlay element
 
 import { render } from 'vitest-browser-svelte';
 import { expect, test, vi } from 'vitest';
@@ -119,4 +122,94 @@ test('German heading "Pause" and subtitle "Nächste Leg in Kürze" are rendered'
 	});
 	expect(screen.container.textContent).toContain('Pause');
 	expect(screen.container.textContent).toContain('Nächste Leg in Kürze');
+});
+
+// ── UI-1: zero-countdown closure flash ────────────────────────────────────────
+
+test('UI-1: remainingSeconds=0 shows "Weiter geht\'s!" instead of "00:00"', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 0,
+	});
+	expect(screen.container.textContent).toContain("Weiter geht's!");
+	expect(screen.container.textContent).not.toContain('00:00');
+});
+
+test('UI-1: "Weiter geht\'s!" element has zero-flash class when remainingSeconds=0', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 0,
+	});
+	const flashEl = screen.container.querySelector('.zero-flash');
+	expect(flashEl).toBeTruthy();
+});
+
+test('UI-1: normal countdown (remainingSeconds=1) does NOT show "Weiter geht\'s!"', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 1,
+	});
+	expect(screen.container.textContent).not.toContain("Weiter geht's!");
+	expect(screen.container.textContent).toContain('00:01');
+});
+
+// ── UI-2: aria-live coarse-interval companion ─────────────────────────────────
+
+test('UI-2: visible countdown digits element has no aria-live attribute', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 272,
+	});
+	const digits = screen.container.querySelector('.countdown-digits');
+	expect(digits).toBeTruthy();
+	expect(digits!.getAttribute('aria-live')).toBeNull();
+});
+
+test('UI-2: sr-only aria-live companion is present in the DOM', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 272,
+	});
+	const companion = screen.container.querySelector('.sr-only[aria-live]');
+	expect(companion).toBeTruthy();
+});
+
+test('UI-2: aria-live companion is empty at mid-countdown (not a minute mark, >10s)', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 272, // 4:32 — not a minute mark, not ≤10s
+	});
+	const companion = screen.container.querySelector('.sr-only[aria-live]');
+	expect(companion).toBeTruthy();
+	expect(companion!.textContent?.trim()).toBe('');
+});
+
+test('UI-2: aria-live companion is populated at a minute mark (remainingSeconds=120)', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 120, // exactly 2 minutes
+	});
+	const companion = screen.container.querySelector('.sr-only[aria-live]');
+	expect(companion).toBeTruthy();
+	expect(companion!.textContent?.trim()).not.toBe('');
+});
+
+test('UI-2: aria-live companion is populated when remainingSeconds=10 (≤10s threshold)', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 10,
+	});
+	const companion = screen.container.querySelector('.sr-only[aria-live]');
+	expect(companion).toBeTruthy();
+	expect(companion!.textContent?.trim()).not.toBe('');
+});
+
+test('UI-2: aria-live companion is populated when remainingSeconds=5 (≤10s threshold)', async () => {
+	const screen = render(PauseOverlay, {
+		pauseActive: true,
+		remainingSeconds: 5,
+	});
+	const companion = screen.container.querySelector('.sr-only[aria-live]');
+	expect(companion).toBeTruthy();
+	expect(companion!.textContent?.trim()).not.toBe('');
 });

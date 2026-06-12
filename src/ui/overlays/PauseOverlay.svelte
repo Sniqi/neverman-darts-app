@@ -5,6 +5,8 @@
 	// Prop-driven — imports no store so it is testable in isolation and reusable.
 	// Structure mirrors MatchWinOverlay.svelte (PATTERNS analog).
 	// z-index: 60 (above RecordOverlay 50, below MatchWinOverlay 100 — UI-SPEC).
+	import { fade } from 'svelte/transition';
+	import { cubicIn } from 'svelte/easing';
 
 	interface Props {
 		pauseActive: boolean;
@@ -25,6 +27,21 @@
 	// Format MM:SS — zero-padded, e.g. 480 → "08:00", 5 → "00:05", 272 → "04:32"
 	let mm = $derived(String(Math.floor(remainingSeconds / 60)).padStart(2, '0'));
 	let ss = $derived(String(remainingSeconds % 60).padStart(2, '0'));
+
+	// UI-1: show "Weiter geht's!" flash when countdown reaches exactly 0.
+	// Both /match and /display see remainingSeconds === 0 via broadcast, so this
+	// derived flag drives the flash on both windows without any local timer.
+	let isZero = $derived(remainingSeconds === 0 && pauseActive);
+
+	// UI-2: aria-live companion — only populated at coarse intervals (every 60s and ≤10s).
+	// The visible digits have no aria-live so screen readers are not flooded every second.
+	let ariaAnnouncement = $derived.by(() => {
+		if (!pauseActive) return '';
+		if (isZero) return "Weiter geht's!";
+		if (remainingSeconds <= 10) return `${remainingSeconds} Sekunden`;
+		if (remainingSeconds % 60 === 0) return `${Math.floor(remainingSeconds / 60)} Minuten`;
+		return '';
+	});
 </script>
 
 {#if pauseActive}
@@ -33,11 +50,21 @@
 		role="dialog"
 		aria-modal="true"
 		aria-label="Pause"
+		in:fade={{ duration: 300, easing: (t) => 1 - Math.pow(1 - t, 2) }}
+		out:fade={{ duration: 200, easing: cubicIn }}
 	>
 		<div class="pause-content">
 			<h1 class="pause-heading">Pause</h1>
 			<p class="pause-subtitle">Nächste Leg in Kürze</p>
-			<p class="countdown-digits" aria-live="polite">{mm}:{ss}</p>
+			<!-- UI-1: zero state shows closure copy; normal state shows MM:SS digits -->
+			<!-- UI-2: aria-live removed from visible element; companion below handles announcements -->
+			{#if isZero}
+				<p class="countdown-digits zero-flash">Weiter geht's!</p>
+			{:else}
+				<p class="countdown-digits">{mm}:{ss}</p>
+			{/if}
+			<!-- UI-2: visually hidden aria-live element, updated only at coarse intervals -->
+			<span class="sr-only" aria-live="polite" aria-atomic="true">{ariaAnnouncement}</span>
 			{#if showResume}
 				<button class="weiter-btn" onclick={onresume}>Weiter</button>
 			{/if}
@@ -54,12 +81,6 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 60;
-		animation: fadeIn 300ms ease-out;
-	}
-
-	@keyframes fadeIn {
-		from { opacity: 0; }
-		to   { opacity: 1; }
 	}
 
 	.pause-content {
@@ -95,6 +116,16 @@
 		font-variant-numeric: tabular-nums;
 	}
 
+	/* UI-1: zero flash shares countdown sizing/color but fades out over 800ms per spec */
+	.zero-flash {
+		animation: zeroFlashFade 800ms ease-out forwards;
+	}
+
+	@keyframes zeroFlashFade {
+		from { opacity: 1; }
+		to   { opacity: 0; }
+	}
+
 	/* "Weiter" button — exact copy of MatchWinOverlay .new-game-btn (PATTERNS analog) */
 	.weiter-btn {
 		height: 56px;
@@ -112,5 +143,18 @@
 
 	.weiter-btn:active {
 		opacity: 0.85;
+	}
+
+	/* UI-2: visually hidden but readable by screen readers */
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 </style>

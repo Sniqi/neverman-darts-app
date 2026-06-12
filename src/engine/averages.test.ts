@@ -268,19 +268,34 @@ describe('matchAverageCrossLeg (Phase 4 — STAT-01)', () => {
 
 	it('does not double-count the final leg on a completed match (winner, remaining=0) (WR-06)', () => {
 		// 2-leg completed match. Both legs are in legCompleted (reducer pushes the final
-		// leg at match close). The winner's remaining is 0 while legStartVisitIndex still
-		// points at the final leg's start (index 1 here). Calling with the real
-		// legStartVisitIndex must equal the legCompleted-only ratio — no double count.
+		// leg at match close). The winner's remaining is 0. The three callers pass
+		// currentLegStartIdx = visits.length so the current-leg slice is empty and the
+		// final leg (already in legCompleted) is not double-counted.
 		const legCompleted = [
 			{ dartsThrown: 9, scored: 300 },
 			{ dartsThrown: 12, scored: 501 },
 		];
-		// visits: leg1 (index 0), leg2/final (index 1). Final-leg start index = 1.
 		const visits: Visit[] = [dartVisit([60, 60, 60]), dartVisit([60, 60, 60])];
 		const player = makePlayer(visits, 0, legCompleted); // remaining 0 = match closed
 		const expected = ((300 + 501) / (9 + 12)) * 3;
-		// Real legStartVisitIndex of the final leg (1) — would double-count without the fix.
-		expect(matchAverageCrossLeg(player, 1, 501)).toBeCloseTo(expected, 5);
+		// Caller passes visits.length (empty current-leg slice) — no double count.
+		expect(matchAverageCrossLeg(player, player.visits.length, 501)).toBeCloseTo(expected, 5);
+	});
+
+	it('does not double-count the final leg on a completed match (LOSER, remaining>0) (CR-01 iter 2)', () => {
+		// 1-leg completed match. The loser finished the (lost) leg with remaining > 0; the
+		// CR-01 fix records the loser's final leg into legCompleted too. Callers pass
+		// currentLegStartIdx = visits.length, so the empty-slice guard (curDarts === 0)
+		// must skip the current-leg contribution. The OLD `remaining === 0` guard skipped
+		// this branch for the loser and added curScored = startScore - remaining a second
+		// time — doubling the loser's match average. This asserts the legCompleted-only
+		// ratio with NO current-leg contribution.
+		const legCompleted = [{ dartsThrown: 12, scored: 401 }];
+		const visits: Visit[] = [dartVisit([60, 60, 60]), dartVisit([60, 60, 60])];
+		const player = makePlayer(visits, 100, legCompleted); // remaining 100 > 0 = loser, match closed
+		const expected = (401 / 12) * 3;
+		// Without the fix: ((401 + (501 - 100)) / 12) * 3 ≈ double.
+		expect(matchAverageCrossLeg(player, player.visits.length, 501)).toBeCloseTo(expected, 5);
 	});
 
 	it('uses currentLegStartIdx to slice only current-leg visits', () => {

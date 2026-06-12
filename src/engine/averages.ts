@@ -99,20 +99,23 @@ export function matchAverageCrossLeg(
 	const prevDarts = completed.reduce((s, l) => s + l.dartsThrown, 0);
 	const prevScored = completed.reduce((s, l) => s + l.scored, 0);
 
-	// WR-06: when remaining === 0 the player has just closed a leg, and the reducer
-	// has already pushed that leg into legCompleted while leaving legStartVisitIndex
-	// pointing at the (now-completed) final leg's start. Adding the current-leg slice
-	// here would double-count that final leg (once from legCompleted, once from the
-	// slice with scored = startScore - 0 = startScore). Skip the current-leg
-	// contribution in that case. Mid-leg (remaining > 0) the current leg is NOT yet
-	// in legCompleted, so it must still be counted (live StatDrawer average).
-	if (player.remaining === 0) {
+	// CR-01 (iter 2): the current leg has already been pushed into legCompleted once it
+	// is closed — for EVERY player, winner AND loser (the CR-01 fix records the loser's
+	// final leg too). The callers pass currentLegStartIdx = player.visits.length on a
+	// completed match, so the current-leg slice is empty for everyone. Drive the guard
+	// off the slice (curDarts === 0) rather than `remaining === 0`: gating on remaining
+	// only caught the winner and let the loser's final-leg score (curScored =
+	// startScore - remaining > 0) be added a second time on top of legCompleted, doubling
+	// the loser's match average. Mid-leg (live StatDrawer) the current leg is NOT yet in
+	// legCompleted and has uncommitted visits (curDarts > 0), so it is still counted.
+	const curVisits = player.visits.slice(currentLegStartIdx);
+	const curDarts = curVisits.reduce((s, v) => s + (v.darts.length > 0 ? v.darts.length : 3), 0);
+
+	if (curDarts === 0) {
 		if (prevDarts === 0) return null;
 		return (prevScored / prevDarts) * 3;
 	}
 
-	const curVisits = player.visits.slice(currentLegStartIdx);
-	const curDarts = curVisits.reduce((s, v) => s + (v.darts.length > 0 ? v.darts.length : 3), 0);
 	const curScored = startScore - player.remaining;
 	const totalDarts = prevDarts + curDarts;
 	const totalScored = prevScored + curScored;

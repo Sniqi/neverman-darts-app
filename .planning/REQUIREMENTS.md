@@ -36,7 +36,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Game Flow
 
 - [x] **FLOW-01**: Player can set up a match: select players/guests, game mode, in/out rules, legs/sets format, and starting order (via bull-off entry or manual)
-- [ ] **FLOW-02**: After a configurable number of legs, a pause screen with countdown timer (e.g. 5 min) appears on both views; match continues after timer or button press
+- [x] **FLOW-02**: After a configurable number of legs, a pause screen with countdown timer (e.g. 5 min) appears on both views; match continues after timer or button press
 - [x] **FLOW-03**: An in-progress match survives a browser reload or crash and can be resumed exactly where it stopped
 
 ### Statistics
@@ -150,7 +150,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUD-01 | Phase 5 | Complete |
 | AUD-02 | Phase 5 | Pending |
 | AUD-03 | Phase 5 | Complete |
-| FLOW-02 | Phase 5 | Pending |
+| FLOW-02 | Phase 5 | Complete |
 | PLAT-01 | Phase 6 | Pending |
 | PLAT-02 | Phase 6 | Pending |
 | PLAT-03 | Phase 6 | Pending |

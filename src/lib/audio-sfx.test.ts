@@ -8,16 +8,19 @@ import { playSfx } from './audio-sfx.js';
 // Minimal Audio mock: tracks constructor calls and records volume assignment.
 const mockPlay = vi.fn().mockResolvedValue(undefined);
 
-function makeMockAudio() {
-	return { play: mockPlay, volume: 1 };
-}
+// lastAudioInstance is set by MockAudio so tests can inspect volume after playSfx.
+let lastAudioInstance: { play: typeof mockPlay; volume: number } | null = null;
 
-const MockAudio = vi.fn(makeMockAudio);
+const MockAudio = vi.fn(function AudioMock(this: unknown) {
+	lastAudioInstance = { play: mockPlay, volume: 1 };
+	return lastAudioInstance;
+});
 
 beforeEach(() => {
 	vi.stubGlobal('Audio', MockAudio);
 	MockAudio.mockClear();
 	mockPlay.mockClear();
+	lastAudioInstance = null;
 });
 
 describe('audio-sfx', () => {
@@ -55,16 +58,9 @@ describe('audio-sfx', () => {
 			expect(MockAudio).toHaveBeenCalledWith('/sfx/record.mp3');
 		});
 
-		it('sets volume to 0.8 on the constructed Audio instance', () => {
-			// Use a regular function so 'new' semantics work correctly in vitest.
-			// The constructor sets this.volume; we spy on the instance via mock.instances.
-			MockAudio.mockImplementationOnce(function (this: { volume: number; play: () => Promise<void> }) {
-				this.volume = 1;
-				this.play = mockPlay;
-			});
+		it('sets volume to 0.8 on the Audio instance', () => {
 			playSfx('180', true);
-			const instance = MockAudio.mock.instances[0] as unknown as { volume: number };
-			expect(instance.volume).toBe(0.8);
+			expect(lastAudioInstance?.volume).toBe(0.8);
 		});
 
 		it('calls play() on the Audio instance', () => {

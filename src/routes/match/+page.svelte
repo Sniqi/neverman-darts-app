@@ -8,6 +8,7 @@
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
 	import { loadAudioPrefs } from '../../lib/audio-prefs.js';
 	import { initVoices, announceVisit } from '../../lib/audio-caller.js';
+	import { playSfx } from '../../lib/audio-sfx.js';
 	import { getSuggestion } from '../../engine/checkout.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
 	import VisitStrip from '../../ui/input/VisitStrip.svelte';
@@ -52,6 +53,72 @@
 			releaseWakeLock();
 			document.removeEventListener('visibilitychange', handleVisibility);
 		};
+	});
+
+	// ── SFX trigger (AUD-02 / D-05) ──────────────────────────────────────────
+	// Fires in sync with the Phase 4 RecordOverlay (same pendingRecords signal).
+	// 180 SFX takes priority; else any other record type fires 'record' sound.
+	// High-finish SFX (checkout ≥ 100) also covered here via highest-checkout record
+	// when it IS a personal best. Non-record high finishes are caught below (A4).
+	// Pitfall 6: playSfx is called here only — never in /display.
+	$effect(() => {
+		const records = matchStore.pendingRecords;
+		if (records.length === 0) return;
+
+		const has180 = records.some(r => r.type === '180');
+		if (has180) {
+			playSfx('180', audioPrefs.sfxEnabled);
+		} else {
+			playSfx('record', audioPrefs.sfxEnabled);
+		}
+
+		// Also fire highfinish for a highest-checkout record with value ≥ 100 (A4).
+		const hasHighFinish = records.some(r => r.type === 'highest-checkout' && (r.value ?? 0) >= 100);
+		if (hasHighFinish) {
+			playSfx('highfinish', audioPrefs.sfxEnabled);
+		}
+	});
+
+	// ── High-finish SFX for checkouts ≥ 100 that are NOT new personal records ─
+	// pendingRecords only contains highest-checkout when it is a new personal best.
+	// A checkout of e.g. 120 that is not a personal best would be missed above.
+	// Trigger: watch each player's legCompleted length; when it increases, inspect
+	// the checkout visit of that leg. Source: /match visit-detection pattern (A4).
+	let lastLegCounts = $state<Record<string, number>>({});
+
+	$effect(() => {
+		const state = matchStore.state;
+		if (state.phase !== 'playing') return;
+
+		for (const player of state.players) {
+			const prevLegCount = lastLegCounts[player.id] ?? 0;
+			const nextLegCount = player.legCompleted?.length ?? 0;
+			if (nextLegCount > prevLegCount) {
+				lastLegCounts = { ...lastLegCounts, [player.id]: nextLegCount };
+
+				// Find the checkout visit in the just-closed leg.
+				// Only fire if pendingRecords does NOT already include a highest-checkout
+				// for this player (avoid doubling up when it IS also a record).
+				const alreadyCovered = matchStore.pendingRecords.some(
+					r => r.type === 'highest-checkout' && r.playerId === player.id && (r.value ?? 0) >= 100
+				);
+				if (alreadyCovered) continue;
+
+				// Inspect visits added since the previous leg count to find the checkout.
+				const visits = player.visits;
+				for (const v of visits) {
+					if (v.wasCheckout === true) {
+						const score = v.darts.length > 0
+							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
+							: null; // numpad checkout score not directly available here
+						if (score !== null && score >= 100) {
+							playSfx('highfinish', audioPrefs.sfxEnabled);
+						}
+					}
+				}
+				return;
+			}
+		}
 	});
 
 	// ── Numpad toggle: remembers last-used mode per player (D-07) ──────────

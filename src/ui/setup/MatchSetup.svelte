@@ -8,7 +8,11 @@
 	import ProfileManager from './ProfileManager.svelte';
 	import ConfirmDialog from '../dialogs/ConfirmDialog.svelte';
 	import { loadUnfinishedMatch, clearUnfinishedMatch } from '../../lib/storage.js';
+	import { loadAudioPrefs, saveAudioPref } from '../../lib/audio-prefs.js';
 	import type { MatchConfig } from '../../engine/types.js';
+
+	// ── Audio & Pause prefs (AUD-03) — read once at module level (localStorage is sync) ──
+	const audioPrefs = loadAudioPrefs();
 
 	interface MatchPlayer {
 		id: string;
@@ -72,6 +76,30 @@
 	function adjustSets(delta: number) {
 		const next = setsToWin + delta;
 		if (next >= 1 && next <= 9) setsToWin = next;
+	}
+
+	// ── Audio & Pause state (AUD-03 / D-07) ──────────────────────────────────
+	let callerEnabled = $state(audioPrefs.callerEnabled);
+	let callerLang = $state<'de' | 'en'>(audioPrefs.callerLang);
+	let sfxEnabled = $state(audioPrefs.sfxEnabled);
+	let pauseEnabled = $state(audioPrefs.pauseEnabled);
+	let pauseLegs = $state(audioPrefs.pauseLegs);
+	let pauseMinutes = $state(audioPrefs.pauseMinutes);
+
+	function adjustPauseLegs(delta: number) {
+		const next = pauseLegs + delta;
+		if (next >= 1) {
+			pauseLegs = next;
+			saveAudioPref('pauseLegs', next);
+		}
+	}
+
+	function adjustPauseMinutes(delta: number) {
+		const next = pauseMinutes + delta;
+		if (next >= 1) {
+			pauseMinutes = next;
+			saveAudioPref('pauseMinutes', next);
+		}
 	}
 </script>
 
@@ -158,6 +186,94 @@
 					<span class="stepper-value">{setsToWin}</span>
 					<button class="stepper-btn" onclick={() => adjustSets(1)} disabled={setsToWin >= 9} aria-label="Sätze erhöhen">+</button>
 				</div>
+			</div>
+		{/if}
+	</section>
+
+	<!-- Audio & Pause (AUD-03 / D-07) -->
+	<section>
+		<h2>Audio &amp; Pause</h2>
+
+		<!-- Caller toggle -->
+		<div class="toggle-row">
+			<label class="toggle-label" for="caller-toggle">Anrufer</label>
+			<input
+				id="caller-toggle"
+				type="checkbox"
+				role="switch"
+				aria-checked={callerEnabled}
+				bind:checked={callerEnabled}
+				onchange={() => saveAudioPref('callerEnabled', callerEnabled)}
+			/>
+		</div>
+
+		<!-- Language seg-control — only when caller is on -->
+		{#if callerEnabled}
+			<div class="stepper-row">
+				<span class="stepper-label">Sprache</span>
+				<div class="seg-control" role="group" aria-label="Sprache">
+					<button
+						class="seg-btn"
+						class:active={callerLang === 'de'}
+						onclick={() => { callerLang = 'de'; saveAudioPref('callerLang', 'de'); }}
+						aria-pressed={callerLang === 'de'}
+					>Deutsch</button>
+					<button
+						class="seg-btn"
+						class:active={callerLang === 'en'}
+						onclick={() => { callerLang = 'en'; saveAudioPref('callerLang', 'en'); }}
+						aria-pressed={callerLang === 'en'}
+					>Englisch</button>
+				</div>
+			</div>
+		{/if}
+
+		<!-- SFX toggle -->
+		<div class="toggle-row">
+			<label class="toggle-label" for="sfx-toggle">Soundeffekte</label>
+			<input
+				id="sfx-toggle"
+				type="checkbox"
+				role="switch"
+				aria-checked={sfxEnabled}
+				bind:checked={sfxEnabled}
+				onchange={() => saveAudioPref('sfxEnabled', sfxEnabled)}
+			/>
+		</div>
+
+		<!-- Auto-pause toggle -->
+		<div class="toggle-row">
+			<label class="toggle-label" for="pause-toggle">Automatische Pause</label>
+			<input
+				id="pause-toggle"
+				type="checkbox"
+				role="switch"
+				aria-checked={pauseEnabled}
+				bind:checked={pauseEnabled}
+				onchange={() => saveAudioPref('pauseEnabled', pauseEnabled)}
+			/>
+		</div>
+
+		<!-- Pause steppers — only when auto-pause is on -->
+		{#if pauseEnabled}
+			<div class="stepper-row">
+				<span class="stepper-label">Pause nach</span>
+				<div class="stepper">
+					<button class="stepper-btn" onclick={() => adjustPauseLegs(-1)} disabled={pauseLegs <= 1} aria-label="Legs verringern">−</button>
+					<span class="stepper-value">{pauseLegs}</span>
+					<button class="stepper-btn" onclick={() => adjustPauseLegs(1)} aria-label="Legs erhöhen">+</button>
+				</div>
+				<span class="stepper-unit">Legs</span>
+			</div>
+
+			<div class="stepper-row">
+				<span class="stepper-label">Pausendauer</span>
+				<div class="stepper">
+					<button class="stepper-btn" onclick={() => adjustPauseMinutes(-1)} disabled={pauseMinutes <= 1} aria-label="Minuten verringern">−</button>
+					<span class="stepper-value">{pauseMinutes}</span>
+					<button class="stepper-btn" onclick={() => adjustPauseMinutes(1)} aria-label="Minuten erhöhen">+</button>
+				</div>
+				<span class="stepper-unit">Minuten</span>
 			</div>
 		{/if}
 	</section>
@@ -319,6 +435,12 @@
 		font-weight: 600;
 		min-width: 24px;
 		text-align: center;
+	}
+
+	.stepper-unit {
+		font-size: 14px;
+		color: #888;
+		min-width: 48px;
 	}
 
 	/* Sets toggle */

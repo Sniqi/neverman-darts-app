@@ -220,5 +220,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
 | 4. Statistics & Achievements | 5/5 | Complete    | 2026-06-12 |
-| 5. Audio & Auto-Pause | 3/3 | Complete   | 2026-06-12 |
+| 5. Audio & Auto-Pause | 3/3 | Complete    | 2026-06-12 |
 | 6. PWA & Deployment | 0/? | Not started | - |

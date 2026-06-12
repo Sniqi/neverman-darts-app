@@ -65,7 +65,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Audio
 
 - [x] **AUD-01**: Caller voice announces visit scores via speech synthesis, with selectable language German or English ("One hundred and eighty!")
-- [ ] **AUD-02**: Sound effects play on 180s, high finishes, and new records, reinforcing the celebration overlay
+- [x] **AUD-02**: Sound effects play on 180s, high finishes, and new records, reinforcing the celebration overlay
 - [x] **AUD-03**: Player can mute or configure caller and sound effects
 
 ### Platform
@@ -148,7 +148,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ACHV-02 | Phase 4 | Complete |
 | ACHV-03 | Phase 4 | Complete |
 | AUD-01 | Phase 5 | Complete |
-| AUD-02 | Phase 5 | Pending |
+| AUD-02 | Phase 5 | Complete |
 | AUD-03 | Phase 5 | Complete |
 | FLOW-02 | Phase 5 | Complete |
 | PLAT-01 | Phase 6 | Pending |

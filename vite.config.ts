@@ -16,6 +16,7 @@ export default defineConfig({
 					name: 'unit',
 					environment: 'node',
 					include: ['src/**/*.test.ts', '!src/ui/**/*.test.ts'],
+					setupFiles: ['src/test-setup-node.ts'],
 					server: {
 						deps: {
 							inline: ['@sveltejs/kit']

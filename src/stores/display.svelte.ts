@@ -14,6 +14,26 @@ import { BC_CHANNEL, LS_SNAPSHOT } from '../lib/sync-constants.js';
 const CHANNEL_NAME = BC_CHANNEL;
 const SNAPSHOT_KEY = LS_SNAPSHOT;
 
+/**
+ * Validates the shape of an incoming MatchState before it reaches the render loops
+ * (WR-07 / WR-04). A corrupt or partially-hydrated snapshot (empty players, or
+ * activePlayerIndex out of range) would render a broken grid
+ * (grid-template-columns: repeat(0, 1fr)) and crash the averages/standings loops.
+ * Both ingress paths — localStorage hydration AND the live BroadcastChannel handler —
+ * must apply this identical guard so they cannot diverge.
+ */
+function isValidMatchState(parsed: unknown): parsed is MatchState {
+	const p = parsed as MatchState | null;
+	return (
+		!!p &&
+		Array.isArray(p.players) &&
+		p.players.length > 0 &&
+		typeof p.activePlayerIndex === 'number' &&
+		p.activePlayerIndex >= 0 &&
+		p.activePlayerIndex < p.players.length
+	);
+}
+
 export class DisplayStore {
 	state = $state<MatchState | null>(null);
 	private channel: BroadcastChannel | null = null;
@@ -30,22 +50,13 @@ export class DisplayStore {
 	 */
 	connect(): () => void {
 		// Hydrate from snapshot — T-02-01: parse inside try/catch; fallback to null.
-		// WR-07: validate the parsed shape before assigning. A corrupt / partially
-		// hydrated snapshot (empty players, or activePlayerIndex out of range) would
-		// render a broken grid (grid-template-columns: repeat(0, 1fr)) and crash the
-		// averages/standings loops. On any invalid shape, leave state null (idle screen).
+		// WR-07: validate the parsed shape before assigning (see isValidMatchState).
+		// On any invalid shape, leave state null (idle screen).
 		try {
 			const raw = localStorage.getItem(SNAPSHOT_KEY);
 			if (raw) {
-				const parsed = JSON.parse(raw) as MatchState;
-				if (
-					parsed &&
-					Array.isArray(parsed.players) &&
-					parsed.players.length > 0 &&
-					typeof parsed.activePlayerIndex === 'number' &&
-					parsed.activePlayerIndex >= 0 &&
-					parsed.activePlayerIndex < parsed.players.length
-				) {
+				const parsed = JSON.parse(raw) as unknown;
+				if (isValidMatchState(parsed)) {
 					this.state = parsed;
 				}
 			}
@@ -53,10 +64,15 @@ export class DisplayStore {
 			// Corrupt or invalid JSON — leave state null (idle screen will show)
 		}
 
-		// Subscribe to live updates from the scoring window
+		// Subscribe to live updates from the scoring window. WR-04: apply the SAME
+		// shape guard as the hydration path — a malformed or partial MatchState posted
+		// on the channel (future protocol change / stray same-origin sender) must not
+		// reach the render loops the WR-07 guard protects.
 		this.channel = new BroadcastChannel(CHANNEL_NAME);
-		this.channel.addEventListener('message', (e: MessageEvent<MatchState>) => {
-			this.state = e.data;
+		this.channel.addEventListener('message', (e: MessageEvent<unknown>) => {
+			if (isValidMatchState(e.data)) {
+				this.state = e.data;
+			}
 		});
 
 		// Return cleanup function for $effect teardown

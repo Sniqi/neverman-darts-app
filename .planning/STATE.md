@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 5 discuss complete — CONTEXT.md ready for planning
-last_updated: "2026-06-12T18:06:03.942Z"
-last_activity: 2026-06-12 -- Phase 5 planning complete
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-06-12T18:17:09.814Z"
+last_activity: 2026-06-12 -- Phase 5 execution started
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 27
-  completed_plans: 27
+  total_plans: 30
+  completed_plans: 28
   percent: 67
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 04 — statistics-achievements
+**Current focus:** Phase 5 — Audio & Auto-Pause
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
+Phase: 5 (Audio & Auto-Pause) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-12 -- Phase 5 planning complete
+Last activity: 2026-06-12 -- Phase 5 execution started
 
 Progress: [█████████░] 89%
 
@@ -78,6 +78,7 @@ Progress: [█████████░] 89%
 | Phase 04-statistics-achievements P02 | 3min | 3 tasks | 3 files |
 | Phase 04-statistics-achievements P04 | 2min | 2 tasks | 3 files |
 | Phase 04 P05 | 8min | 3 tasks | 10 files |
+| Phase 05-audio-auto-pause P01 | 7min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -119,6 +120,7 @@ Recent decisions affecting current work:
 - [Phase ?]: StatDrawer open state is component-local $state — resets to closed on navigation without route-level wiring
 - [Phase ?]: guards first-ever record for brand-new players
 - [Phase ?]: Pitfall 5 T-04-12 mitigation
+- [Phase ?]: Checkout hint uses getSuggestion(player.remaining + total, outRule) — pre-visit remaining recovered post-dispatch (A3)
 
 ### Pending Todos
 
@@ -137,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-12T17:28:06.522Z
-Stopped at: Phase 5 discuss complete — CONTEXT.md ready for planning
-Resume file: .planning/phases/05-audio-auto-pause/05-CONTEXT.md
+Last session: 2026-06-12T18:17:09.807Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: .planning/phases/05-audio-auto-pause/05-02-PLAN.md

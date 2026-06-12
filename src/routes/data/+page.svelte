@@ -192,7 +192,7 @@
 	<ConfirmDialog
 		heading="Daten ersetzen?"
 		body="Ersetzt alle aktuellen Profile und den Verlauf. Diese Aktion kann nicht rückgängig gemacht werden."
-		ctaLabel={importing ? 'Importiere…' : 'Importieren'}
+		ctaLabel="Importieren"
 		ctaStyle="destructive"
 		backdropDismiss={false}
 		onconfirm={handleImportConfirm}

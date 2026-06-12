@@ -1,10 +1,11 @@
 ---
 phase: 5
 slug: audio-auto-pause
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-06-12
+reviewed_at: 2026-06-12
 ---
 
 # Phase 5 — UI Design Contract: Audio & Auto-Pause

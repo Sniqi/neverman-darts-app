@@ -64,10 +64,14 @@ export class MatchStore {
 				winnerId: winner.id,
 				state: $state.snapshot(state)
 			});
-			// Clear resume slot — completed match must not show a resume prompt (Pitfall 2)
-			localStorage.removeItem(LS_SNAPSHOT);
 		} catch {
 			// DB unavailable — match was played; history persistence is best-effort
+		}
+		// Clear resume slot unconditionally — must run even if DB write fails (Pitfall 2)
+		try {
+			localStorage.removeItem(LS_SNAPSHOT);
+		} catch {
+			// localStorage unavailable — acceptable
 		}
 	}
 

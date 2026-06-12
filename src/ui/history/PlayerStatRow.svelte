@@ -11,9 +11,10 @@
 		player: PlayerState;
 		isWinner: boolean;
 		config: MatchConfig;
+		totalLegsPlayed: number;
 	}
 
-	let { player, isWinner, config }: Props = $props();
+	let { player, isWinner, config, totalLegsPlayed }: Props = $props();
 
 	/** Legs or sets won label with correct German singular/plural. */
 	const winsLabel = $derived.by(() => {
@@ -26,8 +27,14 @@
 		}
 	});
 
-	/** Match average formatted to one decimal, or "—" when null. */
+	/**
+	 * Match average formatted to one decimal, or "—" when unavailable.
+	 * For multi-leg matches, computeAverage only captures the last leg's scoring
+	 * (remaining resets to startScore at each leg start). Cross-leg accumulation
+	 * is deferred to Phase 4 — show "—" to avoid a misleadingly precise wrong number.
+	 */
 	const avgDisplay = $derived.by(() => {
+		if (totalLegsPlayed > 1) return '—';
 		const avg = computeAverage(player.visits, config.startScore, player.remaining);
 		return avg !== null ? avg.toFixed(1) : '—';
 	});

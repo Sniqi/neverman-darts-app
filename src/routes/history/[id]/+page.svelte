@@ -15,10 +15,16 @@
 	const record = $derived(data.record);
 
 	let showDeleteDialog = $state(false);
+	let deleteError = $state<string | null>(null);
 
 	/** Winner is the player whose id matches record.winnerId. */
 	const winner = $derived(
 		record.state.players.find((p) => p.id === record.winnerId) ?? record.state.players[0]
+	);
+
+	/** Total legs played in the match — sum of all players' legsWon. */
+	const totalLegsPlayed = $derived(
+		record.state.players.reduce((sum, p) => sum + p.legsWon, 0)
 	);
 
 	/** Full long date for the detail header card, e.g. "12. Juni 2026". */
@@ -56,8 +62,12 @@
 	});
 
 	async function handleDeleteConfirm() {
-		await deleteMatch(record.id!);
-		goto(`${base}/history`);
+		try {
+			await deleteMatch(record.id!);
+			goto(`${base}/history`);
+		} catch {
+			deleteError = 'Löschen fehlgeschlagen.';
+		}
 	}
 </script>
 
@@ -92,6 +102,7 @@
 						{player}
 						isWinner={player.id === record.winnerId}
 						config={record.state.config}
+						{totalLegsPlayed}
 					/>
 				{/each}
 			</div>
@@ -108,6 +119,9 @@
 			>
 				Spiel löschen
 			</button>
+			{#if deleteError}
+				<p class="delete-error" role="alert">{deleteError}</p>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -248,5 +262,12 @@
 
 	.delete-btn:active {
 		background: rgba(192, 57, 43, 0.1);
+	}
+
+	.delete-error {
+		font-size: 14px;
+		font-weight: 400;
+		color: #c0392b;
+		margin: var(--space-sm, 8px) 0 0 0;
 	}
 </style>

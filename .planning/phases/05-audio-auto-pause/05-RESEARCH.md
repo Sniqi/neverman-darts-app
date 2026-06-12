@@ -587,22 +587,22 @@ export function saveAudioPref<K extends keyof AudioPrefs>(key: K, value: AudioPr
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Checkout hint phrasing — `suggestion` array format**
    - What we know: `getSuggestion()` returns `string[] | null` like `['T20', 'T20', 'D20']`.
    - What's unclear: How should this array be spoken? "T20, T20, D20" or "Triple 20, Triple 20, Double 20"? Should the checkout hint always include the full route or only when it fits in one utterance?
-   - Recommendation: For DE, speak the raw array joined by ", " (`getSuggestion` format): "T20, T20, D20". Chrome TTS reads "T20" fine. If full expansion is desired later, add a small `expandDartNotation(dart: string, lang: 'de' | 'en')` utility.
+   - RESOLVED: For DE, speak the raw array joined by ", " (`getSuggestion` format): "T20, T20, D20". Chrome TTS reads "T20" fine. If full expansion is desired later, add a small `expandDartNotation(dart: string, lang: 'de' | 'en')` utility.
 
 2. **Pause state broadcast envelope vs. raw MatchState**
    - What we know: `DisplayStore` currently does a strict `isValidMatchState` cast on every BC_CHANNEL message.
    - What's unclear: Whether to wrap the message in an envelope `{ type, matchState, ...pause }` or keep MatchState raw and publish pause state as a separate message type on the same channel.
-   - Recommendation: Use a type-discriminated envelope on `BC_CHANNEL`. The plan must update both `MatchStore.dispatch()` broadcast and `DisplayStore.connect()` message handler. See Pitfall 3.
+   - RESOLVED: Use a type-discriminated envelope on `BC_CHANNEL`. The plan must update both `MatchStore.dispatch()` broadcast and `DisplayStore.connect()` message handler. See Pitfall 3.
 
 3. **Where does the visit score for the caller come from?**
    - What we know: After `CONFIRM_VISIT`, the visit is in `player.visits[last]`. For board visits, `darts.reduce(sum)`. For numpad visits, remaining delta.
    - What's unclear: The `pendingCorrection` state in `/match` already computes `visitTotal` for display in `CorrectionWindow`. The announcement should use this same computed value, not recompute.
-   - Recommendation: Re-use `pendingCorrection.total` from the existing visit-detection `$effect` to pass to `announceVisit`. Bust visits should not be announced (callers don't announce busts in real darts, or say "überworfen" — outside scope per CONTEXT.md).
+   - RESOLVED: Re-use `pendingCorrection.total` from the existing visit-detection `$effect` to pass to `announceVisit`. Bust visits should not be announced (callers don't announce busts in real darts, or say "überworfen" — outside scope per CONTEXT.md).
 
 ---
 

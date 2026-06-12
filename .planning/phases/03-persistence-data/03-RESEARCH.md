@@ -604,22 +604,25 @@ export const load: PageLoad = async ({ params }) => {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the in-progress match snapshot be included in export?**
    - What we know: CONTEXT.md says "default assumption: export covers profiles + completed history only; the live match is device-local"
    - What's unclear: If a user exports during a live match, the export won't include the unfinished match state
    - Recommendation: Exclude — `dexie-export-import` exports only the `matches` table (completed) and `profiles` table. The localStorage snapshot is intentionally not in the file. Document this in the Daten screen UI.
+   - **RESOLVED:** No — the in-progress match is excluded. Plan 03's objective scopes export to `exportDB(db)` over the Dexie `profiles` + `matches` tables only; the live match lives in the `neverman-match-snapshot` localStorage key and is intentionally device-local (CONTEXT D-10 + the Claude's-discretion note: `export covers profiles + completed history only; the live match is device-local`). Plan 03 Task 3 surfaces this with the import description copy `Laufende Spiele sind nicht enthalten.` No schema change resulted, so the default assumption held.
 
 2. **`phase === 'leg-complete'` — is this a real phase in the current engine?**
    - What we know: `src/engine/types.ts` shows `phase: 'setup' | 'playing' | 'leg-complete' | 'match-complete'`
    - What's unclear: Whether `leg-complete` is ever durably written to localStorage (it's likely transient, replaced by `playing` on the next dispatch)
    - Recommendation: Include `leg-complete` in the resume guard (safe), but note it is likely a UI-only transient phase — the snapshot written after a leg-win dart will have `phase: 'leg-complete'` until the next leg's first dart. The resume prompt showing for this state is correct behavior (the match is unfinished).
+   - **RESOLVED:** Treated as resumable. Plan 01 Task 1's `loadUnfinishedMatch()` resume guard returns the parsed state when `state.phase === 'playing' || state.phase === 'leg-complete'` (and null for `setup` / `match-complete` / corrupt JSON). A reload during the inter-leg window (snapshot written after a leg-win dart, before the next leg's first dart) therefore still restores correctly and surfaces the resume prompt — the match is unfinished, so this is the intended behavior. The unit `<behavior>` block explicitly asserts `loadUnfinishedMatch()` returns the parsed state for `phase 'leg-complete'`.
 
 3. **Multi-player result string format**
    - What we know: D-04 says "final leg/set result (e.g. '3:1')" — this implies 2-player phrasing
    - What's unclear: 3–4 player matches don't have a simple A:B format
    - Recommendation: For 2 players, use "A:B" (legsWon); for 3–4 players, show winner name + legs won (e.g. "Alex 3 Legs"). Keep this as a detail for the planner to decide on history row formatting.
+   - **RESOLVED:** Per Plan 02 Task 1's `toHistoryRow()` / HistoryRow format decision. Two-player matches use a `"n:m"` result string (from `legsWon`, or from `setsWon` when the match is `setsEnabled`), rendered in the row as "[Winner] · n:m · [Loser]" with the winner name in accent. Three-to-four-player matches drop the `a:b` form and render "[Winner] gewinnt — n Legs" (winner name + legs won). Plan 02 Task 1's `<behavior>` block tests all three branches: the `"n:m"` result for a 2-player match, the sets-based result for a `setsEnabled` match, and the winner + legs (no `a:b`) form for a 3–4 player match.
 
 ---
 

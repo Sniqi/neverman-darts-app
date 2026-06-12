@@ -23,15 +23,28 @@
 	// record payloads never reach displayStore.state (T-04-12).
 	// When a win banner is showing (leg or match), fold records into the badge (D-08).
 	let recordStrings = $state<string[]>([]);
+	// WR-05: track the last-processed sequence id so a retransmit of the same event is
+	// ignored, and append (not overwrite) records that arrive while a celebration is
+	// still showing — two players hitting 180 in quick succession both get shown.
+	let lastRecordSeq = -1;
 
 	$effect(() => {
 		let ch: BroadcastChannel;
 		try {
 			ch = new BroadcastChannel(BC_RECORD_CHANNEL);
 			ch.addEventListener('message', (e: MessageEvent) => {
-				const data = e.data as { type: string; records: string[] };
+				const data = e.data as { type: string; seq?: number; records: string[] };
 				if (data?.type === 'record-event' && Array.isArray(data.records)) {
-					recordStrings = data.records;
+					// Drop duplicate/stale sequences (seq is monotonic from the scorer).
+					if (typeof data.seq === 'number') {
+						if (data.seq <= lastRecordSeq) return;
+						lastRecordSeq = data.seq;
+					}
+					// Append within the active dismiss window; replace once cleared.
+					recordStrings =
+						recordStrings.length > 0
+							? [...recordStrings, ...data.records]
+							: data.records;
 				}
 			});
 		} catch {

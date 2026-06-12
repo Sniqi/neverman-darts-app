@@ -273,12 +273,19 @@ export class MatchStore {
 	#broadcastRecordEvent(items: RecordItem[]): void {
 		try {
 			const ch = new BroadcastChannel(BC_RECORD_CHANNEL);
-			ch.postMessage({ type: 'record-event', records: items.map(i => i.text) });
+			// WR-05: include a monotonic sequence id so the display can append (not
+			// overwrite) rapid back-to-back record events and de-duplicate retransmits,
+			// rather than dropping a record when two events land within the dismiss window.
+			this.#recordSeq += 1;
+			ch.postMessage({ type: 'record-event', seq: this.#recordSeq, records: items.map(i => i.text) });
 			ch.close();
 		} catch {
 			// Silently ignore — celebration is best-effort; play continues
 		}
 	}
+
+	/** Monotonic counter for record-event payloads (WR-05). */
+	#recordSeq = 0;
 
 	/**
 	 * Persist a completed match to IndexedDB and clear the resume slot.

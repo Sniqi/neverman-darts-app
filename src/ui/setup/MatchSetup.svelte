@@ -6,6 +6,8 @@
 	import { base } from '$app/paths';
 	import PlayerPicker from './PlayerPicker.svelte';
 	import ProfileManager from './ProfileManager.svelte';
+	import ConfirmDialog from '../dialogs/ConfirmDialog.svelte';
+	import { loadUnfinishedMatch, clearUnfinishedMatch } from '../../lib/storage.js';
 	import type { MatchConfig } from '../../engine/types.js';
 
 	interface MatchPlayer {
@@ -27,10 +29,12 @@
 	// Profile manager collapsible toggle
 	let profilesOpen = $state(false);
 
+	// D-02: new-match warning when a saved unfinished match exists
+	let showSavedMatchWarning = $state(false);
+
 	let canStart = $derived(players.length >= 1);
 
-	function handleStart() {
-		if (!canStart) return;
+	function proceedToStart() {
 		const config: MatchConfig = { startScore, outRule, legsToWin, setsEnabled, setsToWin };
 		// Store config + players in sessionStorage for the bull-off screen to read
 		sessionStorage.setItem(
@@ -38,6 +42,26 @@
 			JSON.stringify({ config, players })
 		);
 		goto(`${base}/bulloff`);
+	}
+
+	function handleStart() {
+		if (!canStart) return;
+		// D-02: warn if an unfinished match is saved before replacing it
+		if (loadUnfinishedMatch() !== null) {
+			showSavedMatchWarning = true;
+		} else {
+			proceedToStart();
+		}
+	}
+
+	function handleSavedMatchConfirm() {
+		clearUnfinishedMatch();
+		showSavedMatchWarning = false;
+		proceedToStart();
+	}
+
+	function handleSavedMatchCancel() {
+		showSavedMatchWarning = false;
 	}
 
 	function adjustLegs(delta: number) {
@@ -151,6 +175,18 @@
 		>Spiel starten</button>
 	</section>
 </main>
+
+{#if showSavedMatchWarning}
+	<ConfirmDialog
+		heading="Es läuft noch ein Spiel"
+		body="Wenn du ein neues Spiel startest, geht der aktuelle Spielstand verloren."
+		ctaLabel="Verwerfen und neu starten"
+		ctaStyle="destructive"
+		backdropDismiss={false}
+		onconfirm={handleSavedMatchConfirm}
+		oncancel={handleSavedMatchCancel}
+	/>
+{/if}
 
 <style>
 	.setup-screen {

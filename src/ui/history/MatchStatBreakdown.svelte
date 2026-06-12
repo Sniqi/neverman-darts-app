@@ -14,6 +14,33 @@
 		bestLeg,
 	} from '../../engine/averages.js';
 
+	/**
+	 * Highest checkout (finish) value across a player's visits (WR-02).
+	 * Board checkouts sum dart values; numpad checkouts (darts: []) carry no darts, so the
+	 * finish value is reconstructed from the leg's running remaining before the closing
+	 * visit (= the cleared amount). Walk visits per leg, resetting at each leg boundary.
+	 * Returns null when the player never checked out.
+	 */
+	function highestCheckout(player: PlayerState, startScore: number): number | null {
+		let best: number | null = null;
+		let running = startScore;
+		for (const v of player.visits) {
+			if (v.bust) continue;
+			const boardScore =
+				v.darts.length > 0
+					? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
+					: null;
+			if (v.wasCheckout === true) {
+				const score = boardScore ?? running;
+				if (best === null || score > best) best = score;
+			}
+			if (boardScore !== null) running -= boardScore;
+			else if (v.wasCheckout === true) running = 0;
+			if (running <= 0) running = startScore;
+		}
+		return best;
+	}
+
 	interface Props {
 		players: PlayerState[];
 		config: MatchConfig;
@@ -48,15 +75,7 @@
 		{@const bands = computeScoreBands(visitScores)}
 		{@const checkoutPct = checkoutPercent(player.visits, config.outRule)}
 		{@const highestVisitScore = highestVisit(player, config.startScore)}
-		{@const checkoutVisits = player.visits.filter((v) => v.wasCheckout === true)}
-		{@const highestCheckoutScore =
-			checkoutVisits.length > 0
-				? Math.max(...checkoutVisits.map((v) =>
-						v.darts.length > 0
-							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
-							: 0
-					))
-				: null}
+		{@const highestCheckoutScore = highestCheckout(player, config.startScore)}
 		{@const bestLegDarts = bestLeg(player, legStart)}
 
 		<div class="player-stat-block">

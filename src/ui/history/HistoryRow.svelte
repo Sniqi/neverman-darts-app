@@ -18,6 +18,7 @@
 	const row = $derived(toHistoryRow(record));
 
 	function navigate() {
+		if (record.id == null) return;
 		goto(`${base}/history/${record.id}`);
 	}
 </script>

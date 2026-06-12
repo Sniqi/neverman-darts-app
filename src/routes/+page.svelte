@@ -4,6 +4,7 @@
 	// Shows resume prompt when an unfinished match exists (D-01).
 	// "Neues Spiel" warns before replacing a saved match (D-02).
 
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { loadUnfinishedMatch, clearUnfinishedMatch, requestPersistentStorage } from '../lib/storage.js';
@@ -18,7 +19,7 @@
 	// New-match warning dialog visibility
 	let showNewMatchWarning = $state(false);
 
-	$effect(() => {
+	onMount(() => {
 		unfinishedMatch = loadUnfinishedMatch();
 		// Fire-and-forget: request persistent storage so data isn't evicted (T-03-02)
 		requestPersistentStorage();

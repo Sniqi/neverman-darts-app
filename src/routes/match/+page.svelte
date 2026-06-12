@@ -98,6 +98,10 @@
 	// Trigger: watch each player's legCompleted length; when it increases, inspect
 	// the checkout visit of that leg. Source: /match visit-detection pattern (A4).
 	let lastLegCounts = $state<Record<string, number>>({});
+	// Tracks the visit count per player at the time their last leg ended.
+	// Used to slice player.visits to only the just-completed leg's visits,
+	// preventing replay of prior-leg high-finishes on subsequent leg completions (CR-01).
+	let lastLegEndVisitCounts = $state<Record<string, number>>({});
 
 	$effect(() => {
 		const state = matchStore.state;
@@ -107,7 +111,12 @@
 			const prevLegCount = lastLegCounts[player.id] ?? 0;
 			const nextLegCount = player.legCompleted?.length ?? 0;
 			if (nextLegCount > prevLegCount) {
+				// Capture the visit index where this leg started (before updating tracking state).
+				const legStartVisitIdx = lastLegEndVisitCounts[player.id] ?? 0;
+
+				// Advance both tracking maps for this player.
 				lastLegCounts = { ...lastLegCounts, [player.id]: nextLegCount };
+				lastLegEndVisitCounts = { ...lastLegEndVisitCounts, [player.id]: player.visits.length };
 
 				// Find the checkout visit in the just-closed leg.
 				// Only fire if pendingRecords does NOT already include a highest-checkout
@@ -117,9 +126,9 @@
 				);
 				if (alreadyCovered) continue;
 
-				// Inspect visits added since the previous leg count to find the checkout.
-				const visits = player.visits;
-				for (const v of visits) {
+				// Inspect only visits added since the previous leg ended (CR-01 fix).
+				const legVisits = player.visits.slice(legStartVisitIdx);
+				for (const v of legVisits) {
 					if (v.wasCheckout === true) {
 						const score = v.darts.length > 0
 							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)

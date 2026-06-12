@@ -206,51 +206,68 @@ export function visitScoresFromState(player: PlayerState, startScore: number): n
 	const scores: number[] = [];
 	const completed = player.legCompleted ?? [];
 
-	// Build leg boundaries: each entry in completed tells us how many visits that leg had.
-	// We reconstruct visit counts per leg from dartsThrown? No — legCompleted stores
-	// dartsThrown (darts), not visit counts. We need visit counts to detect boundaries.
-	// Approach: for each completed leg, track cumulative visit indices.
-	// Since we don't store visit counts per leg in legCompleted, we track running remaining
-	// and reset at leg boundaries using legCompleted scored values.
+	// WR-03: drive leg boundaries from structural data (the per-leg scored totals in
+	// legCompleted) rather than inferring them from `running` reaching 0. The old
+	// approach skipped non-checkout numpad visits without decrementing `running`, so a
+	// leg containing such a visit and closed by a board visit never reset — corrupting
+	// every subsequent leg's running remaining. By advancing to the next leg once the
+	// current leg's accumulated score reaches completed[legIdx].scored, board-closed and
+	// mixed numpad/board legs reset at the correct boundary.
 	//
-	// Strategy: walk visits, tracking running remaining. When remaining hits 0 (leg closed),
-	// reset to startScore for the next leg.
+	// Residual limitation: a NON-closing numpad visit's score still cannot be
+	// reconstructed (no per-visit remaining is persisted), so its points are omitted from
+	// the returned band scores. Such a leg may therefore not reach its expected scored
+	// total from board visits alone; the boundary then falls back to the leg-closing
+	// `wasCheckout` flag or the running<=0 zero-crossing. This is the same documented
+	// numpad-delta limitation (RESEARCH Pitfall 2) and is unchanged by this fix.
 
 	let running = startScore;
+	let legIdx = 0;
+	let legScoredSoFar = 0;
+
+	const advanceLeg = () => {
+		running = startScore;
+		legScoredSoFar = 0;
+		legIdx += 1;
+	};
 
 	for (const v of player.visits) {
 		if (v.bust) {
-			// Bust: remaining unchanged, skip from scores
+			// Bust: remaining unchanged, contributes no score
 			continue;
 		}
-		let score: number;
+
+		let score: number | null;
 		if (v.darts.length > 0) {
 			// Board entry: sum dart values
 			score = v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0);
+		} else if (v.wasCheckout) {
+			// Leg-closing numpad visit: score = running remaining (reduces to 0)
+			score = running;
 		} else {
-			// Numpad entry: score derived from remaining delta
-			// We need to know what the remaining was *after* this visit.
-			// For completed legs: after the leg-closing visit, remaining = 0.
-			// For intermediate numpad visits: we don't have the per-visit remaining.
-			// Use the same approach: running - (running - score) = score
-			// But we only know the final remaining for the match.
-			// For numpad visits that are NOT leg-closing: we cannot reconstruct the score
-			// without intermediate remaining. However, wasCheckout tells us if it closed a leg.
-			if (v.wasCheckout) {
-				// Leg-closing visit: score = running (reduces remaining to 0)
-				score = running;
-			} else {
-				// Non-closing numpad: score unknown without intermediate state.
-				// Skip this visit (conservative — cannot reconstruct reliably).
-				// The leg boundary reset still needs to happen.
-				continue;
-			}
+			// Non-closing numpad visit: score not reconstructable. Omit from scores but
+			// still allow the boundary logic below to close the leg when appropriate.
+			score = null;
 		}
-		scores.push(score);
-		running -= score;
-		// Reset remaining at leg boundary
-		if (running <= 0) {
-			running = startScore;
+
+		if (score !== null) {
+			scores.push(score);
+			running -= score;
+			legScoredSoFar += score;
+		}
+
+		// Structural leg-boundary detection: prefer the known per-leg scored total.
+		const expectedLegScored = legIdx < completed.length ? completed[legIdx].scored : null;
+		if (v.wasCheckout) {
+			// An explicit leg-closing visit always advances the leg.
+			advanceLeg();
+		} else if (expectedLegScored !== null && legScoredSoFar >= expectedLegScored) {
+			// Reached this leg's recorded total → leg closed (covers board-closed legs).
+			advanceLeg();
+		} else if (expectedLegScored === null && running <= 0) {
+			// No structural data (legacy blob / current in-progress leg): fall back to
+			// the running zero-crossing.
+			advanceLeg();
 		}
 	}
 

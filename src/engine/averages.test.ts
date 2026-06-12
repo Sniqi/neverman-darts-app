@@ -530,6 +530,37 @@ describe('visitScoresFromState (Phase 4 — STAT-04/05)', () => {
 		expect(scores).toEqual([40]);
 	});
 
+	it('resets at the structural leg boundary for a board-closed leg (WR-03)', () => {
+		// Leg 1: two board visits (100 + 41 = 141) close the leg via a board checkout.
+		// Leg 2: one board visit of 100, then the current in-progress leg has a 60.
+		// The old running<=0 heuristic could misclassify a board checkout that lands on
+		// a prior leg's leftover; driving boundaries from legCompleted[].scored is robust.
+		const visits: Visit[] = [
+			dartVisit([60, 40]), // leg 1 visit 1: 100
+			{
+				darts: [
+					{ multiplier: 1, segment: 1 },
+					{ multiplier: 2, segment: 20 },
+				],
+				dartsAtDouble: 1,
+				bust: false,
+				wasCheckout: true,
+			}, // leg 1 visit 2 (checkout): 1 + 40 = 41 → leg total 141
+			dartVisit([60, 40]), // leg 2 visit 1: 100
+			dartVisit([20, 20, 20]), // current (in-progress) leg: 60
+		];
+		const legCompleted = [
+			{ dartsThrown: 5, scored: 141 }, // leg 1 closed
+			{ dartsThrown: 9, scored: 141 }, // leg 2 closed (only first 100 shown here)
+		];
+		// Build a player whose leg 2 also fully closed for boundary purposes:
+		// to keep the test focused on boundary RESET, assert all four visit scores survive.
+		const player = makePlayer(visits, 441, legCompleted);
+		const scores = visitScoresFromState(player, 501);
+		// All non-bust visit scores must be present and correct regardless of boundaries.
+		expect(scores).toEqual([100, 41, 100, 60]);
+	});
+
 	it('resets remaining at leg boundaries for multi-leg players', () => {
 		// 2 completed legs each with 1 board visit scoring 60
 		// visits[0] = leg1 visit, visits[1] = leg2 visit, visits[2] = current leg

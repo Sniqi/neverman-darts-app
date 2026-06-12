@@ -88,7 +88,7 @@
 
 	function adjustPauseLegs(delta: number) {
 		const next = pauseLegs + delta;
-		if (next >= 1) {
+		if (next >= 1 && next <= 20) {
 			pauseLegs = next;
 			saveAudioPref('pauseLegs', next);
 		}
@@ -96,7 +96,7 @@
 
 	function adjustPauseMinutes(delta: number) {
 		const next = pauseMinutes + delta;
-		if (next >= 1) {
+		if (next >= 1 && next <= 30) {
 			pauseMinutes = next;
 			saveAudioPref('pauseMinutes', next);
 		}
@@ -261,7 +261,7 @@
 				<div class="stepper">
 					<button class="stepper-btn" onclick={() => adjustPauseLegs(-1)} disabled={pauseLegs <= 1} aria-label="Legs verringern">−</button>
 					<span class="stepper-value">{pauseLegs}</span>
-					<button class="stepper-btn" onclick={() => adjustPauseLegs(1)} aria-label="Legs erhöhen">+</button>
+					<button class="stepper-btn" onclick={() => adjustPauseLegs(1)} disabled={pauseLegs >= 20} aria-label="Legs erhöhen">+</button>
 				</div>
 				<span class="stepper-unit">Legs</span>
 			</div>
@@ -271,7 +271,7 @@
 				<div class="stepper">
 					<button class="stepper-btn" onclick={() => adjustPauseMinutes(-1)} disabled={pauseMinutes <= 1} aria-label="Minuten verringern">−</button>
 					<span class="stepper-value">{pauseMinutes}</span>
-					<button class="stepper-btn" onclick={() => adjustPauseMinutes(1)} aria-label="Minuten erhöhen">+</button>
+					<button class="stepper-btn" onclick={() => adjustPauseMinutes(1)} disabled={pauseMinutes >= 30} aria-label="Minuten erhöhen">+</button>
 				</div>
 				<span class="stepper-unit">Minuten</span>
 			</div>

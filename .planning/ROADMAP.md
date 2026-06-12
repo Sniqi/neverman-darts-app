@@ -149,8 +149,22 @@ Plans:
   4. Player can view a statistics dashboard with charts (score distribution, average trend, darts per leg, win rate)
   5. When a new personal record is set during play, an overlay/animation appears on both the input and spectator views and the record is permanently stored
 
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 5 plans
+**Mode:** mvp (vertical slices) · **UI hint**: yes
+
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Engine stats core: legCompleted + wasCheckout fields, cross-leg average, first-9, checkout %, score bands, best/worst leg (pure, TDD)
+
+**Wave 2** *(blocked on Wave 1; disjoint files, run in parallel)*
+
+- [ ] 04-02-PLAN.md — Live in-match StatDrawer slice (D-01): StatCard + StatDrawer mounted on /match
+- [ ] 04-03-PLAN.md — Lifetime stats + dashboard (STAT-07/08, D-09/D-10): db/stats.ts aggregation, SVG charts, ProfileStatDashboard, /stats route + Statistik start-screen entry
+- [ ] 04-04-PLAN.md — Match-detail breakdown: MatchStatBreakdown fills .phase4-region + PlayerStatRow cross-leg average
+
+**Wave 3** *(blocked on Wave 2 — shares match route, needs computeLifetimeStats)*
+
+- [ ] 04-05-PLAN.md — Record detection + celebration (ACHV-01..03, D-03..D-08): MatchStore detection + preload, neverman-record channel, RecordOverlay on both views, win-banner fold-in
 
 ### Phase 5: Audio & Auto-Pause
 
@@ -192,6 +206,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
-| 4. Statistics & Achievements | 0/? | Not started | - |
+| 4. Statistics & Achievements | 0/5 | Planned | - |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |
 | 6. PWA & Deployment | 0/? | Not started | - |

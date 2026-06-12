@@ -380,15 +380,22 @@ export class MatchStore {
 	 * Decrement the countdown by 1 second. Called every second by the scoring window's
 	 * setInterval $effect. At 0 (or already 0) calls resumePause() to auto-resume.
 	 * Broadcasts a pause-tick after each change so /display stays in sync.
+	 *
+	 * UI-1: When reaching 0, broadcast the zero state so both /match and /display show
+	 * the "Weiter geht's!" flash for 800ms, then call resumePause() to clear the overlay.
 	 */
 	decrementPause(): void {
 		if (this.pauseRemainingSeconds > 1) {
 			this.pauseRemainingSeconds -= 1;
 			this.#broadcastPause();
-		} else {
-			// Reached 0 (or already 0) — auto-resume
-			this.resumePause();
+		} else if (this.pauseRemainingSeconds === 1) {
+			// Hit zero: broadcast the zero state so both windows render the flash, then
+			// wait 800ms before clearing pauseActive (UI-1 closure flash timing).
+			this.pauseRemainingSeconds = 0;
+			this.#broadcastPause();
+			setTimeout(() => this.resumePause(), 800);
 		}
+		// If already 0 (e.g. interval fires during the 800ms window), do nothing.
 	}
 
 	/**

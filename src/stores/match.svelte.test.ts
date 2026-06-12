@@ -662,20 +662,29 @@ describe('MatchStore', () => {
 			expect(s.pauseActive).toBe(true);
 		});
 
-		it('decrementPause to 0 auto-resumes: pauseActive=false', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 1 });
-			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
-			completeLeg(s);
-			// Drain all but the last second
-			for (let i = 0; i < 59; i++) {
+		it('decrementPause to 0: shows zero state (UI-1 flash), then auto-resumes after 800ms', () => {
+			vi.useFakeTimers();
+			try {
+				const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 1 });
+				s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+				completeLeg(s);
+				// Drain all but the last second
+				for (let i = 0; i < 59; i++) {
+					s.decrementPause();
+				}
+				expect(s.pauseRemainingSeconds).toBe(1);
+				expect(s.pauseActive).toBe(true);
+				// Final decrement: sets remainingSeconds=0 (zero flash), but pauseActive still true
 				s.decrementPause();
+				expect(s.pauseRemainingSeconds).toBe(0);
+				expect(s.pauseActive).toBe(true); // flash window — not yet resumed
+				// After 800ms the setTimeout fires resumePause()
+				vi.advanceTimersByTime(800);
+				expect(s.pauseActive).toBe(false);
+				expect(s.pauseRemainingSeconds).toBe(0);
+			} finally {
+				vi.useRealTimers();
 			}
-			expect(s.pauseRemainingSeconds).toBe(1);
-			expect(s.pauseActive).toBe(true);
-			// Final decrement should reach 0 and auto-resume
-			s.decrementPause();
-			expect(s.pauseActive).toBe(false);
-			expect(s.pauseRemainingSeconds).toBe(0);
 		});
 
 		it('resumePause immediately clears pauseActive and pauseRemainingSeconds', () => {

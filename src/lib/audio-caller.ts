@@ -15,7 +15,7 @@ let cachedVoices: SpeechSynthesisVoice[] = [];
 export function initVoices(): void {
 	if (typeof speechSynthesis === 'undefined') return;
 	cachedVoices = speechSynthesis.getVoices();
-	if (speechSynthesis.onvoiceschanged !== undefined) {
+	if ('onvoiceschanged' in speechSynthesis) {
 		speechSynthesis.onvoiceschanged = () => {
 			cachedVoices = speechSynthesis.getVoices();
 		};

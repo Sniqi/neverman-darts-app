@@ -234,6 +234,35 @@ describe('computeLifetimeStats', () => {
 		expect(stats.highestCheckout).toBe(91);
 	});
 
+	it('highestCheckout reconstructs a numpad checkout score from running remaining (WR-01)', () => {
+		// A leg closed entirely via the numpad: a single finishing visit (darts: [],
+		// wasCheckout: true) clearing 170 to reach 0 from startScore 170. The finish
+		// value must be reconstructed as the cleared amount (170), not 0.
+		const numpadCheckout: Visit = makeNumpadVisit(true);
+		const state: MatchState = {
+			config: { startScore: 501, outRule: 'double', legsToWin: 1, setsEnabled: false, setsToWin: 1 },
+			players: [
+				{
+					id: 'alice', name: 'alice', isGuest: false,
+					remaining: 0, legsWon: 1, setsWon: 0,
+					visits: [numpadCheckout],
+					legCompleted: [{ dartsThrown: 3, scored: 501 }],
+				},
+				{
+					id: 'bob', name: 'bob', isGuest: false,
+					remaining: 501, legsWon: 0, setsWon: 0, visits: [], legCompleted: [],
+				},
+			],
+			activePlayerIndex: 0, legStarterIndex: 0, currentVisit: [],
+			phase: 'match-complete', eventLog: [], legStartVisitIndex: { alice: 0, bob: 0 },
+		};
+		// startScore 501, single numpad checkout clears the whole 501 → finish value 501.
+		const r = makeRecord(state, 'alice') as MatchRecord;
+		r.id = 1;
+		const stats = computeLifetimeStats([r], 'alice');
+		expect(stats.highestCheckout).toBe(501);
+	});
+
 	it('averageTrend has one entry per match (oldest→newest)', () => {
 		const state1 = makeMatchState('alice', 'bob', {
 			p1LegCompleted: [{ dartsThrown: 9, scored: 501 }]

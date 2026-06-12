@@ -152,13 +152,26 @@ export function computeLifetimeStats(
 		const hv = highestVisitFn(player, startScore);
 		if (hv !== null && hv > highestVisitVal) highestVisitVal = hv;
 
-		// Highest checkout: max wasCheckout=true visit score
-		for (const v of player.visits) {
-			if (v.wasCheckout === true) {
-				const score = v.darts.length > 0
+		// Highest checkout: max wasCheckout=true visit score (WR-01).
+		// Board checkouts sum dart values. Numpad checkouts (darts: []) store no darts,
+		// so the finish value must be reconstructed from the leg's running remaining
+		// before the closing visit — which equals the cleared amount (remaining → 0).
+		// Walk visits per leg, resetting running to startScore at each leg boundary.
+		{
+			let running: number = startScore;
+			for (const v of player.visits) {
+				if (v.bust) continue; // bust leaves remaining unchanged
+				const boardScore = v.darts.length > 0
 					? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
-					: player.remaining === 0 ? 0 : 0; // numpad checkout: score=remaining before visit
-				if (score > highestCheckoutVal) highestCheckoutVal = score;
+					: null;
+				if (v.wasCheckout === true) {
+					// Numpad checkout score = running (reduces to 0); board = dart sum.
+					const score = boardScore ?? running;
+					if (score > highestCheckoutVal) highestCheckoutVal = score;
+				}
+				if (boardScore !== null) running -= boardScore;
+				else if (v.wasCheckout === true) running = 0;
+				if (running <= 0) running = startScore;
 			}
 		}
 

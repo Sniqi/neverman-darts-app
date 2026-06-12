@@ -31,7 +31,7 @@
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') oncancel();
+		if (e.key === 'Escape' && backdropDismiss) oncancel();
 	}
 
 	onMount(() => {

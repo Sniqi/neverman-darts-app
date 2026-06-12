@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 4 UI-SPEC approved
-last_updated: "2026-06-12T13:56:23.330Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-06-12T14:03:06.834Z"
 last_activity: 2026-06-12 -- Phase 04 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 27
-  completed_plans: 23
+  completed_plans: 24
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 04 (statistics-achievements) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-12 -- Phase 04 execution started
 
@@ -74,6 +74,7 @@ Progress: [█████████░] 89%
 | Phase 03-persistence-data P02 | 7min | 3 tasks | 11 files |
 | Phase 03-persistence-data P03 | 6min | 3 tasks | 7 files |
 | Phase 04 P01 | 8min | 3 tasks | 5 files |
+| Phase 04-statistics-achievements P02 | 3min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Winner in persistCompletedMatch derived from state.players[state.activePlayerIndex] — reducer leaves activePlayerIndex pointing at winner on match-complete
 - [Phase ?]: FileReader polyfill in test-setup-node.ts (vitest setupFiles) — dexie-export-import needs self + FileReader browser globals in node unit env
 - [Phase ?]: D-10/D-11/D-12: exportDB single JSON, importInto clearTablesBeforeImport replace-all, ConfirmDialog backdropDismiss=false
+- [Phase ?]: first9Average legScored computed inline in StatDrawer — board visits summed exactly, non-closing numpad visits skipped (unrecoverable per 04-01 visitScoresFromState limitation)
+- [Phase ?]: StatDrawer open state is component-local $state — resets to closed on navigation without route-level wiring
 
 ### Pending Todos
 
@@ -129,6 +132,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-12T13:56:23.324Z
-Stopped at: Phase 4 UI-SPEC approved
-Resume file: .planning/phases/04-statistics-achievements/04-UI-SPEC.md
+Last session: 2026-06-12T14:03:06.829Z
+Stopped at: Completed 04-02-PLAN.md
+Resume file: None

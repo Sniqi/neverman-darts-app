@@ -149,12 +149,12 @@ Plans:
   4. Player can view a statistics dashboard with charts (score distribution, average trend, darts per leg, win rate)
   5. When a new personal record is set during play, an overlay/animation appears on both the input and spectator views and the record is permanently stored
 
-**Plans:** 5 plans
+**Plans:** 1/5 plans executed
 **Mode:** mvp (vertical slices) · **UI hint**: yes
 
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Engine stats core: legCompleted + wasCheckout fields, cross-leg average, first-9, checkout %, score bands, best/worst leg (pure, TDD)
+- [x] 04-01-PLAN.md — Engine stats core: legCompleted + wasCheckout fields, cross-leg average, first-9, checkout %, score bands, best/worst leg (pure, TDD)
 
 **Wave 2** *(blocked on Wave 1; disjoint files, run in parallel)*
 
@@ -206,6 +206,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
-| 4. Statistics & Achievements | 0/5 | Planned | - |
+| 4. Statistics & Achievements | 1/5 | In Progress|  |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |
 | 6. PWA & Deployment | 0/? | Not started | - |

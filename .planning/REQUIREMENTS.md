@@ -41,11 +41,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Statistics
 
-- [ ] **STAT-01**: Player sees live 3-dart average for the current leg and the whole match (correct dart counting: busts = 3 darts, checkout visits = darts actually used)
-- [ ] **STAT-02**: Player sees first-9 average per leg and match
-- [ ] **STAT-03**: Player sees checkout percentage (doubles hit / darts at double)
-- [ ] **STAT-04**: App counts score bands per leg/match/lifetime: 180s, 140+, 100+, 60+
-- [ ] **STAT-05**: App tracks highest visit score, highest checkout, and best/worst leg (darts used) per player
+- [x] **STAT-01**: Player sees live 3-dart average for the current leg and the whole match (correct dart counting: busts = 3 darts, checkout visits = darts actually used)
+- [x] **STAT-02**: Player sees first-9 average per leg and match
+- [x] **STAT-03**: Player sees checkout percentage (doubles hit / darts at double)
+- [x] **STAT-04**: App counts score bands per leg/match/lifetime: 180s, 140+, 100+, 60+
+- [x] **STAT-05**: App tracks highest visit score, highest checkout, and best/worst leg (darts used) per player
 - [x] **STAT-06**: Player can browse match history (past matches with results and key stats)
 - [ ] **STAT-07**: Player can view lifetime statistics per profile (averages, checkout %, score bands, records)
 - [ ] **STAT-08**: Player can view a statistics dashboard with charts (score distribution, average trend over time, darts per leg, win rate)
@@ -137,11 +137,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FLOW-03 | Phase 3 | Complete |
 | STAT-06 | Phase 3 | Complete |
 | PROF-03 | Phase 3 | Complete |
-| STAT-01 | Phase 4 | Pending |
-| STAT-02 | Phase 4 | Pending |
-| STAT-03 | Phase 4 | Pending |
-| STAT-04 | Phase 4 | Pending |
-| STAT-05 | Phase 4 | Pending |
+| STAT-01 | Phase 4 | Complete |
+| STAT-02 | Phase 4 | Complete |
+| STAT-03 | Phase 4 | Complete |
+| STAT-04 | Phase 4 | Complete |
+| STAT-05 | Phase 4 | Complete |
 | STAT-07 | Phase 4 | Pending |
 | STAT-08 | Phase 4 | Pending |
 | ACHV-01 | Phase 4 | Pending |

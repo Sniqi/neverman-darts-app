@@ -26,7 +26,8 @@ import { reduce, initialState } from '../engine/reducer.js';
 import { getSuggestion } from '../engine/checkout.js';
 import type { MatchAction, MatchState, PlayerState } from '../engine/types.js';
 import { db } from '../db/db.js';
-import { BC_CHANNEL, BC_RECORD_CHANNEL, LS_SNAPSHOT } from '../lib/sync-constants.js';
+import { BC_CHANNEL, BC_RECORD_CHANNEL, LS_SNAPSHOT, MSG_PAUSE_TICK } from '../lib/sync-constants.js';
+import { loadAudioPrefs } from '../lib/audio-prefs.js';
 import { computeLifetimeStats, type LifetimeStats } from '../db/stats.js';
 import { matchAverageCrossLeg } from '../engine/averages.js';
 
@@ -57,6 +58,30 @@ export class MatchStore {
 	 * On a coincident win the route folds these into the win banner instead.
 	 */
 	pendingRecords = $state<RecordItem[]>([]);
+
+	// ── Auto-pause state (FLOW-02 / D-08) ─────────────────────────────────────
+	// These are session/UI state — NOT added to MatchState/reducer (RESEARCH Pattern 3).
+	// pauseLegCount: total legs completed across the whole match (monotonic, set-reset-safe).
+	// pauseActive: true while the pause countdown is visible.
+	// pauseRemainingSeconds: countdown seconds left (set to pauseMinutes*60 on trigger).
+	/** Total completed legs in the current match, used to detect the pause threshold. */
+	pauseLegCount = $state(0);
+	/** True when the auto-pause countdown overlay should be shown. */
+	pauseActive = $state(false);
+	/** Remaining seconds on the countdown; 0 when not paused. */
+	pauseRemainingSeconds = $state(0);
+
+	/** Pause config read once at construction from localStorage prefs (D-08). */
+	#pauseEnabled: boolean;
+	#pauseLegs: number;
+	#pauseMinutes: number;
+
+	constructor() {
+		const prefs = loadAudioPrefs();
+		this.#pauseEnabled = prefs.pauseEnabled;
+		this.#pauseLegs = prefs.pauseLegs;
+		this.#pauseMinutes = prefs.pauseMinutes;
+	}
 
 	dispatch(action: MatchAction): void {
 		const prevState = this.state;
@@ -92,6 +117,11 @@ export class MatchStore {
 		if (this.state.phase === 'match-complete') {
 			this.#persistCompletedMatch(this.state);
 		}
+
+		// FLOW-02: check whether a leg was just completed and the pause threshold is crossed.
+		// Mirrors #detectRecords placement — after BC publish, after persist, after records.
+		// Never calls dispatch/reduce (T-04-14 anti-infinite-loop mirror).
+		this.#checkAutoPause(prevState, this.state);
 	}
 
 	/**
@@ -307,6 +337,88 @@ export class MatchStore {
 			ch.close();
 		} catch {
 			// Silently ignore — celebration is best-effort; play continues
+		}
+	}
+
+	/**
+	 * Check whether a leg was completed in the prev→next transition and whether
+	 * the auto-pause threshold has been reached. Called after every dispatch.
+	 * Never calls dispatch/reduce — only mutates pause $state fields (FLOW-02 / T-04-14).
+	 *
+	 * Uses legCompleted.length (monotonic across sets) NOT legsWon (resets on set win).
+	 */
+	#checkAutoPause(prev: MatchState, next: MatchState): void {
+		// Count total completed legs across ALL players in both states.
+		// legCompleted is monotonically growing: set wins do NOT reset it (unlike legsWon).
+		const prevTotal = prev.players.reduce(
+			(sum, p) => sum + (p.legCompleted?.length ?? 0), 0
+		);
+		const nextTotal = next.players.reduce(
+			(sum, p) => sum + (p.legCompleted?.length ?? 0), 0
+		);
+
+		if (nextTotal <= prevTotal) return; // no leg completed this dispatch
+
+		const delta = nextTotal - prevTotal;
+		this.pauseLegCount += delta;
+
+		// Only trigger when: enabled, threshold hit, not already paused, match still in play
+		if (
+			this.#pauseEnabled &&
+			this.#pauseLegs > 0 &&
+			this.pauseLegCount % this.#pauseLegs === 0 &&
+			!this.pauseActive &&
+			next.phase !== 'match-complete'
+		) {
+			this.pauseActive = true;
+			this.pauseRemainingSeconds = this.#pauseMinutes * 60;
+			this.#broadcastPause();
+		}
+	}
+
+	/**
+	 * Decrement the countdown by 1 second. Called every second by the scoring window's
+	 * setInterval $effect. At 0 (or already 0) calls resumePause() to auto-resume.
+	 * Broadcasts a pause-tick after each change so /display stays in sync.
+	 */
+	decrementPause(): void {
+		if (this.pauseRemainingSeconds > 1) {
+			this.pauseRemainingSeconds -= 1;
+			this.#broadcastPause();
+		} else {
+			// Reached 0 (or already 0) — auto-resume
+			this.resumePause();
+		}
+	}
+
+	/**
+	 * Immediately resume the match from pause (player pressed "Weiter" or timer expired).
+	 * Sets pauseActive=false, clears countdown, and broadcasts so /display hides overlay.
+	 */
+	resumePause(): void {
+		this.pauseActive = false;
+		this.pauseRemainingSeconds = 0;
+		this.#broadcastPause();
+	}
+
+	/**
+	 * Broadcast current pause state to the spectator display via BC_CHANNEL.
+	 * Uses the same open-post-close pattern as the match-state broadcast.
+	 * Non-fatal: wrapped in try/catch so pause logic never interrupts scoring.
+	 * Type discriminant MSG_PAUSE_TICK prevents isValidMatchState from processing
+	 * this message as a match-state snapshot (RESEARCH Pitfall 3).
+	 */
+	#broadcastPause(): void {
+		try {
+			const ch = new BroadcastChannel(BC_CHANNEL);
+			ch.postMessage({
+				type: MSG_PAUSE_TICK,
+				pauseActive: this.pauseActive,
+				pauseRemainingSeconds: this.pauseRemainingSeconds,
+			});
+			ch.close();
+		} catch {
+			// Silently ignore — pause sync is best-effort; play continues
 		}
 	}
 

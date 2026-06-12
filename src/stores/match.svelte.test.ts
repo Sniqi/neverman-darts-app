@@ -560,6 +560,182 @@ describe('MatchStore', () => {
 		});
 	});
 
+	// ── Auto-pause (FLOW-02 / D-08) ──────────────────────────────────────────
+	//
+	// Uses a 1-leg pause interval so the threshold is hit quickly in tests.
+	// BroadcastChannel is stubbed (same as record detection tests above).
+	// localStorage is stubbed to inject test prefs so #checkAutoPause reads
+	// the desired pauseEnabled/pauseLegs/pauseMinutes values.
+	//
+	// NOTE: MatchStore reads prefs once in its constructor via loadAudioPrefs().
+	// Tests must stub localStorage BEFORE creating the store instance.
+
+	describe('matchStore.pause', () => {
+		/** Drive a leg to completion: 501 - 180 - 180 - 101 = 40, then D20 checkout. */
+		function completeLeg(s: MatchStore): void {
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 101 });
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 40, dartsUsed: 1, dartsAtDouble: 1 });
+		}
+
+		const config3Legs: MatchConfig = {
+			startScore: 501,
+			outRule: 'double',
+			legsToWin: 3,
+			setsEnabled: false,
+			setsToWin: 1,
+		};
+
+		/** Create a fresh MatchStore with prefs injected via localStorage stub. */
+		function makeStoreWithPrefs(prefs: {
+			pauseEnabled: boolean;
+			pauseLegs: number;
+			pauseMinutes: number;
+		}): MatchStore {
+			vi.stubGlobal('localStorage', {
+				getItem: (key: string) => {
+					if (key === 'nvm_pause_enabled') return prefs.pauseEnabled ? 'true' : 'false';
+					if (key === 'nvm_pause_legs') return String(prefs.pauseLegs);
+					if (key === 'nvm_pause_minutes') return String(prefs.pauseMinutes);
+					return null;
+				},
+				setItem: () => {},
+				removeItem: () => {},
+			});
+			return new MatchStore();
+		}
+
+		beforeEach(() => {
+			vi.stubGlobal('BroadcastChannel', class {
+				name: string;
+				constructor(name: string) { this.name = name; }
+				postMessage() {}
+				close() {}
+			});
+		});
+
+		it('initial values: pauseLegCount=0, pauseActive=false, pauseRemainingSeconds=0', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 2 });
+			expect(s.pauseLegCount).toBe(0);
+			expect(s.pauseActive).toBe(false);
+			expect(s.pauseRemainingSeconds).toBe(0);
+		});
+
+		it('pauseActive becomes true after completing the configured number of legs (1-leg interval)', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 2 });
+			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			completeLeg(s);
+			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseActive).toBe(true);
+			expect(s.pauseRemainingSeconds).toBe(120); // 2 * 60
+		});
+
+		it('pauseActive stays false when pauseEnabled=false', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: false, pauseLegs: 1, pauseMinutes: 2 });
+			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			completeLeg(s);
+			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseActive).toBe(false);
+		});
+
+		it('pauseLegCount increments per completed leg (2-leg interval, no pause at leg 1)', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 2, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			completeLeg(s);
+			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseActive).toBe(false);
+			completeLeg(s);
+			expect(s.pauseLegCount).toBe(2);
+			expect(s.pauseActive).toBe(true);
+		});
+
+		it('decrementPause reduces remainingSeconds and does not go negative', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			completeLeg(s);
+			expect(s.pauseActive).toBe(true);
+			expect(s.pauseRemainingSeconds).toBe(60);
+
+			s.decrementPause();
+			expect(s.pauseRemainingSeconds).toBe(59);
+			expect(s.pauseActive).toBe(true);
+		});
+
+		it('decrementPause to 0 auto-resumes: pauseActive=false', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			completeLeg(s);
+			// Drain all but the last second
+			for (let i = 0; i < 59; i++) {
+				s.decrementPause();
+			}
+			expect(s.pauseRemainingSeconds).toBe(1);
+			expect(s.pauseActive).toBe(true);
+			// Final decrement should reach 0 and auto-resume
+			s.decrementPause();
+			expect(s.pauseActive).toBe(false);
+			expect(s.pauseRemainingSeconds).toBe(0);
+		});
+
+		it('resumePause immediately clears pauseActive and pauseRemainingSeconds', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 5 });
+			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			completeLeg(s);
+			expect(s.pauseActive).toBe(true);
+			s.resumePause();
+			expect(s.pauseActive).toBe(false);
+			expect(s.pauseRemainingSeconds).toBe(0);
+		});
+
+		it('pauseLegCount still advances after a set win (legsWon resets but legCompleted does not)', () => {
+			// Use a sets-enabled config so legsWon resets mid-match
+			const configSets: MatchConfig = {
+				startScore: 501,
+				outRule: 'double',
+				legsToWin: 1,       // 1 leg to win a set
+				setsEnabled: true,
+				setsToWin: 2,       // 2 sets to win the match
+			};
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 2, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: configSets, players: [player1], order: ['p1'] });
+
+			// Complete leg 1 (wins set 1; legsWon resets to 0)
+			completeLeg(s);
+			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseActive).toBe(false); // threshold=2, not reached yet
+
+			// Complete leg 2 (wins set 2 → match-complete; but pauseLegCount should be 2)
+			// pauseActive should NOT fire because phase === 'match-complete'
+			completeLeg(s);
+			expect(s.pauseLegCount).toBe(2);
+			// match is complete so pause should not trigger
+			expect(s.pauseActive).toBe(false);
+		});
+
+		it('pause threshold trips correctly at 5-leg default (no pause before 5 legs)', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 5, pauseMinutes: 8 });
+			// Use legsToWin:9 so we can play 5 legs without ending the match
+			const configLong: MatchConfig = {
+				startScore: 501,
+				outRule: 'double',
+				legsToWin: 9,
+				setsEnabled: false,
+				setsToWin: 1,
+			};
+			s.dispatch({ type: 'START_MATCH', config: configLong, players: [player1], order: ['p1'] });
+
+			for (let i = 1; i <= 4; i++) {
+				completeLeg(s);
+				expect(s.pauseActive).toBe(false);
+			}
+			completeLeg(s);
+			expect(s.pauseLegCount).toBe(5);
+			expect(s.pauseActive).toBe(true);
+			expect(s.pauseRemainingSeconds).toBe(480); // 8 * 60
+		});
+	});
+
 	describe('mid-visit remaining (CR-06 / ENG-07)', () => {
 		beforeEach(() => {
 			store.dispatch({

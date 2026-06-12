@@ -21,3 +21,10 @@ export const BC_RECORD_CHANNEL = 'neverman-record';
 
 /** localStorage key for the cold-start snapshot used by DisplayStore.connect(). */
 export const LS_SNAPSHOT = 'neverman-match-snapshot';
+
+/** Message type discriminant for auto-pause tick messages sent on BC_CHANNEL (D-09).
+ *  A pause-tick is a small separate message on the SAME neverman-match channel:
+ *  { type: MSG_PAUSE_TICK, pauseActive: boolean, pauseRemainingSeconds: number }
+ *  This keeps the channel count stable while allowing DisplayStore to route
+ *  pause state without passing it through isValidMatchState (RESEARCH Pitfall 3). */
+export const MSG_PAUSE_TICK = 'pause-tick';

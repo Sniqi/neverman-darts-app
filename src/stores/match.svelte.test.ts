@@ -338,7 +338,7 @@ describe('MatchStore', () => {
 				order: ['p1'],
 			});
 			// Preload records for p1 — prior best = 140
-			store.preloadedRecords = new Map([['p1', priorStats]]);
+			store.preloadedRecords = new Map([['p1', { ...priorStats }]]);
 
 			// Score 141 via board (T17 T18 T20 = 51+54+60=165... use T19+T20+T18 = 57+60+54=171)
 			// Simplest: use NUMPAD_VISIT with a board-style visit — but NUMPAD stores darts:[].
@@ -363,7 +363,7 @@ describe('MatchStore', () => {
 				players: [{ id: 'p1', name: 'Alice', isGuest: false }],
 				order: ['p1'],
 			});
-			store.preloadedRecords = new Map([['p1', statsWithMaxVisit]]);
+			store.preloadedRecords = new Map([['p1', { ...statsWithMaxVisit }]]);
 
 			// Score exactly 180: T20 + T20 + T20
 			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
@@ -385,7 +385,7 @@ describe('MatchStore', () => {
 				players: [{ id: 'p1', name: 'Alice', isGuest: false }],
 				order: ['p1'],
 			});
-			store.preloadedRecords = new Map([['p1', priorStats]]);
+			store.preloadedRecords = new Map([['p1', { ...priorStats }]]);
 
 			// Score 180: always posts a record event
 			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
@@ -408,16 +408,44 @@ describe('MatchStore', () => {
 				players: [{ id: 'p1', name: 'Alice', isGuest: false }],
 				order: ['p1'],
 			});
-			store.preloadedRecords = new Map([['p1', priorStats]]); // prior best visit = 140
+			store.preloadedRecords = new Map([['p1', { ...priorStats }]]); // prior best visit = 140
 
-			// Numpad 180 (501 → 321): "180!" must fire even though darts:[] (D-04)
+			// Numpad 160 (501 → 341), beats prior best 140 → highest-visit (proves
+			// numpad visits are score-detected via the remaining delta, darts:[])
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 160 });
+			expect(store.pendingRecords.map(r => r.type)).toContain('highest-visit');
+
+			// Numpad 180 (341 → 161): "180!" must fire even though darts:[] (D-04)
 			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
 			expect(store.pendingRecords.map(r => r.type)).toContain('180');
 			expect(postedMessages.length).toBeGreaterThan(0);
+		});
 
-			// Numpad 160 (321 → 161), beats prior best 140 → highest-visit
-			store.dispatch({ type: 'NUMPAD_VISIT', total: 160 });
+		it('does NOT re-fire a highest-visit record for a repeated/lower visit in the same match (baseline advances)', () => {
+			// User-reported bug: "Höchste Aufnahme" was celebrated on every visit above
+			// the START-of-match best, even when it did not beat the in-match best.
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [{ id: 'p1', name: 'Alice', isGuest: false }],
+				order: ['p1'],
+			});
+			store.preloadedRecords = new Map([['p1', { ...priorStats }]]); // prior best visit = 140
+
+			// 160 beats 140 → new record (one broadcast)
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 160 }); // 501 → 341
 			expect(store.pendingRecords.map(r => r.type)).toContain('highest-visit');
+			expect(postedMessages.length).toBe(1);
+
+			// 160 again ties the in-match best (160) → NO new record, NO new broadcast.
+			// (pendingRecords retains the prior record until the overlay dismisses, so the
+			// broadcast count is the authoritative signal that nothing new fired.)
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 160 }); // 341 → 181
+			expect(postedMessages.length).toBe(1);
+
+			// 150 is below the in-match best → still NO new record / broadcast
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 150 }); // 181 → 31
+			expect(postedMessages.length).toBe(1);
 		});
 
 		it('does NOT detect records for guest players (D-11)', () => {
@@ -428,7 +456,7 @@ describe('MatchStore', () => {
 				order: ['guest-1'],
 			});
 			// Even with preloaded records, guest should not fire
-			store.preloadedRecords = new Map([['guest-1', priorStats]]);
+			store.preloadedRecords = new Map([['guest-1', { ...priorStats }]]);
 
 			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
 			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });
@@ -473,7 +501,7 @@ describe('MatchStore', () => {
 					players: [{ id: 'p1', name: 'Alice', isGuest: false }],
 					order: ['p1'],
 				});
-				store.preloadedRecords = new Map([['p1', newPlayerStats]]);
+				store.preloadedRecords = new Map([['p1', { ...newPlayerStats }]]);
 
 				// Drive to leg win: 501 - 180 - 180 - 101 = 40, then 40 checkout (double 20)
 				store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
@@ -495,7 +523,7 @@ describe('MatchStore', () => {
 					players: [{ id: 'p1', name: 'Alice', isGuest: false }],
 					order: ['p1'],
 				});
-				store.preloadedRecords = new Map([['p1', newPlayerStats]]);
+				store.preloadedRecords = new Map([['p1', { ...newPlayerStats }]]);
 
 				// Drive to match completion
 				store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
@@ -519,7 +547,7 @@ describe('MatchStore', () => {
 				players: [{ id: 'p1', name: 'Alice', isGuest: false }],
 				order: ['p1'],
 			});
-			store.preloadedRecords = new Map([['p1', priorStats]]);
+			store.preloadedRecords = new Map([['p1', { ...priorStats }]]);
 
 			// Score 180 — triggers record detection
 			store.dispatch({ type: 'DART_THROWN', dart: { multiplier: 3, segment: 20 } });

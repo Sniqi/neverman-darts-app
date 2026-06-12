@@ -79,8 +79,9 @@ export class MatchStore {
 		}
 
 		// Phase 4: detect records after publish, before match-complete persist.
-		// Uses preloaded baselines (unaffected by UNDO — always history-only).
-		// Never dispatches further actions (T-04-14 anti-infinite-loop).
+		// Compares against per-player baselines (lifetime best at match start, then
+		// advanced as new bests are set in-match so a record celebrates only once per
+		// genuine new best). Never dispatches further actions (T-04-14 anti-infinite-loop).
 		const recordItems = this.#detectRecords(prevState, this.state);
 		if (recordItems.length > 0) {
 			this.pendingRecords = recordItems;
@@ -200,6 +201,15 @@ export class MatchStore {
 								text: 'Neuer Rekord: Höchste Aufnahme',
 							});
 						}
+
+						// Advance the in-match running best so a repeated or lower visit
+						// does not re-fire "Neuer Rekord: Höchste Aufnahme" (user feedback:
+						// the record was re-celebrated on every visit above the START-of-match
+						// value). A 180 also raises the bar to 180 — no later visit can then
+						// claim a fresh highest-visit record.
+						if (visitScore > baseline.highestVisit) {
+							baseline.highestVisit = visitScore;
+						}
 					}
 				}
 			}
@@ -217,6 +227,8 @@ export class MatchStore {
 						value: newLegDarts,
 						text: `Neuer Rekord: Bestes Leg (${newLegDarts} Darts)`,
 					});
+					// Advance running best so a later equal/slower leg does not re-fire.
+					baseline.bestLeg = newLegDarts;
 				}
 
 				// Highest checkout: the leg-closing visit.
@@ -241,6 +253,9 @@ export class MatchStore {
 								value: checkoutScore,
 								text: `Neuer Rekord: Höchstes Finish ${checkoutScore}`,
 							});
+							// Advance running best so an equal/lower finish later in the
+							// same match does not re-fire the record.
+							baseline.highestCheckout = checkoutScore;
 						}
 					}
 				}
@@ -267,6 +282,7 @@ export class MatchStore {
 							value: liveAvg,
 							text: 'Neuer Rekord: Bester Match-Schnitt',
 						});
+						baseline.matchAverage = liveAvg;
 					}
 				}
 			}

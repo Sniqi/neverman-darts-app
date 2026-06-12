@@ -54,7 +54,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **PROF-01**: Player can create, edit, and delete persistent player profiles
 - [x] **PROF-02**: Player can add guest players to a match without creating a profile (guest stats are not persisted)
-- [ ] **PROF-03**: Player can export all data (profiles, history, stats) as a JSON file and import it again (backup / device transfer)
+- [x] **PROF-03**: Player can export all data (profiles, history, stats) as a JSON file and import it again (backup / device transfer)
 
 ### Achievements
 
@@ -136,7 +136,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DISP-05 | Phase 2 | Complete |
 | FLOW-03 | Phase 3 | Complete |
 | STAT-06 | Phase 3 | Complete |
-| PROF-03 | Phase 3 | Pending |
+| PROF-03 | Phase 3 | Complete |
 | STAT-01 | Phase 4 | Pending |
 | STAT-02 | Phase 4 | Pending |
 | STAT-03 | Phase 4 | Pending |

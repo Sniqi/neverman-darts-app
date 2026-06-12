@@ -24,10 +24,13 @@
 ## Top 3 Priority Fixes
 
 1. **"Weiter geht's!" zero-countdown flash not implemented** — At `remainingSeconds === 0`, the spec requires a temporary string swap to "Weiter geht's!" displayed for 800ms before auto-resume. Without this, the countdown goes dark with no closing signal — users may not realize the pause ended automatically. Fix: add a derived `isZero` boolean, conditionally render "Weiter geht's!" in place of the `MM:SS` display, and trigger the 800ms flash via a `$effect` that sets a local `showZero` boolean; the parent's auto-resume handles navigation.
+   **RESOLVED (2026-06-12, commit bfe99b6 + 5836ebe):** `decrementPause()` now sets `pauseRemainingSeconds=0` and broadcasts before calling `resumePause()` via `setTimeout(...,800)`. `PauseOverlay` renders "Weiter geht's!" with `.zero-flash` (opacity fade keyframe) when `isZero` derived is true. Works on both `/match` and `/display` via broadcast state.
 
 2. **fadeOut exit animation absent** — The spec declares "fadeOut opacity 1→0, 200ms ease-in" on overlay removal. The component only defines `fadeIn`. Without an exit transition, the overlay snaps away instantly rather than fading, which is jarring especially on a large spectator display at 3 m. Fix: use Svelte's `transition:fade={{ duration: 200, easing: cubicIn }}` or a CSS `@keyframes fadeOut` with `animation-fill-mode: forwards` keyed on the `pauseActive` condition.
+   **RESOLVED (2026-06-12, commit 5836ebe):** Added `out:fade={{ duration: 200, easing: cubicIn }}` from `svelte/transition`; replaced manual `@keyframes fadeIn` with `in:fade={{ duration: 300 }}` for consistency.
 
 3. **aria-live announces countdown every second** — The spec says countdown should announce "every 60s and at ≤10s". Currently `aria-live="polite"` is on the element that renders `{mm}:{ss}` which updates every second, so screen readers will read the time every single second for the entire 8-minute countdown. This will be deeply disruptive to any assistive-technology user. Fix: move `aria-live` to a visually-hidden companion element that is only populated at the 60-second marks and when `remainingSeconds <= 10`, leaving the displayed digits untouched.
+   **RESOLVED (2026-06-12, commit 5836ebe):** Removed `aria-live` from `.countdown-digits`. Added `.sr-only[aria-live="polite"]` companion populated only at minute marks and `remainingSeconds <= 10`. 10 new browser test cases cover all three fixes; full suite 405/405 green.
 
 ---
 

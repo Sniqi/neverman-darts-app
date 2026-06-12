@@ -77,6 +77,14 @@ export class MatchStore {
 		return getSuggestion(this.remaining, this.state.config.outRule);
 	}
 
+	/**
+	 * Restore a previously persisted MatchState (crash-resume, D-01).
+	 * Direct assignment to the $state field — same mechanism as dispatch().
+	 */
+	restore(state: MatchState): void {
+		this.state = state;
+	}
+
 	get isMatchComplete(): boolean {
 		return this.state.phase === 'match-complete';
 	}

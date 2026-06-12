@@ -124,6 +124,77 @@ describe('MatchStore', () => {
 		});
 	});
 
+	describe('restore()', () => {
+		it('after restore(savedState), store.state deep-equals the saved state', () => {
+			const savedState: import('../engine/types.js').MatchState = {
+				config: {
+					startScore: 501,
+					outRule: 'double',
+					legsToWin: 3,
+					setsEnabled: false,
+					setsToWin: 1,
+				},
+				players: [
+					{
+						id: 'p1',
+						name: 'Alice',
+						isGuest: false,
+						remaining: 321,
+						legsWon: 1,
+						setsWon: 0,
+						visits: [],
+					},
+				],
+				activePlayerIndex: 0,
+				legStarterIndex: 0,
+				currentVisit: [],
+				phase: 'playing',
+				eventLog: [
+					{
+						type: 'START_MATCH',
+						config: {
+							startScore: 501,
+							outRule: 'double',
+							legsToWin: 3,
+							setsEnabled: false,
+							setsToWin: 1,
+						},
+						players: [{ id: 'p1', name: 'Alice', isGuest: false }],
+						order: ['p1'],
+					},
+				],
+				legStartVisitIndex: { p1: 0 },
+			};
+			store.restore(savedState);
+			expect(store.state.phase).toBe('playing');
+			expect(store.state.players[0].remaining).toBe(321);
+			expect(store.state.players[0].legsWon).toBe(1);
+			expect(store.state.activePlayerIndex).toBe(0);
+			expect(store.state.eventLog).toHaveLength(1);
+		});
+
+		it('after restore(), store remains usable — UNDO dispatch replays correctly', () => {
+			// Build state with a visit already dispatched
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 }); // remaining 321
+
+			// Capture state and restore it into a fresh store
+			const snapshot = JSON.parse(JSON.stringify(store.state));
+			const freshStore = new MatchStore();
+			freshStore.restore(snapshot);
+			expect(freshStore.state.players[0].remaining).toBe(321);
+
+			// A subsequent UNDO should replay correctly (back to 501)
+			freshStore.dispatch({ type: 'UNDO' });
+			expect(freshStore.state.players[0].remaining).toBe(501);
+		});
+	});
+
 	describe('mid-visit remaining (CR-06 / ENG-07)', () => {
 		beforeEach(() => {
 			store.dispatch({

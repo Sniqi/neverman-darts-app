@@ -8,7 +8,7 @@
 // cross-origin injection possible (T-02-01, T-02-02).
 
 import type { MatchState } from '../engine/types.js';
-import { BC_CHANNEL, LS_SNAPSHOT } from '../lib/sync-constants.js';
+import { BC_CHANNEL, LS_SNAPSHOT, MSG_PAUSE_TICK } from '../lib/sync-constants.js';
 
 // Aliases for backward-compat with the names used throughout this file
 const CHANNEL_NAME = BC_CHANNEL;
@@ -37,6 +37,11 @@ function isValidMatchState(parsed: unknown): parsed is MatchState {
 export class DisplayStore {
 	state = $state<MatchState | null>(null);
 	private channel: BroadcastChannel | null = null;
+
+	/** True when the pause countdown overlay should be shown on /display. */
+	pauseActive = $state(false);
+	/** Remaining seconds on the countdown as broadcast by the scoring window. */
+	pauseRemainingSeconds = $state(0);
 
 	/**
 	 * Hydrates state from the localStorage snapshot (cold-start / reload path),
@@ -70,6 +75,15 @@ export class DisplayStore {
 		// reach the render loops the WR-07 guard protects.
 		this.channel = new BroadcastChannel(CHANNEL_NAME);
 		this.channel.addEventListener('message', (e: MessageEvent<unknown>) => {
+			// FLOW-02: route pause-tick messages before the match-state guard so they
+			// are never passed to isValidMatchState (RESEARCH Pitfall 3, T-05-07).
+			// Same cast style as display/+page.svelte record-event handling.
+			const data = e.data as { type?: string; pauseActive?: boolean; pauseRemainingSeconds?: number };
+			if (data?.type === MSG_PAUSE_TICK) {
+				this.pauseActive = data.pauseActive ?? false;
+				this.pauseRemainingSeconds = data.pauseRemainingSeconds ?? 0;
+				return;
+			}
 			if (isValidMatchState(e.data)) {
 				this.state = e.data;
 			}

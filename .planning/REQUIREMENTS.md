@@ -47,8 +47,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **STAT-04**: App counts score bands per leg/match/lifetime: 180s, 140+, 100+, 60+
 - [x] **STAT-05**: App tracks highest visit score, highest checkout, and best/worst leg (darts used) per player
 - [x] **STAT-06**: Player can browse match history (past matches with results and key stats)
-- [ ] **STAT-07**: Player can view lifetime statistics per profile (averages, checkout %, score bands, records)
-- [ ] **STAT-08**: Player can view a statistics dashboard with charts (score distribution, average trend over time, darts per leg, win rate)
+- [x] **STAT-07**: Player can view lifetime statistics per profile (averages, checkout %, score bands, records)
+- [x] **STAT-08**: Player can view a statistics dashboard with charts (score distribution, average trend over time, darts per leg, win rate)
 
 ### Profiles & Data
 
@@ -142,8 +142,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAT-03 | Phase 4 | Complete |
 | STAT-04 | Phase 4 | Complete |
 | STAT-05 | Phase 4 | Complete |
-| STAT-07 | Phase 4 | Pending |
-| STAT-08 | Phase 4 | Pending |
+| STAT-07 | Phase 4 | Complete |
+| STAT-08 | Phase 4 | Complete |
 | ACHV-01 | Phase 4 | Complete |
 | ACHV-02 | Phase 4 | Complete |
 | ACHV-03 | Phase 4 | Complete |

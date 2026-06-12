@@ -12,7 +12,8 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 ### Validated
 
-(None yet — ship to validate)
+- **Statistics (live + lifetime + dashboard)** — live 3-dart/first-9 averages, checkout %, score bands, best/worst leg during play; per-profile lifetime stats with hand-rolled SVG charts at `/stats`; match-detail breakdown. *Validated in Phase 4: Statistics & Achievements.*
+- **Achievements: personal records celebrated live AND stored** — highest visit/checkout, best leg, best match average, 180s detected in real time, celebrated on input + spectator views, and persisted (recompute-from-history). Records celebrate once per genuine new best. *Validated in Phase 4 (human UAT 2026-06-12).*
 
 ### Active
 
@@ -93,4 +94,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-10 after initialization*
+*Last updated: 2026-06-12 — Phase 4 (Statistics & Achievements) complete*

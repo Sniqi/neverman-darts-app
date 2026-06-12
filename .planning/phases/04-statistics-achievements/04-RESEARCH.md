@@ -933,17 +933,17 @@ export function profileStatsLive(profileId: string): Readable<LifetimeStats | nu
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **first-9 average for mixed board/numpad input with dartsUsed ≠ 3**
    - What we know: `NUMPAD_VISIT` captures `dartsUsed?: 1 | 2 | 3`. A 2-dart or 1-dart numpad finish could be the 3rd visit of the first-9 window.
    - What's unclear: Should first-9 use the first 9 actual darts (spanning more than 3 visits if a finish visit uses fewer), or the first 3 visits?
-   - Recommendation: Use first 3 VISITS for simplicity (standard tournament definition). The planner should document this choice in the plan.
+   - **RESOLVED:** Use the first 3 VISITS (standard tournament definition). Locked in plan 04-01 Task 2 (`first9Average`).
 
 2. **Highest visit: should bust visits count?**
    - What we know: A bust reverts score. A 180 bust (three T20s followed by a bust dart) still hit 180 before busting — but `Visit.bust = true` and the score is not counted.
    - What's unclear: Whether "highest visit" in D-03 refers to the intended score or the scored score.
-   - Recommendation: Count only non-bust visit scores (scored = actual change in remaining). This is the conservative and correct statistical interpretation. A bust visit's "score" of e.g. 180+1 is not actually scored.
+   - **RESOLVED:** Count only non-bust visit scores (scored = actual change in remaining). Locked in plan 04-01 (`visitScoresFromState` bust filter) and 04-05 record detection.
 
 ---
 

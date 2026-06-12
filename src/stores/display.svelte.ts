@@ -29,11 +29,25 @@ export class DisplayStore {
 	 * messages will not update state.
 	 */
 	connect(): () => void {
-		// Hydrate from snapshot — T-02-01: parse inside try/catch; fallback to null
+		// Hydrate from snapshot — T-02-01: parse inside try/catch; fallback to null.
+		// WR-07: validate the parsed shape before assigning. A corrupt / partially
+		// hydrated snapshot (empty players, or activePlayerIndex out of range) would
+		// render a broken grid (grid-template-columns: repeat(0, 1fr)) and crash the
+		// averages/standings loops. On any invalid shape, leave state null (idle screen).
 		try {
 			const raw = localStorage.getItem(SNAPSHOT_KEY);
 			if (raw) {
-				this.state = JSON.parse(raw) as MatchState;
+				const parsed = JSON.parse(raw) as MatchState;
+				if (
+					parsed &&
+					Array.isArray(parsed.players) &&
+					parsed.players.length > 0 &&
+					typeof parsed.activePlayerIndex === 'number' &&
+					parsed.activePlayerIndex >= 0 &&
+					parsed.activePlayerIndex < parsed.players.length
+				) {
+					this.state = parsed;
+				}
 			}
 		} catch {
 			// Corrupt or invalid JSON — leave state null (idle screen will show)

@@ -18,6 +18,25 @@
 		matchStore.isMatchComplete ? matchStore.activePlayer?.name ?? '' : ''
 	);
 
+	// WR-04: snapshot the record badge locally and clear matchStore.pendingRecords once
+	// the match-complete overlay has rendered. The store is the source of recordBadge
+	// (via the route), so we copy the text into local state first, then clear — otherwise
+	// stale pendingRecords would leak past "Neues Spiel" navigation into the next match.
+	let displayBadge = $state<string | null>(null);
+	$effect(() => {
+		if (matchStore.isMatchComplete) {
+			if (recordBadge && displayBadge === null) {
+				displayBadge = recordBadge;
+			}
+			if (matchStore.pendingRecords.length > 0) {
+				matchStore.pendingRecords = [];
+			}
+		} else {
+			// Reset for the next match once the overlay is no longer showing.
+			displayBadge = null;
+		}
+	});
+
 	function newGame() {
 		goto(`${base}/setup`);
 	}
@@ -28,8 +47,8 @@
 		<div class="win-content">
 			<h1 class="win-heading">{winnerName} gewinnt!</h1>
 			<p class="win-body">Das Spiel ist beendet.</p>
-			{#if recordBadge}
-				<p class="record-badge">{recordBadge}</p>
+			{#if displayBadge}
+				<p class="record-badge">{displayBadge}</p>
 			{/if}
 			<button class="new-game-btn" onclick={newGame}>
 				Neues Spiel

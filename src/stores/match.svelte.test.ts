@@ -399,6 +399,27 @@ describe('MatchStore', () => {
 			expect(msg.records.length).toBeGreaterThan(0);
 		});
 
+		it('detects numpad-entered records via the remaining-delta (darts:[]) — D-04 + highest-visit', () => {
+			// Numpad visits store darts:[]; detection must derive the score from the
+			// remaining delta (prev.remaining - next.remaining) so a 180 still celebrates.
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [{ id: 'p1', name: 'Alice', isGuest: false }],
+				order: ['p1'],
+			});
+			store.preloadedRecords = new Map([['p1', priorStats]]); // prior best visit = 140
+
+			// Numpad 180 (501 → 321): "180!" must fire even though darts:[] (D-04)
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+			expect(store.pendingRecords.map(r => r.type)).toContain('180');
+			expect(postedMessages.length).toBeGreaterThan(0);
+
+			// Numpad 160 (321 → 161), beats prior best 140 → highest-visit
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 160 });
+			expect(store.pendingRecords.map(r => r.type)).toContain('highest-visit');
+		});
+
 		it('does NOT detect records for guest players (D-11)', () => {
 			store.dispatch({
 				type: 'START_MATCH',

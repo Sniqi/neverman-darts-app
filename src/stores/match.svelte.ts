@@ -151,15 +151,21 @@ export class MatchStore {
 
 				// Only non-bust visits count for score-based records
 				if (!lastVisit.bust) {
-					// Compute the visit score from dart values (board visits only)
-					// For numpad visits (darts: []), score cannot be determined without
-					// intermediate remaining — skip visit-based records for numpad
+					// Compute the visit score. Board visits sum dart values; numpad
+					// visits (darts: []) use the remaining-delta approach (RESEARCH):
+					// prev.remaining - next.remaining for an in-leg visit, or the cleared
+					// amount (prev.remaining) when this visit also closed the leg (checkout).
+					// This keeps numpad 180s and highest-visit records detectable (D-04).
 					let visitScore: number | null = null;
 					if (lastVisit.darts.length > 0) {
 						visitScore = lastVisit.darts.reduce(
 							(s, d) => s + d.multiplier * d.segment,
 							0,
 						);
+					} else if (prevPlayer) {
+						visitScore = nextLegCount > prevLegCount
+							? prevPlayer.remaining
+							: prevPlayer.remaining - nextPlayer.remaining;
 					}
 
 					if (visitScore !== null) {
@@ -203,16 +209,22 @@ export class MatchStore {
 					});
 				}
 
-				// Highest checkout: the leg-closing visit
-				// Find the wasCheckout visit in the new visits since prev
+				// Highest checkout: the leg-closing visit.
+				// Board checkouts sum dart values; numpad checkouts (darts: []) cleared
+				// exactly prevPlayer.remaining to reach 0 (one visit per dispatch).
 				const newVisits = nextPlayer.visits.slice(prevVisitCount);
 				for (const v of newVisits) {
-					if (v.wasCheckout === true && v.darts.length > 0) {
-						const checkoutScore = v.darts.reduce(
-							(s, d) => s + d.multiplier * d.segment,
-							0,
-						);
-						if (checkoutScore > baseline.highestCheckout) {
+					if (v.wasCheckout === true) {
+						let checkoutScore: number | null = null;
+						if (v.darts.length > 0) {
+							checkoutScore = v.darts.reduce(
+								(s, d) => s + d.multiplier * d.segment,
+								0,
+							);
+						} else if (prevPlayer) {
+							checkoutScore = prevPlayer.remaining;
+						}
+						if (checkoutScore !== null && checkoutScore > baseline.highestCheckout) {
 							items.push({
 								playerId: nextPlayer.id,
 								type: 'highest-checkout',

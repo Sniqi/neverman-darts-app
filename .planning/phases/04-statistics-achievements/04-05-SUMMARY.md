@@ -52,7 +52,7 @@ key_files:
     - src/routes/display/+page.svelte
 decisions:
   - "Null-baseline D-05: (preloaded.bestLeg === null || newLegDarts < preloaded.bestLeg) and (preloaded.matchAverage === null || liveAvg > preloaded.matchAverage) — plain < null / > null evaluate false in JS and silently skip first-ever record"
-  - "Numpad visit score detection limited to board visits (darts.length > 0) — numpad intermediate remaining is not stored per-visit, so highest-visit and highest-checkout detection only fires for board-entered visits; consistent with visitScoresFromState limitation documented in 04-01"
+  - "RESOLVED (post-exec fix): numpad visit score detection now uses the RESEARCH remaining-delta approach (prev.remaining - next.remaining; prev.remaining for a numpad checkout) — numpad-entered 180s, highest-visit, and highest-checkout now celebrate (D-04 restored). New unit test covers the numpad path."
   - "loadRecords called from onMount in /match route — guard for players.length > 0"
   - "matchAverageCrossLeg replaces matchAverage in MatchWinDisplay — cross-leg correct for multi-leg final screen"
 metrics:
@@ -135,11 +135,11 @@ Tests       283 passed (283)
 - **Files modified:** `src/routes/match/+page.svelte`
 - **Commit:** 990677f (included in task commit)
 
-**2. [Rule 2 - Missing critical] Numpad visit score detection limited to board visits**
-- **Found during:** Task 2 implementation — `#detectRecords` computes visit score from `visit.darts.reduce()` which returns 0 for numpad visits (`darts: []`)
-- **Decision:** Consistent with `visitScoresFromState` limitation documented in 04-01 SUMMARY — per-visit intermediate remaining is not stored, so numpad intermediate visits have no recoverable score. Only board visits trigger highest-visit / highest-checkout detection. First 180 via numpad is NOT celebrated (180 detection requires exact dart values). This is a known limitation, not a bug.
-- **Files modified:** none — limitation documented, no code change
-- **Impact:** Players using numpad entry will not see highest-visit or 180 celebrations; board entry celebrates correctly. For 04-06 post-phase review: consider storing per-visit remaining or a visitScore field.
+**2. [RESOLVED post-exec] Numpad visit score detection**
+- **Found during:** Task 2 implementation — `#detectRecords` computed visit score from `visit.darts.reduce()`, which returns 0 for numpad visits (`darts: []`), so numpad-entered 180s/highest-visit/highest-checkout did not celebrate.
+- **Resolution (post-execution fix):** `#detectRecords` now applies the RESEARCH-prescribed remaining-delta approach — `prevPlayer.remaining - nextPlayer.remaining` for an in-leg numpad visit, and `prevPlayer.remaining` (the cleared amount) for a numpad checkout. Board visits still sum dart values. This restores D-04 ("180 always celebrates") for the numpad input path, which is a real/primary fast-entry method (`Numpad.svelte`, `NUMPAD_VISIT`).
+- **Files modified:** `src/stores/match.svelte.ts` (`#detectRecords`), `src/stores/match.svelte.test.ts` (new numpad-path test).
+- **Verification:** 284/284 unit tests pass; new test asserts numpad 180 → "180!" and numpad 160 → highest-visit.
 
 ## Known Stubs
 

@@ -322,3 +322,38 @@ export function highestVisit(player: PlayerState, startScore: number): number | 
 	const scores = visitScoresFromState(player, startScore);
 	return scores.length > 0 ? Math.max(...scores) : null;
 }
+
+/**
+ * Highest checkout (finish) value across a player's visits. Returns null when the
+ * player never checked out (WR-02 — single source of truth for full-replay reconstruction).
+ *
+ * Board checkouts sum dart values; numpad checkouts (darts: []) carry no darts, so the
+ * finish value is reconstructed from the leg's running remaining before the closing
+ * visit (= the cleared amount, remaining → 0). Walk visits per leg, resetting `running`
+ * to startScore at each leg boundary.
+ *
+ * NOTE: this is the full-replay variant used by completed-match / persisted-blob consumers
+ * (db/stats.ts, MatchStatBreakdown). The live record-detection path in match.svelte.ts uses
+ * the per-dispatch prevPlayer.remaining delta instead (incremental, not a full replay) and
+ * intentionally does NOT call this helper.
+ */
+export function highestCheckout(player: PlayerState, startScore: number): number | null {
+	let best: number | null = null;
+	let running = startScore;
+	for (const v of player.visits) {
+		if (v.bust) continue; // bust leaves remaining unchanged
+		const boardScore =
+			v.darts.length > 0
+				? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
+				: null;
+		if (v.wasCheckout === true) {
+			// Numpad checkout score = running (reduces to 0); board = dart sum.
+			const score = boardScore ?? running;
+			if (best === null || score > best) best = score;
+		}
+		if (boardScore !== null) running -= boardScore;
+		else if (v.wasCheckout === true) running = 0;
+		if (running <= 0) running = startScore;
+	}
+	return best;
+}

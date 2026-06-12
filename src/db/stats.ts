@@ -14,6 +14,7 @@ import {
 	visitScoresFromState,
 	dartsPerLeg,
 	highestVisit as highestVisitFn,
+	highestCheckout as highestCheckoutFn,
 } from '../engine/averages.js';
 import type { ScoreBands } from '../engine/averages.js';
 
@@ -152,28 +153,10 @@ export function computeLifetimeStats(
 		const hv = highestVisitFn(player, startScore);
 		if (hv !== null && hv > highestVisitVal) highestVisitVal = hv;
 
-		// Highest checkout: max wasCheckout=true visit score (WR-01).
-		// Board checkouts sum dart values. Numpad checkouts (darts: []) store no darts,
-		// so the finish value must be reconstructed from the leg's running remaining
-		// before the closing visit — which equals the cleared amount (remaining → 0).
-		// Walk visits per leg, resetting running to startScore at each leg boundary.
-		{
-			let running: number = startScore;
-			for (const v of player.visits) {
-				if (v.bust) continue; // bust leaves remaining unchanged
-				const boardScore = v.darts.length > 0
-					? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
-					: null;
-				if (v.wasCheckout === true) {
-					// Numpad checkout score = running (reduces to 0); board = dart sum.
-					const score = boardScore ?? running;
-					if (score > highestCheckoutVal) highestCheckoutVal = score;
-				}
-				if (boardScore !== null) running -= boardScore;
-				else if (v.wasCheckout === true) running = 0;
-				if (running <= 0) running = startScore;
-			}
-		}
+		// Highest checkout: max wasCheckout=true visit score across matches (WR-02 —
+		// shared full-replay reconstruction helper in averages.ts).
+		const hc = highestCheckoutFn(player, startScore);
+		if (hc !== null && hc > highestCheckoutVal) highestCheckoutVal = hc;
 
 		// Best leg: min darts in any leg across all matches
 		// For a completed match: legCompleted holds all legs.

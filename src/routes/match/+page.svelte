@@ -19,6 +19,7 @@
 	import DartsAtDoubleDialog from '../../ui/input/DartsAtDoubleDialog.svelte';
 	import MatchWinOverlay from '../../ui/overlays/MatchWinOverlay.svelte';
 	import RecordOverlay from '../../ui/overlays/RecordOverlay.svelte';
+	import PauseOverlay from '../../ui/overlays/PauseOverlay.svelte';
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
 
@@ -53,6 +54,18 @@
 			releaseWakeLock();
 			document.removeEventListener('visibilitychange', handleVisibility);
 		};
+	});
+
+	// ── Auto-pause countdown (FLOW-02 / D-08) ────────────────────────────────
+	// Runs only in the scoring window — /display is a pure subscriber (no drift).
+	// Modeled on the wake-lock $effect: cleanup return clears the interval on
+	// unmount and whenever pauseActive flips false (Pitfall 7 leak prevention).
+	$effect(() => {
+		if (!matchStore.pauseActive) return;
+		const id = setInterval(() => {
+			matchStore.decrementPause();
+		}, 1000);
+		return () => clearInterval(id);
 	});
 
 	// ── SFX trigger (AUD-02 / D-05) ──────────────────────────────────────────
@@ -315,6 +328,15 @@
 		ondismiss={() => { matchStore.pendingRecords = []; }}
 	/>
 {/if}
+
+<!-- FLOW-02: Auto-pause overlay (z-60) — above RecordOverlay (z-50), below MatchWinOverlay (z-100).
+     Countdown runs via the $effect above; "Weiter" calls resumePause() to dismiss early. -->
+<PauseOverlay
+	pauseActive={matchStore.pauseActive}
+	remainingSeconds={matchStore.pauseRemainingSeconds}
+	showResume={true}
+	onresume={() => matchStore.resumePause()}
+/>
 
 <SpectatorChooser />
 

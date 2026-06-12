@@ -13,6 +13,7 @@
 	import LegWinBanner from '../../ui/display/LegWinBanner.svelte';
 	import MatchWinDisplay from '../../ui/display/MatchWinDisplay.svelte';
 	import RecordOverlay from '../../ui/overlays/RecordOverlay.svelte';
+	import PauseOverlay from '../../ui/overlays/PauseOverlay.svelte';
 
 	// Connect the display store and subscribe to live updates.
 	// $effect returns the cleanup function which closes the BroadcastChannel.
@@ -212,6 +213,15 @@
 		ondismiss={() => { recordStrings = []; }}
 	/>
 {/if}
+
+<!-- FLOW-02: Auto-pause overlay on spectator view (z-60, read-only — no Weiter button, no local timer).
+     pauseActive/pauseRemainingSeconds are updated by DisplayStore's pause-tick message handler.
+     No new BroadcastChannel subscription needed here — displayStore.connect() handles it (Task 2). -->
+<PauseOverlay
+	pauseActive={displayStore.pauseActive}
+	remainingSeconds={displayStore.pauseRemainingSeconds}
+	showResume={false}
+/>
 
 <!-- Layer 3: fullscreen controls (z-index 30) — outside the conditional so always rendered -->
 

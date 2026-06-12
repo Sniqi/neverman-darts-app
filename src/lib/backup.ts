@@ -23,8 +23,12 @@ export async function exportAllData(): Promise<void> {
 	const date = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 	a.href = url;
 	a.download = `neverman-backup-${date}.json`;
+	a.style.display = 'none';
+	document.body.appendChild(a);
 	a.click();
-	URL.revokeObjectURL(url);
+	document.body.removeChild(a);
+	// Defer revocation so the browser has time to start the download
+	setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
 /**
@@ -37,6 +41,9 @@ export async function validateImportFile(
 	blob: Blob
 ): Promise<{ valid: boolean; errorDe: string | null }> {
 	try {
+		// peakImportFile only validates the header/metadata.
+		// Full schema and data validation happens inside importInto, which runs atomically.
+		// clearTablesBeforeImport is safe because importInto wraps everything in one IDB transaction.
 		const metadata = await peakImportFile(blob);
 		if (metadata.data.databaseName !== 'NevermanDarts') {
 			return { valid: false, errorDe: 'Diese Datei gehört nicht zu Neverman Darts.' };

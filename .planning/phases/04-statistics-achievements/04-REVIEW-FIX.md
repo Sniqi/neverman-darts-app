@@ -1,155 +1,119 @@
 ---
 phase: 04-statistics-achievements
-fixed_at: 2026-06-12T00:00:00Z
+fixed_at: 2026-06-12T15:04:33Z
 review_path: .planning/phases/04-statistics-achievements/04-REVIEW.md
-iteration: 1
-findings_in_scope: 8
-fixed: 8
+iteration: 2
+findings_in_scope: 5
+fixed: 5
 skipped: 0
 status: all_fixed
 ---
 
-# Phase 4: Code Review Fix Report
+# Phase 4: Code Review Fix Report (Iteration 2)
 
-**Fixed at:** 2026-06-12
+**Fixed at:** 2026-06-12T15:04:33Z
 **Source review:** .planning/phases/04-statistics-achievements/04-REVIEW.md
-**Iteration:** 1
+**Iteration:** 2
 
 **Summary:**
-- Findings in scope: 8 (CR-01 + WR-01..WR-07)
-- Fixed: 8
+- Findings in scope (Critical + Warning): 5
+- Fixed: 5
 - Skipped: 0
-- Info findings (IN-01..IN-05): out of scope (critical_warning), not addressed
 
-All fixes were applied in an isolated git worktree, verified per-fix with `npm run test:unit`
-(290 tests passing, up from a 284-test baseline — 6 new regression tests added) and
-`npm run check` (svelte-check). The only remaining type error is the KNOWN pre-existing
-`src/db/profiles.ts:24` Phase 3 debt — no new type errors were introduced by any fix.
+In-scope findings were CR-01, WR-01, WR-02, WR-03, WR-04. The three Info findings
+(IN-01, IN-02, IN-03) were out of scope for `critical_warning` and were not touched.
+
+Verification after fixes: `npm run test:unit` → 14 files / 291 tests passing;
+`npm run check` → only the pre-existing, KNOWN Phase 3 debt error at
+`src/db/profiles.ts:24` remains (untouched, not worsened). No new errors or warnings
+introduced.
 
 ## Fixed Issues
 
-### CR-01: Lost legs are never recorded, corrupting lifetime averages & trends
+### CR-01: `matchAverageCrossLeg` double-counts the final leg for losers on completed matches
 
-**Files modified:** `src/engine/reducer.ts`, `src/engine/reducer.test.ts`, `src/db/stats.test.ts`
-**Commit:** efe9088
-**Applied fix:** Rewrote `handleLegWinFromPlayers` to capture a `legCompleted` entry for
-EVERY player at leg close (winner and losers) via `captureLegStats(p, legStart, startScore)`
-computed BEFORE `remaining` is reset. The winner's `remaining` is already 0 (scored =
-startScore); each loser's `remaining` still holds the start-of-visit value, so
-`scored = startScore - remaining` correctly captures the lost leg. Added a reducer test
-asserting losers receive a `legCompleted` entry, a reducer test asserting UNDO replay
-rebuilds `legCompleted` for all players, and a stats test asserting a losing profile's
-darts now contribute to `averageTrend`, `matchAverage`, `bestLeg`, and
-`dartsPerLegBuckets`. UNDO correctness is preserved because UNDO replays the event log
-through the same reducer path.
+**Files modified:** `src/engine/averages.ts`
+**Commit:** 7ffee8d
+**Applied fix:** Replaced the `if (player.remaining === 0)` early-return guard with
+`if (curDarts === 0)`, computing `curDarts` from the current-leg slice
+(`player.visits.slice(currentLegStartIdx)`) BEFORE the guard. On a completed match all
+three callers pass `currentLegStartIdx = visits.length`, so the slice is empty
+(`curDarts === 0`) for every player — winner AND loser — and the final leg is taken
+solely from `legCompleted`. This eliminates the loser double-count (the old guard only
+caught the winner's `remaining === 0`, so a loser's `curScored = startScore - remaining`
+was added a second time on top of `legCompleted`). The live mid-leg StatDrawer behaviour
+is preserved because mid-leg has uncommitted visits (`curDarts > 0`).
 
-### WR-01: Numpad checkouts always score 0 in highestCheckout (dead ternary)
+Confirmed all three callers pass `visits.length` and remain correct:
+- `src/ui/history/PlayerStatRow.svelte:39`
+- `src/ui/display/MatchWinDisplay.svelte:44`
+- `src/stores/match.svelte.ts:245` (match-complete record detection — a false
+  "Bester Match-Schnitt" record for a loser no longer fires)
 
-**Files modified:** `src/db/stats.ts`, `src/db/stats.test.ts`
-**Commit:** e350fcd
-**Applied fix:** Replaced the dead `player.remaining === 0 ? 0 : 0` ternary with a per-leg
-running-remaining walk. For a numpad checkout (`darts: []`, `wasCheckout: true`) the finish
-value is reconstructed as the running remaining before the closing visit (the cleared
-amount). Board checkouts still sum dart values. Typed the `running` accumulator as `number`
-to avoid a `301 | 401 | 501` literal-type assignment error (the `running = 0` reset).
-Added a test asserting a numpad checkout contributes its real finish value (501) to
-`highestCheckout`. The existing board-checkout test still passes.
+`src/db/stats.ts` was already correct (computes per-match average directly from
+`legCompleted`, never calls `matchAverageCrossLeg` for completed matches) and was not
+changed for this finding.
 
-### WR-02: Numpad checkouts also score 0 in the per-match breakdown
+### WR-01: WR-06 unit coverage is winner-only — the loser path is untested
 
-**Files modified:** `src/ui/history/MatchStatBreakdown.svelte`
-**Commit:** 14e5586
-**Applied fix:** Added a `highestCheckout(player, startScore)` helper using the same per-leg
-running-remaining walk as WR-01, and replaced the inline `{@const highestCheckoutScore}`
-that mapped numpad checkouts to `0`. A match won via a numpad finish now shows the real
-"Höchstes Finish" value. svelte-check passes with no new errors.
+**Files modified:** `src/engine/averages.test.ts`
+**Commit:** 7ffee8d (committed atomically with the CR-01 source fix)
+**Applied fix:** Added a LOSER regression test in the `matchAverageCrossLeg` describe
+block: a completed 1-leg match with `remaining: 100 > 0` and the loser's final leg in
+`legCompleted = [{ dartsThrown: 12, scored: 401 }]`, asserting the average equals the
+`legCompleted`-only ratio `(401 / 12) * 3` with no current-leg contribution. Also updated
+the existing winner test to pass `player.visits.length` (the value the real callers pass)
+instead of a synthetic mid-array index, so the test now models the actual caller contract
+that makes the empty-slice guard fire. Full suite: 62 averages tests pass.
 
-### WR-06: matchAverageCrossLeg double-counts the final leg on a completed match — requires human verification
+### WR-02: Highest-checkout reconstruction duplicated in three places with drift risk
 
-**Files modified:** `src/engine/averages.ts`, `src/engine/averages.test.ts`,
-`src/ui/display/MatchWinDisplay.svelte`, `src/ui/history/PlayerStatRow.svelte`,
-`src/stores/match.svelte.ts`
-**Commit:** d001f27
-**Applied fix:** Two-pronged. (1) In `matchAverageCrossLeg`, when `player.remaining === 0`
-(the winner has just closed a leg already pushed to `legCompleted`), return the
-`legCompleted`-only ratio and skip the current-leg slice entirely — preventing the winner's
-final leg being counted twice. Mid-leg (`remaining > 0`) the current leg is still counted,
-so the live StatDrawer average is unaffected. (2) Because after CR-01 the LOSER's final leg
-is also in `legCompleted` (but the loser's `remaining > 0`), the three completed-match
-callers — `MatchWinDisplay.svelte`, `PlayerStatRow.svelte`, and the `#detectRecords`
-match-complete branch — now pass `player.visits.length` as `currentLegStartIdx`, so the
-current-leg slice is empty and no player double-counts the final leg. Added a 2-leg
-completed-match test asserting the win-screen average equals the `legCompleted`-only ratio.
-**Human-verification flag:** this is a logic change touching the average shown on the win
-screen and in history. Tier 1/2 verification (re-read + tests + svelte-check) passed, but a
-developer should confirm the win-screen and history averages read correctly against a real
-2-leg match before sign-off.
+**Files modified:** `src/engine/averages.ts`, `src/db/stats.ts`, `src/ui/history/MatchStatBreakdown.svelte`
+**Commit:** 7ed2e00
+**Applied fix:** Extracted a single `highestCheckout(player, startScore): number | null`
+helper into `averages.ts` (next to `highestVisit`) holding the per-leg checkout-reconstruction
+walk. Replaced the inline copy in `db/stats.ts` (imported as `highestCheckoutFn`) and removed
+the local function copy in `MatchStatBreakdown.svelte` (now imported from averages). The two
+full-replay consumers now share one implementation.
 
-### WR-04: Match-win badge persists into the next match (pendingRecords not cleared)
+Scope note: the third site cited by the review, the live record-detection in
+`match.svelte.ts:215-236`, uses a per-dispatch `prevPlayer.remaining` delta (incremental,
+single-visit, not a full visit replay) — a different mechanism that cannot consume the
+`highestCheckout(player, startScore)` full-replay signature without restructuring the live
+record loop. It was intentionally left as-is; this divergence is now documented directly on
+the shared helper's JSDoc so the distinction is explicit and not mistaken for drift.
 
-**Files modified:** `src/ui/overlays/MatchWinOverlay.svelte`
-**Commit:** 433a1bf
-**Applied fix:** Added a `$effect` that, on `isMatchComplete`, snapshots the incoming
-`recordBadge` into a local `displayBadge` state and then clears `matchStore.pendingRecords`.
-The local snapshot is necessary because the route derives `recordBadge` from
-`pendingRecords` — clearing the store first would blank the prop. The template now renders
-`displayBadge`. `displayBadge` resets when the overlay is no longer complete (next match).
-This prevents stale records leaking past "Neues Spiel" navigation.
+### WR-03: Record-detection numpad visit-score uses `prevPlayer.remaining` across a possible leg reset
 
-### WR-05: Display record overlay can mis-attribute / drop records across players
+**Files modified:** `src/stores/match.svelte.ts`
+**Commit:** 3cffb51
+**Applied fix:** Restructured the numpad visit-score branch so the in-leg case computes
+`const delta = prevPlayer.remaining - nextPlayer.remaining; visitScore = delta >= 0 ? delta : null;`.
+A negative delta (which could only arise from a hypothetical future bust-on-numpad path that
+resets `remaining` without incrementing the leg count) now degrades to "no record" instead of
+firing a spurious celebration. The implicit coupling is documented at the call site.
 
-**Files modified:** `src/stores/match.svelte.ts`, `src/routes/display/+page.svelte`
-**Commit:** 238c85c
-**Applied fix:** Added a monotonic `#recordSeq` counter in `MatchStore`; the
-`record-event` broadcast payload now carries `seq`. On the display side, the record-channel
-subscription tracks `lastRecordSeq`, ignores stale/duplicate sequences, and APPENDS records
-that arrive while a celebration is still showing (replacing only once the overlay has
-cleared). Two players hitting 180 in quick succession are both shown rather than the second
-overwriting the first.
-
-### WR-07: Empty player array on display crashes the panels grid template
+### WR-04: `DisplayStore` BroadcastChannel message handler has no shape validation
 
 **Files modified:** `src/stores/display.svelte.ts`
-**Commit:** bbd52a9
-**Applied fix:** `DisplayStore.connect()` now validates the parsed localStorage snapshot
-shape — `Array.isArray(parsed.players) && parsed.players.length > 0` and
-`activePlayerIndex` a number within `[0, players.length)` — before assigning to state. A
-corrupt or partially hydrated snapshot leaves `state = null` (idle screen) instead of
-rendering `grid-template-columns: repeat(0, 1fr)` and iterating an empty array.
+**Commit:** 84ad6d6
+**Applied fix:** Extracted the WR-07 shape check from `connect()` into a module-level
+`isValidMatchState(parsed): parsed is MatchState` type guard (validates
+`Array.isArray(players) && players.length > 0` and `activePlayerIndex` in range) and applied
+it in BOTH ingress paths — the localStorage hydration path and the live BroadcastChannel
+message handler (`if (isValidMatchState(e.data)) this.state = e.data;`). A malformed or partial
+`MatchState` posted on the channel can no longer reach the render loops the WR-07 guard protects.
 
-### WR-03: visitScoresFromState leg-boundary reset drifts on mixed numpad/board legs — requires human verification
+## Skipped Issues
 
-**Files modified:** `src/engine/averages.ts`, `src/engine/averages.test.ts`
-**Commit:** 57dcd73
-**Applied fix:** Rewrote the leg-boundary detection to be driven by structural data — the
-per-leg `scored` totals in `legCompleted` — instead of inferring boundaries from `running`
-reaching `<= 0`. The walk advances to the next leg when (a) the visit is an explicit
-`wasCheckout` leg-closer, or (b) the leg's accumulated score reaches
-`completed[legIdx].scored`, falling back to the `running <= 0` zero-crossing only when no
-structural data is available (legacy blobs / the in-progress leg). Added a test for a
-board-closed mixed leg. **Residual limitation (documented in code):** a NON-closing numpad
-visit's score still cannot be reconstructed (no per-visit remaining is persisted), so its
-points are omitted from the returned band scores and such a leg may not reach its expected
-`scored` total from board visits alone. This is the same pre-existing numpad-delta
-limitation (RESEARCH Pitfall 2) and is unchanged by this fix — the fix strictly improves
-boundary accuracy for board-closed and checkout-closed legs without regressing the existing
-band-counting behavior (all prior tests still pass).
-**Human-verification flag:** boundary-reconstruction logic; verified by tests + svelte-check
-but a developer should confirm against a real mixed numpad/board multi-leg match.
+None — all in-scope findings were fixed.
 
-## Notes / Residuals (not blocking, out of scope)
-
-- **PlayerStatRow `legStartVisitIndex` prop now unused:** the WR-06 fix made
-  `PlayerStatRow.svelte` pass `player.visits.length` instead of the `legStartVisitIndex`
-  prop, so that prop is now dead. It was left in place (still passed by
-  `history/[id]/+page.svelte`) to keep the change surgical — removing it requires touching
-  the route too. This overlaps with IN-04 (the `totalLegsPlayed` dead prop on the same
-  component), which is an Info finding out of the critical_warning scope. Recommend removing
-  both dead props together in an IN-tier cleanup pass.
-- **Info findings IN-01..IN-05** were not addressed (out of `critical_warning` scope).
+Out-of-scope (Info, not attempted under `critical_warning`): IN-01 (`matchAverage()` retained
+but superseded), IN-02 (`totalLegsCompleted = 0` dead local), IN-03 (non-closing numpad visit
+score-band omission — documented v1 limitation).
 
 ---
 
-_Fixed: 2026-06-12_
+_Fixed: 2026-06-12T15:04:33Z_
 _Fixer: Claude (gsd-code-fixer)_
-_Iteration: 1_
+_Iteration: 2_

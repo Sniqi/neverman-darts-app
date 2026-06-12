@@ -162,7 +162,12 @@ function applyDartThrown(
 
 	// Not bust: check if leg won (newRemaining === 0)
 	if (newRemaining === 0) {
-		const winVisit: Visit = { darts: newVisit, dartsAtDouble: 0, bust: false };
+		const winVisit: Visit = {
+			darts: newVisit,
+			dartsAtDouble: 0,
+			bust: false,
+			wasCheckout: state.config.outRule === 'double' ? true : undefined,
+		};
 		const updatedPlayer: PlayerState = {
 			...player,
 			remaining: 0,
@@ -228,6 +233,7 @@ function applyNumpadVisit(
 			darts: [],
 			dartsAtDouble,
 			bust: false,
+			wasCheckout: state.config.outRule === 'double' ? true : undefined,
 		};
 		const updatedPlayer: PlayerState = {
 			...player,
@@ -256,6 +262,26 @@ function applyNumpadVisit(
 	};
 }
 
+// ── Phase 4: leg-stats capture helper ─────────────────────────────────────
+
+/**
+ * Computes the legCompleted entry for the closing leg.
+ * Called BEFORE remaining is reset so scored = startScore - player.remaining is correct.
+ */
+function captureLegStats(
+	player: PlayerState,
+	legStartIdx: number,
+	startScore: number,
+): { dartsThrown: number; scored: number } {
+	const legVisits = player.visits.slice(legStartIdx);
+	const dartsThrown = legVisits.reduce(
+		(s, v) => s + (v.darts.length > 0 ? v.darts.length : 3),
+		0,
+	);
+	const scored = startScore - player.remaining;
+	return { dartsThrown, scored };
+}
+
 // ── Leg/set win helpers ────────────────────────────────────────────────────
 
 function handleLegWinFromPlayers(
@@ -268,12 +294,23 @@ function handleLegWinFromPlayers(
 	const config = state.config;
 	const numPlayers = players.length;
 
-	const legsWon = winner.legsWon;
+	// Phase 4: capture this leg's stats for the winner before remaining is reset.
+	// winner.remaining is already 0 (set by the call site), so scored = startScore - 0 = startScore.
+	const legStart = state.legStartVisitIndex[winner.id] ?? 0;
+	const legEntry = captureLegStats(winner, legStart, config.startScore);
+	const winnerWithLeg: PlayerState = {
+		...winner,
+		legCompleted: [...(winner.legCompleted ?? []), legEntry],
+	};
+	// Replace winner in the players array with legCompleted updated
+	const playersWithLeg = players.map((p, i) => i === playerIdx ? winnerWithLeg : p);
+
+	const legsWon = winnerWithLeg.legsWon;
 
 	if (legsWon >= config.legsToWin) {
 		if (config.setsEnabled) {
-			const newSetsWon = winner.setsWon + 1;
-			const updatedPlayers = players.map((p, i) => ({
+			const newSetsWon = winnerWithLeg.setsWon + 1;
+			const updatedPlayers = playersWithLeg.map((p, i) => ({
 				...p,
 				legsWon: 0,
 				remaining: config.startScore,
@@ -311,7 +348,7 @@ function handleLegWinFromPlayers(
 			// No sets — match complete
 			return {
 				...state,
-				players,
+				players: playersWithLeg,
 				activePlayerIndex: playerIdx,
 				currentVisit: [],
 				phase: 'match-complete',
@@ -322,11 +359,11 @@ function handleLegWinFromPlayers(
 
 	// Leg won but not match: advance to next leg
 	// Total legs completed = sum of all legsWon
-	const totalLegsCompleted = players.reduce((sum, p) => sum + p.legsWon, 0);
+	const totalLegsCompleted = playersWithLeg.reduce((sum, p) => sum + p.legsWon, 0);
 	const nextLegStarter = legStarterIndex(totalLegsCompleted, numPlayers);
 
 	// Reset all players' remaining for the new leg
-	const resetPlayers = players.map(p => ({ ...p, remaining: config.startScore }));
+	const resetPlayers = playersWithLeg.map(p => ({ ...p, remaining: config.startScore }));
 
 	// Record each player's visits.length as the start index of the new leg
 	const newLegStartVisitIndex: Record<string, number> = {};

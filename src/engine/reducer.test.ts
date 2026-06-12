@@ -555,6 +555,171 @@ describe('legStartVisitIndex', () => {
 	});
 });
 
+// ── Phase 4: legCompleted accumulator and wasCheckout flag ────────────────
+
+describe('legCompleted accumulator (Phase 4 — STAT-01)', () => {
+	it('legCompleted is undefined (or empty) before any leg is closed', () => {
+		let s = startMatch(cfg({ startScore: 40, legsToWin: 2 }), [playerA], ['a']);
+		const player = s.players[0];
+		expect(player.legCompleted ?? []).toHaveLength(0);
+	});
+
+	it('legCompleted grows by 1 entry after a leg closes (DART_THROWN path)', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = throwDart(s, 2, 20); // D20=40 → leg win; match not complete yet (legsToWin=2)
+		expect(s.players[0].legCompleted).toHaveLength(1);
+	});
+
+	it('legCompleted entry has correct dartsThrown and scored after board-entry leg win', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		// 1 visit of 1 dart (D20=40) → dartsThrown=1, scored=40
+		s = throwDart(s, 2, 20);
+		const entry = s.players[0].legCompleted![0];
+		expect(entry.dartsThrown).toBe(1);
+		expect(entry.scored).toBe(40);
+	});
+
+	it('legCompleted entry has correct dartsThrown and scored after numpad leg win', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		// Numpad visit scoring 20, then finish with numpad 20 → dartsThrown=3+3=6, scored=40
+		s = numpadVisit(s, 20);
+		s = numpadVisit(s, 20, 3, 1);
+		const entry = s.players[0].legCompleted![0];
+		expect(entry.dartsThrown).toBe(6);
+		expect(entry.scored).toBe(40);
+	});
+
+	it('legCompleted accumulates 2 entries after 2 legs close', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 3 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = throwDart(s, 2, 20); // leg 1 win
+		s = throwDart(s, 2, 20); // leg 2 win
+		expect(s.players[0].legCompleted).toHaveLength(2);
+	});
+
+	it('legCompleted also populated on match-complete (no-sets branch)', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 1 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = throwDart(s, 2, 20); // D20=40 → match complete
+		expect(s.phase).toBe('match-complete');
+		expect(s.players[0].legCompleted).toHaveLength(1);
+	});
+
+	it('UNDO of a leg-closing dart reduces legCompleted length back to 0', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = throwDart(s, 2, 20); // leg win — legCompleted.length===1
+		expect(s.players[0].legCompleted).toHaveLength(1);
+		s = reduce(s, { type: 'UNDO' }); // undo the leg win
+		expect(s.players[0].legCompleted ?? []).toHaveLength(0);
+	});
+
+	it('bust visits count their actual dart count; numpad visits count as 3', () => {
+		// Start score 121: T20(60) → remaining 61, T20(60) → 1 → BUST at dart 2 (2 darts stored)
+		// Then a numpad finish of 121 (3 darts) → leg win
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 121, legsToWin: 2 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = throwDart(s, 3, 20); // 60 → remaining 61
+		s = throwDart(s, 3, 20); // 60 → 1 → BUST (visit stored with 2 darts)
+		// remaining stays 121. Now finish: numpad 121
+		s = numpadVisit(s, 121, 3, 1); // counts as 3 darts (numpad, darts:[])
+		const entry = s.players[0].legCompleted![0];
+		// bust visit: 2 darts stored → counts as 2; numpad visit: darts.length===0 → counts as 3
+		expect(entry.dartsThrown).toBe(5);
+		expect(entry.scored).toBe(121);
+	});
+});
+
+describe('wasCheckout flag (Phase 4 — STAT-03)', () => {
+	it('wasCheckout is true on the leg-winning visit for double-out (DART_THROWN)', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2, outRule: 'double' }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = throwDart(s, 2, 20); // D20=40 → leg win
+		// The winning visit was stored in the old (pre-reset) player's visits
+		// After leg close, legStartVisitIndex advances — so visit is at index 0
+		const winVisit = s.players[0].visits[0];
+		expect(winVisit.wasCheckout).toBe(true);
+	});
+
+	it('wasCheckout is true on the leg-winning numpad visit for double-out', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2, outRule: 'double' }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = numpadVisit(s, 40, 2, 1); // finish — leg win
+		const winVisit = s.players[0].visits[0];
+		expect(winVisit.wasCheckout).toBe(true);
+	});
+
+	it('wasCheckout is NOT true for single-out leg win (DART_THROWN)', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 20, outRule: 'single', legsToWin: 2 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = throwDart(s, 1, 20); // single 20 → leg win (single-out)
+		const winVisit = s.players[0].visits[0];
+		expect(winVisit.wasCheckout).toBeFalsy();
+	});
+
+	it('wasCheckout is NOT true for single-out numpad visit', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, outRule: 'single', legsToWin: 2 }),
+			players: [playerA],
+			order: ['a'],
+		});
+		s = numpadVisit(s, 40, 3, 0); // single-out finish
+		const winVisit = s.players[0].visits[0];
+		expect(winVisit.wasCheckout).toBeFalsy();
+	});
+
+	it('non-winning visits do not have wasCheckout set to true', () => {
+		let s = startMatch();
+		s = numpadVisit(s, 140); // normal visit, not a leg win
+		const lastVisit = s.players[0].visits[0];
+		expect(lastVisit.wasCheckout).toBeFalsy();
+	});
+});
+
 // ── ENG-05 / CR-07 / WR-01: Event-log reset and CONFIRM_VISIT no-op ────────
 
 describe('ENG-05: Event-log per-match semantics (CR-07, WR-01)', () => {

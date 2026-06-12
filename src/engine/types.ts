@@ -13,6 +13,8 @@ export interface Visit {
 	darts: DartScore[];
 	dartsAtDouble: number;
 	bust: boolean;
+	/** Phase 4: true when this visit closes a leg under double-out. Optional — absent on historical blobs. */
+	wasCheckout?: boolean;
 }
 
 export interface PlayerState {
@@ -23,6 +25,8 @@ export interface PlayerState {
 	legsWon: number;
 	setsWon: number;
 	visits: Visit[];
+	/** Phase 4: Completed-leg accumulator for cross-leg average. Populated by reducer at leg close. Absent on historical blobs — treat as []. */
+	legCompleted?: Array<{ dartsThrown: number; scored: number }>;
 }
 
 export interface MatchConfig {

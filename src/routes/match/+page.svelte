@@ -6,6 +6,9 @@
 	import { matchStore } from '../../stores/match.svelte.js';
 	import { reduce } from '../../engine/reducer.js';
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
+	import { loadAudioPrefs } from '../../lib/audio-prefs.js';
+	import { initVoices, announceVisit } from '../../lib/audio-caller.js';
+	import { getSuggestion } from '../../engine/checkout.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
 	import VisitStrip from '../../ui/input/VisitStrip.svelte';
 	import Dartboard from '../../ui/input/Dartboard.svelte';
@@ -18,6 +21,9 @@
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
 
+	// ── Audio prefs (AUD-03) — read once at match start; localStorage is sync ──
+	const audioPrefs = loadAudioPrefs();
+
 	// ── Record detection preload (ACHV-01 / D-09) ─────────────────────────────
 	// Load lifetime stats for profile players once at match start so #detectRecords
 	// has a comparison baseline. Guard: only load when players are present.
@@ -25,6 +31,9 @@
 		if (matchStore.state.players.length > 0) {
 			matchStore.loadRecords(matchStore.state);
 		}
+		// AUD-01: warm the voice list so the first announcement has a voice ready.
+		// Called inside onMount (not module level) to ensure browser context exists.
+		initVoices();
 	});
 
 	// ── Wake lock (INP-05) ─────────────────────────────────────────────────
@@ -94,6 +103,17 @@
 					isBust: lastVisit.bust,
 					total
 				};
+				// AUD-01: announce the visit score via the caller (D-03).
+				// Only non-bust visits are announced (callers don't announce busts).
+				// Checkout hint: compute from the pre-visit remaining (player.remaining
+				// after reducer is post-visit; add total back to recover pre-visit value).
+				// A3: suggestion is captured here — post-dispatch remaining + visit total
+				// gives the score the player needed before this visit was thrown.
+				if (!lastVisit.bust) {
+					const preVisitRemaining = player.remaining + total;
+					const suggestion = getSuggestion(preVisitRemaining, state.config.outRule);
+					announceVisit(total, suggestion, audioPrefs.callerLang, audioPrefs.callerEnabled);
+				}
 				return;
 			}
 		}

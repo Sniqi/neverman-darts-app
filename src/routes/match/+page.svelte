@@ -6,10 +6,6 @@
 	import { matchStore } from '../../stores/match.svelte.js';
 	import { reduce } from '../../engine/reducer.js';
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
-	import { loadAudioPrefs } from '../../lib/audio-prefs.js';
-	import { initVoices, announceVisit } from '../../lib/audio-caller.js';
-	import { playSfx } from '../../lib/audio-sfx.js';
-	import { getSuggestion } from '../../engine/checkout.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
 	import VisitStrip from '../../ui/input/VisitStrip.svelte';
 	import Dartboard from '../../ui/input/Dartboard.svelte';
@@ -23,9 +19,6 @@
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
 
-	// ── Audio prefs (AUD-03) — read once at match start; localStorage is sync ──
-	const audioPrefs = loadAudioPrefs();
-
 	// ── Record detection preload (ACHV-01 / D-09) ─────────────────────────────
 	// Load lifetime stats for profile players once at match start so #detectRecords
 	// has a comparison baseline. Guard: only load when players are present.
@@ -33,9 +26,6 @@
 		if (matchStore.state.players.length > 0) {
 			matchStore.loadRecords(matchStore.state);
 		}
-		// AUD-01: warm the voice list so the first announcement has a voice ready.
-		// Called inside onMount (not module level) to ensure browser context exists.
-		initVoices();
 	});
 
 	// ── Wake lock (INP-05) ─────────────────────────────────────────────────
@@ -66,81 +56,6 @@
 			matchStore.decrementPause();
 		}, 1000);
 		return () => clearInterval(id);
-	});
-
-	// ── SFX trigger (AUD-02 / D-05) ──────────────────────────────────────────
-	// Fires in sync with the Phase 4 RecordOverlay (same pendingRecords signal).
-	// 180 SFX takes priority; else any other record type fires 'record' sound.
-	// High-finish SFX (checkout ≥ 100) also covered here via highest-checkout record
-	// when it IS a personal best. Non-record high finishes are caught below (A4).
-	// Pitfall 6: playSfx is called here only — never in /display.
-	$effect(() => {
-		const records = matchStore.pendingRecords;
-		if (records.length === 0) return;
-
-		const has180 = records.some(r => r.type === '180');
-		if (has180) {
-			playSfx('180', audioPrefs.sfxEnabled);
-		} else {
-			playSfx('record', audioPrefs.sfxEnabled);
-		}
-
-		// Also fire highfinish for a highest-checkout record with value ≥ 100 (A4).
-		const hasHighFinish = records.some(r => r.type === 'highest-checkout' && (r.value ?? 0) >= 100);
-		if (hasHighFinish) {
-			playSfx('highfinish', audioPrefs.sfxEnabled);
-		}
-	});
-
-	// ── High-finish SFX for checkouts ≥ 100 that are NOT new personal records ─
-	// pendingRecords only contains highest-checkout when it is a new personal best.
-	// A checkout of e.g. 120 that is not a personal best would be missed above.
-	// Trigger: watch each player's legCompleted length; when it increases, inspect
-	// the checkout visit of that leg. Source: /match visit-detection pattern (A4).
-	let lastLegCounts = $state<Record<string, number>>({});
-	// Tracks the visit count per player at the time their last leg ended.
-	// Used to slice player.visits to only the just-completed leg's visits,
-	// preventing replay of prior-leg high-finishes on subsequent leg completions (CR-01).
-	let lastLegEndVisitCounts = $state<Record<string, number>>({});
-
-	$effect(() => {
-		const state = matchStore.state;
-		if (state.phase !== 'playing') return;
-
-		for (const player of state.players) {
-			const prevLegCount = lastLegCounts[player.id] ?? 0;
-			const nextLegCount = player.legCompleted?.length ?? 0;
-			if (nextLegCount > prevLegCount) {
-				// Capture the visit index where this leg started (before updating tracking state).
-				const legStartVisitIdx = lastLegEndVisitCounts[player.id] ?? 0;
-
-				// Advance both tracking maps for this player.
-				lastLegCounts = { ...lastLegCounts, [player.id]: nextLegCount };
-				lastLegEndVisitCounts = { ...lastLegEndVisitCounts, [player.id]: player.visits.length };
-
-				// Find the checkout visit in the just-closed leg.
-				// Only fire if pendingRecords does NOT already include a highest-checkout
-				// for this player (avoid doubling up when it IS also a record).
-				const alreadyCovered = matchStore.pendingRecords.some(
-					r => r.type === 'highest-checkout' && r.playerId === player.id && (r.value ?? 0) >= 100
-				);
-				if (alreadyCovered) continue;
-
-				// Inspect only visits added since the previous leg ended (CR-01 fix).
-				const legVisits = player.visits.slice(legStartVisitIdx);
-				for (const v of legVisits) {
-					if (v.wasCheckout === true) {
-						const score = v.darts.length > 0
-							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
-							: null; // numpad checkout score not directly available here
-						if (score !== null && score >= 100) {
-							playSfx('highfinish', audioPrefs.sfxEnabled);
-						}
-					}
-				}
-				return;
-			}
-		}
 	});
 
 	// ── Numpad toggle: remembers last-used mode per player (D-07) ──────────
@@ -192,17 +107,6 @@
 					isBust: lastVisit.bust,
 					total
 				};
-				// AUD-01: announce the visit score via the caller (D-03).
-				// Only non-bust visits are announced (callers don't announce busts).
-				// Checkout hint: compute from the pre-visit remaining (player.remaining
-				// after reducer is post-visit; add total back to recover pre-visit value).
-				// A3: suggestion is captured here — post-dispatch remaining + visit total
-				// gives the score the player needed before this visit was thrown.
-				if (!lastVisit.bust) {
-					const preVisitRemaining = player.remaining + total;
-					const suggestion = getSuggestion(preVisitRemaining, state.config.outRule);
-					announceVisit(total, suggestion, audioPrefs.callerLang, audioPrefs.callerEnabled);
-				}
 				return;
 			}
 		}

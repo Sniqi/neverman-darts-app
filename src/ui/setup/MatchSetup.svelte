@@ -85,6 +85,7 @@
 	let pauseEnabled = $state(audioPrefs.pauseEnabled);
 	let pauseLegs = $state(audioPrefs.pauseLegs);
 	let pauseMinutes = $state(audioPrefs.pauseMinutes);
+	let audioVolume = $state(audioPrefs.audioVolume);
 
 	function adjustPauseLegs(delta: number) {
 		const next = pauseLegs + delta;
@@ -239,6 +240,23 @@
 				bind:checked={sfxEnabled}
 				onchange={() => saveAudioPref('sfxEnabled', sfxEnabled)}
 			/>
+		</div>
+
+		<!-- Volume slider (UAT) -->
+		<div class="stepper-row">
+			<label class="stepper-label" for="volume-slider">Lautstärke</label>
+			<input
+				id="volume-slider"
+				type="range"
+				min="0"
+				max="1"
+				step="0.05"
+				bind:value={audioVolume}
+				oninput={() => saveAudioPref('audioVolume', audioVolume)}
+				aria-label="Lautstärke"
+				class="volume-slider"
+			/>
+			<span class="stepper-unit">{Math.round(audioVolume * 100)}%</span>
 		</div>
 
 		<!-- Auto-pause toggle -->
@@ -487,6 +505,15 @@
 		color: #888;
 		margin: 0;
 		text-align: center;
+	}
+
+	/* Volume slider (UAT) */
+	.volume-slider {
+		flex: 1;
+		height: 44px;
+		accent-color: #e8a020;
+		cursor: pointer;
+		min-width: 0;
 	}
 
 	/* Profile manager toggle */

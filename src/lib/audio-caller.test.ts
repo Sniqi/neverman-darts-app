@@ -9,12 +9,13 @@ import { initVoices, announceVisit } from './audio-caller.js';
 
 // ── SpeechSynthesisUtterance stub ─────────────────────────────────────────────
 // Captures the constructor arg and property assignments so tests can assert
-// what text/lang/voice was set.
+// what text/lang/voice/volume was set.
 class MockUtterance {
 	text: string;
 	lang: string = '';
 	voice: SpeechSynthesisVoice | null = null;
 	rate: number = 1;
+	volume: number = 1;
 	onerror: (() => void) | null = null;
 
 	constructor(text: string) {
@@ -75,23 +76,48 @@ describe('audio-caller', () => {
 			expect(mockSpeak).toHaveBeenCalledOnce();
 		});
 
-		it('utterance text contains the score when no suggestion', () => {
+		it('utterance text contains the score when no checkoutNumber', () => {
 			announceVisit(140, null, 'de', true);
 			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
 			expect(utterance.text).toContain('140');
 		});
 
-		it('utterance text contains score AND checkout hint when suggestion provided', () => {
-			announceVisit(121, ['T20', 'T11', 'D14'], 'de', true);
+		it('utterance text contains score AND remaining number when checkoutNumber provided', () => {
+			announceVisit(60, 121, 'de', true);
 			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
-			expect(utterance.text).toContain('121');
+			expect(utterance.text).toContain('60');
 			expect(utterance.text).toContain('du brauchst');
-			expect(utterance.text).toContain('T20');
+			expect(utterance.text).toContain('121');
+		});
+
+		it('utterance text does NOT contain dart notation (T20, D14 etc) — speaks number only', () => {
+			announceVisit(60, 121, 'de', true);
+			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
+			expect(utterance.text).not.toContain('T20');
+			expect(utterance.text).not.toContain('D14');
 		});
 
 		it('calls cancel before speak (clears queue)', () => {
 			announceVisit(100, null, 'de', true);
 			expect(mockCancel).toHaveBeenCalledBefore(mockSpeak);
+		});
+
+		it('applies volume to the utterance', () => {
+			announceVisit(140, null, 'de', true, 0.6);
+			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
+			expect(utterance.volume).toBe(0.6);
+		});
+
+		it('clamps volume above 1 to 1', () => {
+			announceVisit(140, null, 'de', true, 1.5);
+			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
+			expect(utterance.volume).toBe(1);
+		});
+
+		it('clamps volume below 0 to 0', () => {
+			announceVisit(140, null, 'de', true, -0.2);
+			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
+			expect(utterance.volume).toBe(0);
 		});
 	});
 
@@ -101,10 +127,11 @@ describe('audio-caller', () => {
 			initVoices();
 		});
 
-		it('utterance text contains "you need" for English with suggestion', () => {
-			announceVisit(100, ['T20', 'D20'], 'en', true);
+		it('utterance text contains "you need" and remaining number for English with checkoutNumber', () => {
+			announceVisit(100, 141, 'en', true);
 			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
 			expect(utterance.text).toContain('you need');
+			expect(utterance.text).toContain('141');
 		});
 	});
 
@@ -143,6 +170,33 @@ describe('audio-caller', () => {
 			vi.stubGlobal('speechSynthesis', undefined);
 
 			expect(() => announceVisit(60, null, 'de', true)).not.toThrow();
+		});
+	});
+
+	describe('announceVisit — checkout hint is remaining number, not dart route', () => {
+		beforeEach(() => {
+			mockGetVoices.mockReturnValue([makeVoice('de-DE', true)]);
+			initVoices();
+		});
+
+		it('DE: speaks the remaining number in the hint', () => {
+			announceVisit(81, 100, 'de', true);
+			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
+			expect(utterance.text).toBe('81 — du brauchst 100');
+		});
+
+		it('EN: speaks the remaining number in the hint', () => {
+			mockGetVoices.mockReturnValue([makeVoice('en-GB', false)]);
+			initVoices();
+			announceVisit(81, 100, 'en', true);
+			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
+			expect(utterance.text).toBe('81 — you need 100');
+		});
+
+		it('no hint when checkoutNumber is null', () => {
+			announceVisit(140, null, 'de', true);
+			const utterance = mockSpeak.mock.calls[0][0] as MockUtterance;
+			expect(utterance.text).toBe('140');
 		});
 	});
 });

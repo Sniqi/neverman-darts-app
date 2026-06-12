@@ -20,13 +20,13 @@ export type SfxEvent = keyof typeof SFX_PATHS;
  * Play an SFX file. Fire-and-forget — never throws.
  * Silently skips if sfxEnabled is false (D-06).
  * Ignores autoplay-policy rejections via .catch(() => {}) (T-05-04).
- * Volume is 0.8 per UI-SPEC.
+ * volume is clamped to [0, 1]; defaults to 0.8 (UI-SPEC) when not provided.
  */
-export function playSfx(event: SfxEvent, sfxEnabled: boolean): void {
+export function playSfx(event: SfxEvent, sfxEnabled: boolean, volume = 0.8): void {
 	if (!sfxEnabled) return;
 	try {
 		const audio = new Audio(SFX_PATHS[event]);
-		audio.volume = 0.8;
+		audio.volume = Math.min(1, Math.max(0, volume));
 		audio.play().catch(() => {}); // Ignore NotAllowedError (Chrome autoplay policy)
 	} catch {
 		// Audio constructor may throw in SSR or when Audio is unavailable — ignore

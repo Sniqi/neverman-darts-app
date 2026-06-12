@@ -10,6 +10,8 @@ export interface AudioPrefs {
 	pauseEnabled: boolean;
 	pauseLegs: number;
 	pauseMinutes: number;
+	/** Master volume for both caller voice and SFX. Range 0..1, default 0.5. */
+	audioVolume: number;
 }
 
 const DEFAULTS: AudioPrefs = {
@@ -19,6 +21,7 @@ const DEFAULTS: AudioPrefs = {
 	pauseEnabled: true,     // D-08: auto-pause ON by default
 	pauseLegs: 5,           // D-08: every 5 legs
 	pauseMinutes: 8,        // D-08: 8-minute countdown
+	audioVolume: 0.5,       // UAT: 50% default volume
 };
 
 const KEY_MAP: Record<keyof AudioPrefs, string> = {
@@ -28,6 +31,7 @@ const KEY_MAP: Record<keyof AudioPrefs, string> = {
 	pauseEnabled: 'nvm_pause_enabled',
 	pauseLegs: 'nvm_pause_legs',
 	pauseMinutes: 'nvm_pause_minutes',
+	audioVolume: 'nvm_audio_volume',
 };
 
 /**
@@ -38,6 +42,8 @@ const KEY_MAP: Record<keyof AudioPrefs, string> = {
 export function loadAudioPrefs(): AudioPrefs {
 	try {
 		const rawLang = localStorage.getItem(KEY_MAP.callerLang);
+		const rawVolume = parseFloat(localStorage.getItem(KEY_MAP.audioVolume) ?? '');
+		const audioVolume = isNaN(rawVolume) ? 0.5 : Math.min(1, Math.max(0, rawVolume));
 		return {
 			callerEnabled: localStorage.getItem(KEY_MAP.callerEnabled) === 'true',
 			callerLang: (rawLang === 'de' || rawLang === 'en') ? rawLang : 'de',
@@ -45,6 +51,7 @@ export function loadAudioPrefs(): AudioPrefs {
 			pauseEnabled: localStorage.getItem(KEY_MAP.pauseEnabled) !== 'false', // default true
 			pauseLegs: Number(localStorage.getItem(KEY_MAP.pauseLegs)) || 5,
 			pauseMinutes: Number(localStorage.getItem(KEY_MAP.pauseMinutes)) || 8,
+			audioVolume,
 		};
 	} catch {
 		return { ...DEFAULTS };

@@ -3,10 +3,15 @@
 	// Spectator display route shell.
 	// Connects displayStore on mount, branches on idle vs active match.
 	// Manages legWinMessage state via legsWon/setsWon delta watcher (D-09).
+	// UAT: Audio (caller + SFX) now lives here — /match is silent.
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { displayStore } from '../../stores/display.svelte.js';
 	import { BC_RECORD_CHANNEL } from '../../lib/sync-constants.js';
+	import { loadAudioPrefs, saveAudioPref } from '../../lib/audio-prefs.js';
+	import { initVoices, announceVisit } from '../../lib/audio-caller.js';
+	import { playSfx } from '../../lib/audio-sfx.js';
+	import { getSuggestion } from '../../engine/checkout.js';
 	import MatchHeader from '../../ui/display/MatchHeader.svelte';
 	import PlayerPanel from '../../ui/display/PlayerPanel.svelte';
 	import IdleScreen from '../../ui/display/IdleScreen.svelte';
@@ -18,6 +23,90 @@
 	// Connect the display store and subscribe to live updates.
 	// $effect returns the cleanup function which closes the BroadcastChannel.
 	$effect(() => displayStore.connect());
+
+	// ── Audio prefs (UAT) — mutable so storage-event updates reach active effects ──
+	let audioPrefs = $state(loadAudioPrefs());
+	// volume is the slider binding; initialised independently to avoid a Svelte
+	// "state_referenced_locally" warning from reading $state inside $state init.
+	let volume = $state(loadAudioPrefs().audioVolume);
+
+	// Init voices on mount; re-read prefs when Setup tab writes any nvm_* key.
+	$effect(() => {
+		initVoices();
+		function onStorage(e: StorageEvent) {
+			if (e.key?.startsWith('nvm_')) {
+				audioPrefs = loadAudioPrefs();
+				volume = audioPrefs.audioVolume;
+			}
+		}
+		window.addEventListener('storage', onStorage);
+		return () => window.removeEventListener('storage', onStorage);
+	});
+
+	// ── Caller: announce each new non-bust visit (UAT — audio from /display only) ──
+	// Mirrors the /match visit-detection $effect; reads from displayStore.state.
+	let lastVisitCountsDisplay = $state<Record<string, number>>({});
+
+	$effect(() => {
+		const state = displayStore.state;
+		if (!state || state.phase !== 'playing') return;
+
+		for (const player of state.players) {
+			const prevCount = lastVisitCountsDisplay[player.id] ?? 0;
+			if (player.visits.length > prevCount) {
+				const lastVisit = player.visits[player.visits.length - 1];
+				const total = lastVisit.darts.reduce((s, d) => s + d.multiplier * d.segment, 0);
+				lastVisitCountsDisplay = { ...lastVisitCountsDisplay, [player.id]: player.visits.length };
+
+				if (!lastVisit.bust) {
+					// post-visit remaining + total = pre-visit remaining
+					const preVisitRemaining = player.remaining + total;
+					const suggestion = getSuggestion(preVisitRemaining, state.config.outRule);
+					const checkoutNumber = suggestion !== null ? preVisitRemaining : null;
+					announceVisit(total, checkoutNumber, audioPrefs.callerLang, audioPrefs.callerEnabled, audioPrefs.audioVolume);
+				}
+				return;
+			}
+		}
+	});
+
+	// ── High-finish SFX for checkouts ≥ 100 that are NOT new personal records ─
+	// Record-based high-finishes are handled in the record-channel handler below.
+	// This catches non-record checkouts ≥ 100 by watching legCompleted length.
+	let lastLegCountsDisplay = $state<Record<string, number>>({});
+	let lastLegEndVisitCountsDisplay = $state<Record<string, number>>({});
+
+	$effect(() => {
+		const state = displayStore.state;
+		if (!state || state.phase !== 'playing') return;
+
+		for (const player of state.players) {
+			const prevLegCount = lastLegCountsDisplay[player.id] ?? 0;
+			const nextLegCount = player.legCompleted?.length ?? 0;
+			if (nextLegCount > prevLegCount) {
+				const legStartVisitIdx = lastLegEndVisitCountsDisplay[player.id] ?? 0;
+				lastLegCountsDisplay = { ...lastLegCountsDisplay, [player.id]: nextLegCount };
+				lastLegEndVisitCountsDisplay = { ...lastLegEndVisitCountsDisplay, [player.id]: player.visits.length };
+
+				// Only fire if the record-channel SFX handler won't already cover it
+				// (record-channel fires for highest-checkout records; this catches non-records).
+				// We cannot check pendingRecords here (different window), so we fire
+				// speculatively — the record handler deduplicates via seq on its own channel.
+				const legVisits = player.visits.slice(legStartVisitIdx);
+				for (const v of legVisits) {
+					if (v.wasCheckout === true) {
+						const score = v.darts.length > 0
+							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
+							: null;
+						if (score !== null && score >= 100) {
+							playSfx('highfinish', audioPrefs.sfxEnabled, audioPrefs.audioVolume);
+						}
+					}
+				}
+				return;
+			}
+		}
+	});
 
 	// ── Record channel subscription (ACHV-02 / Pitfall 5) ────────────────────
 	// Subscribes to BC_RECORD_CHANNEL independently of the match-state channel so
@@ -34,7 +123,13 @@
 		try {
 			ch = new BroadcastChannel(BC_RECORD_CHANNEL);
 			ch.addEventListener('message', (e: MessageEvent) => {
-				const data = e.data as { type: string; seq?: number; records: string[] };
+				const data = e.data as {
+					type: string;
+					seq?: number;
+					records: string[];
+					types?: string[];
+					values?: (number | null)[];
+				};
 				if (data?.type === 'record-event' && Array.isArray(data.records)) {
 					// Drop duplicate/stale sequences (seq is monotonic from the scorer).
 					if (typeof data.seq === 'number') {
@@ -46,6 +141,20 @@
 						recordStrings.length > 0
 							? [...recordStrings, ...data.records]
 							: data.records;
+
+					// UAT: play SFX from /display using the enriched types/values payload.
+					const types = data.types ?? [];
+					const values = data.values ?? [];
+					if (types.includes('180')) {
+						playSfx('180', audioPrefs.sfxEnabled, audioPrefs.audioVolume);
+					} else if (types.length > 0) {
+						playSfx('record', audioPrefs.sfxEnabled, audioPrefs.audioVolume);
+					}
+					// High-finish SFX for highest-checkout record with value ≥ 100.
+					const hcIdx = types.findIndex(t => t === 'highest-checkout');
+					if (hcIdx !== -1 && (values[hcIdx] ?? 0) >= 100) {
+						playSfx('highfinish', audioPrefs.sfxEnabled, audioPrefs.audioVolume);
+					}
 				}
 			});
 		} catch {
@@ -225,6 +334,25 @@
 
 <!-- Layer 3: fullscreen controls (z-index 30) — outside the conditional so always rendered -->
 
+<!-- UAT: Volume slider — subtle top-left control, touch-sized, accent #e8a020 -->
+<div class="volume-control" aria-label="Lautstärke">
+	<label class="volume-label" for="volume-slider">Lautstärke</label>
+	<input
+		id="volume-slider"
+		type="range"
+		min="0"
+		max="1"
+		step="0.05"
+		bind:value={volume}
+		oninput={() => {
+			audioPrefs = { ...audioPrefs, audioVolume: volume };
+			saveAudioPref('audioVolume', volume);
+		}}
+		aria-label="Lautstärke"
+	/>
+	<span class="volume-pct">{Math.round(volume * 100)}%</span>
+</div>
+
 <!-- PC fullscreen toggle (D-15): small icon button top-right, always visible on /display -->
 <button
 	class="fullscreen-toggle"
@@ -352,5 +480,41 @@
 
 	.exit-btn:active {
 		background: rgba(232, 160, 32, 0.1);
+	}
+
+	/* UAT: Volume slider — top-left, unobtrusive, touch-sized */
+	.volume-control {
+		position: fixed;
+		top: 8px;
+		left: 8px;
+		z-index: 30;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		background: rgba(30, 32, 39, 0.7);
+		border: 1px solid #444;
+		border-radius: 6px;
+		padding: 4px 10px;
+		min-height: 44px;
+	}
+
+	.volume-label {
+		font-size: 12px;
+		color: #aaa;
+		white-space: nowrap;
+	}
+
+	#volume-slider {
+		width: 80px;
+		height: 44px;
+		accent-color: #e8a020;
+		cursor: pointer;
+	}
+
+	.volume-pct {
+		font-size: 12px;
+		color: #e8a020;
+		min-width: 32px;
+		text-align: right;
 	}
 </style>

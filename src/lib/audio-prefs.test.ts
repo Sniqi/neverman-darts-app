@@ -30,6 +30,7 @@ describe('audio-prefs', () => {
 				pauseEnabled: true,
 				pauseLegs: 5,
 				pauseMinutes: 8,
+				audioVolume: 0.5,
 			});
 		});
 
@@ -74,6 +75,30 @@ describe('audio-prefs', () => {
 			expect(prefs.pauseLegs).toBe(3);
 			expect(prefs.pauseMinutes).toBe(10);
 		});
+
+		it('audioVolume defaults to 0.5 when key is absent', () => {
+			expect(loadAudioPrefs().audioVolume).toBe(0.5);
+		});
+
+		it('audioVolume reads back a saved value', () => {
+			saveAudioPref('audioVolume', 0.75);
+			expect(loadAudioPrefs().audioVolume).toBe(0.75);
+		});
+
+		it('audioVolume clamps values above 1 to 1', () => {
+			localStorage.setItem('nvm_audio_volume', '1.5');
+			expect(loadAudioPrefs().audioVolume).toBe(1);
+		});
+
+		it('audioVolume clamps values below 0 to 0', () => {
+			localStorage.setItem('nvm_audio_volume', '-0.2');
+			expect(loadAudioPrefs().audioVolume).toBe(0);
+		});
+
+		it('audioVolume falls back to 0.5 when key is non-numeric', () => {
+			localStorage.setItem('nvm_audio_volume', 'loud');
+			expect(loadAudioPrefs().audioVolume).toBe(0.5);
+		});
 	});
 
 	describe('saveAudioPref', () => {
@@ -110,6 +135,11 @@ describe('audio-prefs', () => {
 		it('writes nvm_pause_enabled = "false" for pauseEnabled=false', () => {
 			saveAudioPref('pauseEnabled', false);
 			expect(localStorage.getItem('nvm_pause_enabled')).toBe('false');
+		});
+
+		it('writes nvm_audio_volume = "0.75" for audioVolume=0.75', () => {
+			saveAudioPref('audioVolume', 0.75);
+			expect(localStorage.getItem('nvm_audio_volume')).toBe('0.75');
 		});
 	});
 });

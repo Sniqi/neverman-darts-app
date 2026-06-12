@@ -44,16 +44,19 @@ function findVoice(langPrefix: string): SpeechSynthesisVoice | null {
  * Announce a visit score via speech synthesis. Fire-and-forget — never throws.
  * Must be called from a user-gesture context (tap/click handler chain) — Pitfall 4.
  *
- * D-03: appends German checkout hint ("du brauchst …") when suggestion is non-null.
+ * D-03: appends checkout hint when checkoutNumber is non-null, speaking the remaining
+ * number (e.g. "141 — du brauchst 141") rather than the dart route (UAT change).
  * D-02: returns silently when speechSynthesis is unavailable or no matching voice.
  * D-06: returns immediately when callerEnabled=false.
- * T-05-01: utterance text is built from numeric score and getSuggestion() output only.
+ * T-05-01: utterance text is built from numeric score and remaining number only.
+ * volume is clamped to [0, 1].
  */
 export function announceVisit(
 	score: number,
-	suggestion: string[] | null,
+	checkoutNumber: number | null,
 	lang: 'de' | 'en',
-	callerEnabled: boolean
+	callerEnabled: boolean,
+	volume = 1.0
 ): void {
 	if (!callerEnabled) return;
 	if (typeof speechSynthesis === 'undefined') return;
@@ -64,12 +67,12 @@ export function announceVisit(
 	const langTag = lang === 'de' ? 'de-DE' : 'en-GB';
 	let text: string;
 	if (lang === 'de') {
-		text = suggestion
-			? `${score} — du brauchst ${suggestion.join(', ')}`
+		text = checkoutNumber !== null
+			? `${score} — du brauchst ${checkoutNumber}`
 			: `${score}`;
 	} else {
-		text = suggestion
-			? `${score} — you need ${suggestion.join(', ')}`
+		text = checkoutNumber !== null
+			? `${score} — you need ${checkoutNumber}`
 			: `${score}`;
 	}
 
@@ -79,6 +82,7 @@ export function announceVisit(
 		utterance.lang = langTag;
 		utterance.voice = voice;
 		utterance.rate = 1.1; // Slightly faster for caller feel
+		utterance.volume = Math.min(1, Math.max(0, volume));
 		utterance.onerror = () => {}; // Silence "interrupted" errors from cancel()
 		speechSynthesis.speak(utterance);
 	} catch {

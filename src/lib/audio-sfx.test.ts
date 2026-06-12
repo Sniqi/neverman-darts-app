@@ -58,9 +58,24 @@ describe('audio-sfx', () => {
 			expect(MockAudio).toHaveBeenCalledWith('/sfx/record.mp3');
 		});
 
-		it('sets volume to 0.8 on the Audio instance', () => {
+		it('sets volume to 0.8 (default) on the Audio instance', () => {
 			playSfx('180', true);
 			expect(lastAudioInstance?.volume).toBe(0.8);
+		});
+
+		it('applies a custom volume when provided', () => {
+			playSfx('180', true, 0.5);
+			expect(lastAudioInstance?.volume).toBe(0.5);
+		});
+
+		it('clamps volume above 1 to 1', () => {
+			playSfx('180', true, 1.5);
+			expect(lastAudioInstance?.volume).toBe(1);
+		});
+
+		it('clamps volume below 0 to 0', () => {
+			playSfx('180', true, -0.3);
+			expect(lastAudioInstance?.volume).toBe(0);
 		});
 
 		it('calls play() on the Audio instance', () => {

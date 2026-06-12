@@ -10,6 +10,7 @@
 	import Dartboard from '../../ui/input/Dartboard.svelte';
 	import Numpad from '../../ui/input/Numpad.svelte';
 	import CorrectionWindow from '../../ui/input/CorrectionWindow.svelte';
+	import StatDrawer from '../../ui/input/StatDrawer.svelte';
 	import DartsAtDoubleDialog from '../../ui/input/DartsAtDoubleDialog.svelte';
 	import MatchWinOverlay from '../../ui/overlays/MatchWinOverlay.svelte';
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
@@ -152,6 +153,7 @@
 	<!-- Score panel + visit strip + undo -->
 	<div class="panel-area">
 		<ScorePanel />
+		<StatDrawer />
 
 		<!-- Correction window overlays the panel area (not the board) -->
 		<div class="panel-relative">

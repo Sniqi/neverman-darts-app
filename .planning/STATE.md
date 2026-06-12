@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3 UI-SPEC approved
-last_updated: "2026-06-12T01:29:43.468Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-06-12T01:41:00.508Z"
 last_activity: 2026-06-12 -- Phase 3 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 22
-  completed_plans: 20
+  completed_plans: 21
   percent: 33
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 3 (persistence-data) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-12 -- Phase 3 execution started
 
@@ -70,6 +70,7 @@ Progress: [█████████░] 89%
 | Phase 02-spectator-display P03 | 8min | 2 tasks | 7 files |
 | Phase 02-spectator-display P05 | 5min | 4 tasks | 5 files |
 | Phase 03-persistence-data P01 | 7min | 3 tasks | 11 files |
+| Phase 03-persistence-data P02 | 7min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 02-01]: legStartVisitIndex added to MatchState
 - [Phase ?]: [Phase 02-01]: DisplayStore uses vi.stubGlobal mocks for BroadcastChannel/localStorage in node env; connect() returns cleanup fn for Svelte $effect teardown
 - [Phase ?]: WR-02 option (a): drop noopener features string from window.open, null win.opener manually — preserves popup-block detection and reverse-tabnabbing guard (T-02-06)
+- [Phase ?]: Winner in persistCompletedMatch derived from state.players[state.activePlayerIndex] — reducer leaves activePlayerIndex pointing at winner on match-complete
 
 ### Pending Todos
 
@@ -122,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-12T01:29:43.461Z
-Stopped at: Phase 3 UI-SPEC approved
-Resume file: .planning/phases/03-persistence-data/03-UI-SPEC.md
+Last session: 2026-06-12T01:41:00.501Z
+Stopped at: Completed 03-02-PLAN.md
+Resume file: None

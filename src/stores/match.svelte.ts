@@ -16,10 +16,7 @@ import { reduce, initialState } from '../engine/reducer.js';
 import { getSuggestion } from '../engine/checkout.js';
 import type { MatchAction, MatchState, PlayerState } from '../engine/types.js';
 import { db } from '../db/db.js';
-
-// Sync protocol constants — MUST match display.svelte.ts and 02-UI-SPEC.md Sync Protocol table
-const BC_CHANNEL = 'neverman-match';
-const LS_SNAPSHOT = 'neverman-match-snapshot';
+import { BC_CHANNEL, LS_SNAPSHOT } from '../lib/sync-constants.js';
 
 export class MatchStore {
 	state = $state<MatchState>(initialState());

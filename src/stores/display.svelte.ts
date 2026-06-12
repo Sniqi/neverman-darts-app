@@ -8,11 +8,11 @@
 // cross-origin injection possible (T-02-01, T-02-02).
 
 import type { MatchState } from '../engine/types.js';
+import { BC_CHANNEL, LS_SNAPSHOT } from '../lib/sync-constants.js';
 
-// These strings MUST match the publisher constants in match.svelte.ts (Plan 02)
-// and the Sync Protocol table in 02-UI-SPEC.md.
-const CHANNEL_NAME = 'neverman-match';
-const SNAPSHOT_KEY = 'neverman-match-snapshot';
+// Aliases for backward-compat with the names used throughout this file
+const CHANNEL_NAME = BC_CHANNEL;
+const SNAPSHOT_KEY = LS_SNAPSHOT;
 
 export class DisplayStore {
 	state = $state<MatchState | null>(null);

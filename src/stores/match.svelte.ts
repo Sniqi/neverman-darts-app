@@ -163,9 +163,19 @@ export class MatchStore {
 							0,
 						);
 					} else if (prevPlayer) {
-						visitScore = nextLegCount > prevLegCount
-							? prevPlayer.remaining
-							: prevPlayer.remaining - nextPlayer.remaining;
+						if (nextLegCount > prevLegCount) {
+							// Leg closed by this numpad visit: cleared amount = prev remaining.
+							visitScore = prevPlayer.remaining;
+						} else {
+							// In-leg numpad visit: score = remaining delta. This assumes the
+							// reducer never resets `remaining` on a non-leg-closing numpad
+							// dispatch (true today). WR-03: guard defensively — if a future
+							// bust-on-numpad path ever reset remaining without incrementing the
+							// leg count, the delta would go negative; degrade that to "no
+							// record" rather than firing a bogus celebration.
+							const delta = prevPlayer.remaining - nextPlayer.remaining;
+							visitScore = delta >= 0 ? delta : null;
+						}
 					}
 
 					if (visitScore !== null) {

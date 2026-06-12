@@ -294,16 +294,17 @@ function handleLegWinFromPlayers(
 	const config = state.config;
 	const numPlayers = players.length;
 
-	// Phase 4: capture this leg's stats for the winner before remaining is reset.
-	// winner.remaining is already 0 (set by the call site), so scored = startScore - 0 = startScore.
-	const legStart = state.legStartVisitIndex[winner.id] ?? 0;
-	const legEntry = captureLegStats(winner, legStart, config.startScore);
-	const winnerWithLeg: PlayerState = {
-		...winner,
-		legCompleted: [...(winner.legCompleted ?? []), legEntry],
-	};
-	// Replace winner in the players array with legCompleted updated
-	const playersWithLeg = players.map((p, i) => i === playerIdx ? winnerWithLeg : p);
+	// Phase 4 (CR-01): capture this leg's stats for EVERY player before remaining is reset.
+	// The winner's remaining is already 0 (set by the call site) → scored = startScore.
+	// Each loser's remaining still holds their start-of-visit value at leg close →
+	// scored = startScore - remaining correctly captures the leg they lost. Recording all
+	// players keeps lifetime averages/trends from silently dropping lost legs.
+	const playersWithLeg = players.map(p => {
+		const legStart = state.legStartVisitIndex[p.id] ?? 0;
+		const legEntry = captureLegStats(p, legStart, config.startScore);
+		return { ...p, legCompleted: [...(p.legCompleted ?? []), legEntry] };
+	});
+	const winnerWithLeg = playersWithLeg[playerIdx];
 
 	const legsWon = winnerWithLeg.legsWon;
 

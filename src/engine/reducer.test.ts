@@ -628,6 +628,44 @@ describe('legCompleted accumulator (Phase 4 — STAT-01)', () => {
 		expect(s.players[0].legCompleted).toHaveLength(1);
 	});
 
+	it('records a legCompleted entry for losing players too (CR-01)', () => {
+		// 2 players, legsToWin=2 so first leg win does not end the match.
+		// Player A scores 20 then finishes 20 (D10); player B scores 60 then loses.
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		});
+		s = numpadVisit(s, 20); // player A: remaining 20
+		s = numpadVisit(s, 30); // player B: remaining 10
+		s = throwDart(s, 2, 10); // player A finishes (D10=20) → leg win
+		const loser = s.players.find(p => p.id === 'b')!;
+		// Loser must have a legCompleted entry for the lost leg.
+		expect(loser.legCompleted).toHaveLength(1);
+		// Loser scored 30 over 1 numpad visit (counts as 3 darts).
+		expect(loser.legCompleted![0].scored).toBe(30);
+		expect(loser.legCompleted![0].dartsThrown).toBe(3);
+	});
+
+	it('UNDO replay rebuilds legCompleted for ALL players (CR-01)', () => {
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2 }),
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		});
+		s = numpadVisit(s, 20); // player A
+		s = numpadVisit(s, 30); // player B
+		s = throwDart(s, 2, 10); // player A wins leg → both get legCompleted
+		expect(s.players.find(p => p.id === 'a')!.legCompleted).toHaveLength(1);
+		expect(s.players.find(p => p.id === 'b')!.legCompleted).toHaveLength(1);
+		// Undo the winning dart — legCompleted should revert to 0 for both players.
+		s = reduce(s, { type: 'UNDO' });
+		expect(s.players.find(p => p.id === 'a')!.legCompleted ?? []).toHaveLength(0);
+		expect(s.players.find(p => p.id === 'b')!.legCompleted ?? []).toHaveLength(0);
+	});
+
 	it('UNDO of a leg-closing dart reduces legCompleted length back to 0', () => {
 		let s = reduce(initialState(), {
 			type: 'START_MATCH',

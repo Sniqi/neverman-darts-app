@@ -254,6 +254,30 @@ describe('computeLifetimeStats', () => {
 		expect(stats.averageTrend[1]).toBeCloseTo((501 / 6) * 3, 1);
 	});
 
+	it('a losing profile contributes its darts to averageTrend and matchAverage (CR-01)', () => {
+		// Since the reducer now records legCompleted for losers too, a losing profile's
+		// legs must show up in averageTrend / matchAverage rather than being dropped.
+		// Loser (bob) lost the leg with 18 darts scoring 360.
+		const state = makeMatchState('alice', 'bob', {
+			p1LegCompleted: [{ dartsThrown: 9, scored: 501 }],
+			p2LegCompleted: [{ dartsThrown: 18, scored: 360 }],
+			p2Remaining: 141,
+		});
+		const r = makeRecord(state, 'alice') as MatchRecord;
+		r.id = 1;
+
+		const statsBob = computeLifetimeStats([r], 'bob');
+		expect(statsBob.matchesPlayed).toBe(1);
+		expect(statsBob.wins).toBe(0);
+		// Loser's leg must contribute: averageTrend has one entry, matchAverage non-null.
+		expect(statsBob.averageTrend).toHaveLength(1);
+		expect(statsBob.averageTrend[0]).toBeCloseTo((360 / 18) * 3, 1);
+		expect(statsBob.matchAverage).toBeCloseTo((360 / 18) * 3, 1);
+		// And the lost leg shows up in best-leg / darts-per-leg buckets.
+		expect(statsBob.bestLeg).toBe(18);
+		expect(statsBob.dartsPerLegBuckets).toEqual([18]);
+	});
+
 	it('legacy blob without legCompleted does not throw', () => {
 		const state = makeMatchState('alice', 'bob');
 		// Manually remove legCompleted to simulate legacy blob

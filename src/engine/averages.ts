@@ -98,6 +98,19 @@ export function matchAverageCrossLeg(
 	const completed = player.legCompleted ?? [];
 	const prevDarts = completed.reduce((s, l) => s + l.dartsThrown, 0);
 	const prevScored = completed.reduce((s, l) => s + l.scored, 0);
+
+	// WR-06: when remaining === 0 the player has just closed a leg, and the reducer
+	// has already pushed that leg into legCompleted while leaving legStartVisitIndex
+	// pointing at the (now-completed) final leg's start. Adding the current-leg slice
+	// here would double-count that final leg (once from legCompleted, once from the
+	// slice with scored = startScore - 0 = startScore). Skip the current-leg
+	// contribution in that case. Mid-leg (remaining > 0) the current leg is NOT yet
+	// in legCompleted, so it must still be counted (live StatDrawer average).
+	if (player.remaining === 0) {
+		if (prevDarts === 0) return null;
+		return (prevScored / prevDarts) * 3;
+	}
+
 	const curVisits = player.visits.slice(currentLegStartIdx);
 	const curDarts = curVisits.reduce((s, v) => s + (v.darts.length > 0 ? v.darts.length : 3), 0);
 	const curScored = startScore - player.remaining;

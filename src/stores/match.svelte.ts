@@ -238,10 +238,13 @@ export class MatchStore {
 
 			// ── Match complete ───────────────────────────────────────────────
 			if (next.phase === 'match-complete' && prev.phase !== 'match-complete') {
-				const legStartIdx = next.legStartVisitIndex[nextPlayer.id] ?? 0;
+				// WR-06: on match-complete every player's final leg is already in
+				// legCompleted while legStartVisitIndex still points at the final leg
+				// start. Pass visits.length so the current-leg slice is empty and the
+				// final leg is not double-counted in the record-detection average.
 				const liveAvg = matchAverageCrossLeg(
 					nextPlayer,
-					legStartIdx,
+					nextPlayer.visits.length,
 					next.config.startScore,
 				);
 

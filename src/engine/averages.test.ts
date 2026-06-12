@@ -266,6 +266,23 @@ describe('matchAverageCrossLeg (Phase 4 — STAT-01)', () => {
 		expect(matchAverageCrossLeg(player, 0, 501)).toBe(60);
 	});
 
+	it('does not double-count the final leg on a completed match (winner, remaining=0) (WR-06)', () => {
+		// 2-leg completed match. Both legs are in legCompleted (reducer pushes the final
+		// leg at match close). The winner's remaining is 0 while legStartVisitIndex still
+		// points at the final leg's start (index 1 here). Calling with the real
+		// legStartVisitIndex must equal the legCompleted-only ratio — no double count.
+		const legCompleted = [
+			{ dartsThrown: 9, scored: 300 },
+			{ dartsThrown: 12, scored: 501 },
+		];
+		// visits: leg1 (index 0), leg2/final (index 1). Final-leg start index = 1.
+		const visits: Visit[] = [dartVisit([60, 60, 60]), dartVisit([60, 60, 60])];
+		const player = makePlayer(visits, 0, legCompleted); // remaining 0 = match closed
+		const expected = ((300 + 501) / (9 + 12)) * 3;
+		// Real legStartVisitIndex of the final leg (1) — would double-count without the fix.
+		expect(matchAverageCrossLeg(player, 1, 501)).toBeCloseTo(expected, 5);
+	});
+
 	it('uses currentLegStartIdx to slice only current-leg visits', () => {
 		// Prior leg had 2 visits at index 0,1; current leg starts at index 2
 		const legCompleted = [{ dartsThrown: 6, scored: 120 }];

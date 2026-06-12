@@ -35,10 +35,13 @@
 
 	// Per-player match averages using cross-leg accumulator (RESEARCH State of the Art).
 	// matchAverageCrossLeg correctly handles multi-leg matches where remaining resets.
+	// WR-06: on a completed match every player's final leg is already in legCompleted
+	// while legStartVisitIndex still points at the final leg's start. Pass
+	// visits.length so the current-leg slice is empty and the final leg is not
+	// double-counted (matters for losers whose remaining > 0).
 	let playerAverages = $derived(
 		state.players.map(pl => {
-			const legStartIdx = state.legStartVisitIndex[pl.id] ?? 0;
-			const val = matchAverageCrossLeg(pl, legStartIdx, state.config.startScore);
+			const val = matchAverageCrossLeg(pl, pl.visits.length, state.config.startScore);
 			return val !== null ? val.toFixed(1) : '—';
 		})
 	);

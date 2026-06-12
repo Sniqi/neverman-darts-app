@@ -33,7 +33,10 @@
 	 * Uses matchAverageCrossLeg for correct cross-leg accumulation (Phase 4).
 	 */
 	const avgDisplay = $derived.by(() => {
-		const avg = matchAverageCrossLeg(player, legStartVisitIndex, config.startScore);
+		// WR-06: history rows render persisted (completed) matches where every leg —
+		// including the final one — is already in legCompleted. Pass visits.length so
+		// the current-leg slice is empty and the final leg is not double-counted.
+		const avg = matchAverageCrossLeg(player, player.visits.length, config.startScore);
 		return avg !== null ? avg.toFixed(1) : '—';
 	});
 </script>

@@ -15,6 +15,7 @@
 import { reduce, initialState } from '../engine/reducer.js';
 import { getSuggestion } from '../engine/checkout.js';
 import type { MatchAction, MatchState, PlayerState } from '../engine/types.js';
+import { db } from '../db/db.js';
 
 // Sync protocol constants — MUST match display.svelte.ts and 02-UI-SPEC.md Sync Protocol table
 const BC_CHANNEL = 'neverman-match';
@@ -40,6 +41,33 @@ export class MatchStore {
 			localStorage.setItem(LS_SNAPSHOT, JSON.stringify(this.state));
 		} catch {
 			// Silently ignore — localStorage may be unavailable in private mode or quota exceeded
+		}
+
+		// D-08: on match-complete, persist to history and clear the resume slot (fire-and-forget)
+		if (this.state.phase === 'match-complete') {
+			this.#persistCompletedMatch(this.state);
+		}
+	}
+
+	/**
+	 * Persist a completed match to IndexedDB and clear the resume slot.
+	 * Fire-and-forget — called without await inside dispatch().
+	 * Wrapped in try/catch: if DB is unavailable (private mode / quota) the match
+	 * was still played; history is best-effort (T-03-06).
+	 */
+	async #persistCompletedMatch(state: MatchState): Promise<void> {
+		try {
+			// On match-complete the reducer leaves activePlayerIndex pointing at the winner.
+			const winner = state.players[state.activePlayerIndex];
+			await db.matches.add({
+				completedAt: Date.now(),
+				winnerId: winner.id,
+				state: $state.snapshot(state)
+			});
+			// Clear resume slot — completed match must not show a resume prompt (Pitfall 2)
+			localStorage.removeItem(LS_SNAPSHOT);
+		} catch {
+			// DB unavailable — match was played; history persistence is best-effort
 		}
 	}
 

@@ -3,8 +3,10 @@
 // Unit tests for MatchStore dispatch, activePlayer, remaining, suggestion getters.
 // Runs in the `unit` vitest project (includes src/**/*.test.ts, excludes src/ui/**).
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import 'fake-indexeddb/auto';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MatchStore } from './match.svelte.js';
+import { db } from '../db/db.js';
 import type { MatchConfig } from '../engine/types.js';
 
 const config501Double: MatchConfig = {
@@ -192,6 +194,73 @@ describe('MatchStore', () => {
 			// A subsequent UNDO should replay correctly (back to 501)
 			freshStore.dispatch({ type: 'UNDO' });
 			expect(freshStore.state.players[0].remaining).toBe(501);
+		});
+	});
+
+	describe('persist-on-complete (D-08 / STAT-06)', () => {
+		const config1Leg: MatchConfig = {
+			startScore: 501,
+			outRule: 'double',
+			legsToWin: 1,
+			setsEnabled: false,
+			setsToWin: 1,
+		};
+
+		beforeEach(async () => {
+			await db.matches.clear();
+			vi.stubGlobal('localStorage', {
+				_store: {} as Record<string, string>,
+				getItem(key: string) { return this._store[key] ?? null; },
+				setItem(key: string, val: string) { this._store[key] = val; },
+				removeItem(key: string) { delete this._store[key]; },
+			});
+		});
+
+		/**
+		 * Drive a single-leg 501 double-out match to completion.
+		 * Route: 180 + 180 + 100 + 32 → remaining 0 (checkout).
+		 * 501 - 180 = 321; 321 - 180 = 141; 141 - 100 = 41; 41 - 32 = 9... doesn't work.
+		 * Use: 501 - 180 - 180 - 101 = 40; then 40 checkout double-20.
+		 * 101 is a valid total (not in IMPOSSIBLE_3DART); 40 is valid.
+		 */
+		function driveToMatchComplete(s: MatchStore): void {
+			s.dispatch({
+				type: 'START_MATCH',
+				config: config1Leg,
+				players: [player1],
+				order: ['p1'],
+			});
+			// 501 - 180 = 321
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+			// 321 - 180 = 141
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+			// 141 - 101 = 40
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 101 });
+			// 40 → double-20 checkout (total: 40, dartsAtDouble: 1)
+			s.dispatch({ type: 'NUMPAD_VISIT', total: 40, dartsUsed: 1, dartsAtDouble: 1 });
+		}
+
+		it('completing a match writes a record to db.matches with the correct winnerId', async () => {
+			driveToMatchComplete(store);
+
+			expect(store.state.phase).toBe('match-complete');
+
+			// Fire-and-forget — wait a tick for the async persist
+			await new Promise((r) => setTimeout(r, 50));
+
+			const all = await db.matches.toArray();
+			expect(all).toHaveLength(1);
+			expect(all[0].winnerId).toBe('p1');
+		});
+
+		it('after match-complete, localStorage resume slot is removed (D-08)', async () => {
+			driveToMatchComplete(store);
+
+			expect(store.state.phase).toBe('match-complete');
+
+			await new Promise((r) => setTimeout(r, 50));
+
+			expect(localStorage.getItem('neverman-match-snapshot')).toBeNull();
 		});
 	});
 

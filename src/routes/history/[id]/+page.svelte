@@ -10,6 +10,7 @@
 	import { deleteMatch } from '../../../db/matches.js';
 	import ConfirmDialog from '../../../ui/dialogs/ConfirmDialog.svelte';
 	import PlayerStatRow from '../../../ui/history/PlayerStatRow.svelte';
+	import MatchStatBreakdown from '../../../ui/history/MatchStatBreakdown.svelte';
 
 	let { data }: { data: PageData } = $props();
 	const record = $derived(data.record);
@@ -103,13 +104,19 @@
 						isWinner={player.id === record.winnerId}
 						config={record.state.config}
 						{totalLegsPlayed}
+						legStartVisitIndex={record.state.legStartVisitIndex[player.id] ?? 0}
 					/>
 				{/each}
 			</div>
 		</section>
 
-		<!-- Phase 4 growth area — intentionally empty (no placeholder text per extension contract) -->
-		<div class="phase4-region" aria-hidden="true"></div>
+		<!-- Phase 4: per-player match stats breakdown -->
+		<MatchStatBreakdown
+			players={record.state.players}
+			config={record.state.config}
+			winnerId={record.winnerId}
+			legStartVisitIndex={record.state.legStartVisitIndex}
+		/>
 
 		<!-- Delete action -->
 		<div class="delete-section">
@@ -236,11 +243,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm, 8px);
-	}
-
-	/* Phase 4 growth area — empty whitespace, no text */
-	.phase4-region {
-		min-height: var(--space-xl, 32px);
 	}
 
 	/* Delete section */

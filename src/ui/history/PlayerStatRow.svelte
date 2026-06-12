@@ -4,7 +4,7 @@
 	// Shows: player name, legs/sets won, match average.
 	// Security T-03-05: all values via {interpolation} — no {@html}.
 
-	import { computeAverage } from '../../engine/averages.js';
+	import { matchAverageCrossLeg } from '../../engine/averages.js';
 	import type { PlayerState, MatchConfig } from '../../engine/types.js';
 
 	interface Props {
@@ -12,9 +12,10 @@
 		isWinner: boolean;
 		config: MatchConfig;
 		totalLegsPlayed: number;
+		legStartVisitIndex: number;
 	}
 
-	let { player, isWinner, config, totalLegsPlayed }: Props = $props();
+	let { player, isWinner, config, totalLegsPlayed, legStartVisitIndex }: Props = $props();
 
 	/** Legs or sets won label with correct German singular/plural. */
 	const winsLabel = $derived.by(() => {
@@ -28,14 +29,11 @@
 	});
 
 	/**
-	 * Match average formatted to one decimal, or "—" when unavailable.
-	 * For multi-leg matches, computeAverage only captures the last leg's scoring
-	 * (remaining resets to startScore at each leg start). Cross-leg accumulation
-	 * is deferred to Phase 4 — show "—" to avoid a misleadingly precise wrong number.
+	 * Match average formatted to one decimal, or "—" when no darts thrown.
+	 * Uses matchAverageCrossLeg for correct cross-leg accumulation (Phase 4).
 	 */
 	const avgDisplay = $derived.by(() => {
-		if (totalLegsPlayed > 1) return '—';
-		const avg = computeAverage(player.visits, config.startScore, player.remaining);
+		const avg = matchAverageCrossLeg(player, legStartVisitIndex, config.startScore);
 		return avg !== null ? avg.toFixed(1) : '—';
 	});
 </script>

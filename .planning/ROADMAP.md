@@ -179,7 +179,7 @@ Plans:
   3. Player can mute or independently configure the caller voice and sound effects
   4. After a configurable number of legs, a pause screen with a countdown timer appears on both views; the match continues automatically when the timer expires or when the player presses a button
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 **Mode:** mvp (vertical slices) · **UI hint**: yes
 
 **Wave 1**
@@ -188,7 +188,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 — shares match/+page.svelte; uses audio-prefs)*
 
-- [ ] 05-02-PLAN.md — SFX slice + settings UI (AUD-02/AUD-03): audio-sfx fire-and-forget + static/sfx assets, AudioSettings section in MatchSetup, SFX triggers (180/record/high-finish) in /match
+- [x] 05-02-PLAN.md — SFX slice + settings UI (AUD-02/AUD-03): audio-sfx fire-and-forget + static/sfx assets, AudioSettings section in MatchSetup, SFX triggers (180/record/high-finish) in /match
 
 **Wave 3** *(blocked on Wave 2 — shares match/+page.svelte; needs pause prefs)*
 
@@ -220,5 +220,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
 | 4. Statistics & Achievements | 5/5 | Complete    | 2026-06-12 |
-| 5. Audio & Auto-Pause | 1/3 | In Progress|  |
+| 5. Audio & Auto-Pause | 2/3 | In Progress|  |
 | 6. PWA & Deployment | 0/? | Not started | - |

@@ -149,7 +149,7 @@ Plans:
   4. Player can view a statistics dashboard with charts (score distribution, average trend, darts per leg, win rate)
   5. When a new personal record is set during play, an overlay/animation appears on both the input and spectator views and the record is permanently stored
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 **Mode:** mvp (vertical slices) · **UI hint**: yes
 
 **Wave 1**
@@ -160,7 +160,7 @@ Plans:
 
 - [x] 04-02-PLAN.md — Live in-match StatDrawer slice (D-01): StatCard + StatDrawer mounted on /match
 - [x] 04-03-PLAN.md — Lifetime stats + dashboard (STAT-07/08, D-09/D-10): db/stats.ts aggregation, SVG charts, ProfileStatDashboard, /stats route + Statistik start-screen entry
-- [ ] 04-04-PLAN.md — Match-detail breakdown: MatchStatBreakdown fills .phase4-region + PlayerStatRow cross-leg average
+- [x] 04-04-PLAN.md — Match-detail breakdown: MatchStatBreakdown fills .phase4-region + PlayerStatRow cross-leg average
 
 **Wave 3** *(blocked on Wave 2 — shares match route, needs computeLifetimeStats)*
 
@@ -206,6 +206,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
-| 4. Statistics & Achievements | 3/5 | In Progress|  |
+| 4. Statistics & Achievements | 4/5 | In Progress|  |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |
 | 6. PWA & Deployment | 0/? | Not started | - |

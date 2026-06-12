@@ -68,3 +68,16 @@ Three design decisions were revised during UAT (committed in feat(05) a42f851):
   The number is cleaner and unambiguous for all languages.
 - Applied to both DE and EN. announceVisit signature changed from
   suggestion:string[]|null to checkoutNumber:number|null.
+
+## Correction after gap 1 (audio location)
+
+**Observer/display windows cannot autoplay audio without a user gesture.**
+Chrome (and all modern browsers) block audio autoplay in passive windows — a /display
+window opened via `window.open()` has no user-gesture chain, so speechSynthesis.speak()
+and new Audio().play() are silently blocked. The "audio from /display" approach from
+gap 1 above does not work in practice.
+
+**Resolution:** Audio (caller + SFX) moved back to /match (the scoring window), which
+always has a user-gesture chain (the player taps darts). The volume slider is present
+in /match (in the undo-bar row) and in MatchSetup (Audio & Pause section). /display is
+restored to a pure passive subscriber with no audio code whatsoever.

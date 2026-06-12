@@ -6,6 +6,10 @@
 	import { matchStore } from '../../stores/match.svelte.js';
 	import { reduce } from '../../engine/reducer.js';
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
+	import { loadAudioPrefs, saveAudioPref } from '../../lib/audio-prefs.js';
+	import { initVoices, announceVisit } from '../../lib/audio-caller.js';
+	import { playSfx } from '../../lib/audio-sfx.js';
+	import { getSuggestion } from '../../engine/checkout.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
 	import VisitStrip from '../../ui/input/VisitStrip.svelte';
 	import Dartboard from '../../ui/input/Dartboard.svelte';
@@ -19,12 +23,80 @@
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
 
+	// ── Audio prefs — read once for stable booleans; volume is $state for live slider ──
+	const { callerEnabled, callerLang, sfxEnabled } = loadAudioPrefs();
+	let audioVolume = $state(loadAudioPrefs().audioVolume);
+
 	// ── Record detection preload (ACHV-01 / D-09) ─────────────────────────────
 	// Load lifetime stats for profile players once at match start so #detectRecords
 	// has a comparison baseline. Guard: only load when players are present.
 	onMount(() => {
 		if (matchStore.state.players.length > 0) {
 			matchStore.loadRecords(matchStore.state);
+		}
+		// AUD-01: warm the voice list so the first announcement has a voice ready.
+		initVoices();
+	});
+
+	// ── SFX: pendingRecords trigger (AUD-02) ──────────────────────────────────
+	// 180 SFX takes priority; any other record type fires 'record' sound.
+	// High-finish SFX for highest-checkout record with value ≥ 100 also fired here.
+	$effect(() => {
+		const records = matchStore.pendingRecords;
+		if (records.length === 0) return;
+
+		const has180 = records.some(r => r.type === '180');
+		if (has180) {
+			playSfx('180', sfxEnabled, audioVolume);
+		} else {
+			playSfx('record', sfxEnabled, audioVolume);
+		}
+
+		const hasHighFinish = records.some(r => r.type === 'highest-checkout' && (r.value ?? 0) >= 100);
+		if (hasHighFinish) {
+			playSfx('highfinish', sfxEnabled, audioVolume);
+		}
+	});
+
+	// ── High-finish SFX for checkouts ≥ 100 that are NOT new personal records ─
+	// pendingRecords only contains highest-checkout when it is a new personal best;
+	// non-record checkouts ≥ 100 are caught here by watching legCompleted length (A4).
+	let lastLegCounts = $state<Record<string, number>>({});
+	// Tracks visit count per player at the time their last leg ended (CR-01 fix).
+	let lastLegEndVisitCounts = $state<Record<string, number>>({});
+
+	$effect(() => {
+		const state = matchStore.state;
+		if (state.phase !== 'playing') return;
+
+		for (const player of state.players) {
+			const prevLegCount = lastLegCounts[player.id] ?? 0;
+			const nextLegCount = player.legCompleted?.length ?? 0;
+			if (nextLegCount > prevLegCount) {
+				const legStartVisitIdx = lastLegEndVisitCounts[player.id] ?? 0;
+				lastLegCounts = { ...lastLegCounts, [player.id]: nextLegCount };
+				lastLegEndVisitCounts = { ...lastLegEndVisitCounts, [player.id]: player.visits.length };
+
+				// Only fire if the record SFX handler above won't already cover it.
+				const alreadyCovered = matchStore.pendingRecords.some(
+					r => r.type === 'highest-checkout' && r.playerId === player.id && (r.value ?? 0) >= 100
+				);
+				if (alreadyCovered) continue;
+
+				// Inspect only visits from the just-completed leg (CR-01).
+				const legVisits = player.visits.slice(legStartVisitIdx);
+				for (const v of legVisits) {
+					if (v.wasCheckout === true) {
+						const score = v.darts.length > 0
+							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
+							: null;
+						if (score !== null && score >= 100) {
+							playSfx('highfinish', sfxEnabled, audioVolume);
+						}
+					}
+				}
+				return;
+			}
 		}
 	});
 
@@ -73,9 +145,9 @@
 		};
 	}
 
-	// ── Correction window state ────────────────────────────────────────────
-	// We track completed visits per-player (CR-04) so the window fires for every
-	// visit, not just the first of the match.
+	// ── Correction window + caller announcement (CR-04 / AUD-01) ────────────
+	// Tracks completed visits per-player so both the correction window and the
+	// caller announcement fire for every visit, not just the first of the match.
 
 	interface PendingCorrection {
 		darts: DartScore[];
@@ -84,10 +156,10 @@
 	}
 
 	let pendingCorrection = $state<PendingCorrection | null>(null);
-	// Per-player visit counts keyed by player.id (CR-04 fix: was a single cross-player number)
+	// Per-player visit counts keyed by player.id (CR-04 fix: was a single cross-player counter)
 	let lastVisitCounts = $state<Record<string, number>>({});
 
-	// Watch for completed visits: compare each player's visit count against the per-player record
+	// Watch for completed visits: open correction window and announce via caller.
 	$effect(() => {
 		const state = matchStore.state;
 		if (state.phase !== 'playing') return;
@@ -107,6 +179,15 @@
 					isBust: lastVisit.bust,
 					total
 				};
+
+				// AUD-01: announce non-bust visits. Caller fires here (same detection point)
+				// so visit count and caller stay in sync without a second $effect.
+				if (!lastVisit.bust) {
+					const preVisitRemaining = player.remaining + total;
+					const suggestion = getSuggestion(preVisitRemaining, state.config.outRule);
+					const checkoutNumber = suggestion !== null ? preVisitRemaining : null;
+					announceVisit(total, checkoutNumber, callerLang, callerEnabled, audioVolume);
+				}
 				return;
 			}
 		}
@@ -189,6 +270,20 @@
 				>
 					{inputMode === 'board' ? '🔢 Numpad' : '🎯 Board'}
 				</button>
+				<div class="volume-row" aria-label="Lautstärke">
+					<label class="volume-label" for="match-volume-slider">🔊</label>
+					<input
+						id="match-volume-slider"
+						type="range"
+						min="0"
+						max="1"
+						step="0.05"
+						bind:value={audioVolume}
+						oninput={() => saveAudioPref('audioVolume', audioVolume)}
+						aria-label="Lautstärke"
+						class="volume-slider"
+					/>
+				</div>
 				<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
 					Rückgängig
 				</button>
@@ -320,6 +415,29 @@
 
 	.undo-btn:active {
 		background: rgba(232, 160, 32, 0.1);
+	}
+
+	/* Volume row — compact slider between toggle and undo buttons */
+	.volume-row {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		flex: 1;
+		min-width: 0;
+		padding: 0 var(--space-sm, 8px);
+	}
+
+	.volume-label {
+		font-size: 14px;
+		flex-shrink: 0;
+	}
+
+	.volume-slider {
+		flex: 1;
+		min-width: 0;
+		height: 44px;
+		accent-color: #e8a020;
+		cursor: pointer;
 	}
 
 	/* Landscape layout (D-02): score panel left 38%, board right 62% */

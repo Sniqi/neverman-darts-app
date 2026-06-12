@@ -332,15 +332,11 @@ export class MatchStore {
 			// WR-05: include a monotonic sequence id so the display can append (not
 			// overwrite) rapid back-to-back record events and de-duplicate retransmits,
 			// rather than dropping a record when two events land within the dismiss window.
-			// UAT: include types and values so /display can pick the correct SFX without
-			// re-deriving record logic on that side.
 			this.#recordSeq += 1;
 			ch.postMessage({
 				type: 'record-event',
 				seq: this.#recordSeq,
 				records: items.map(i => i.text),
-				types: items.map(i => i.type),
-				values: items.map(i => i.value ?? null),
 			});
 			ch.close();
 		} catch {

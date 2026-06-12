@@ -1,7 +1,7 @@
 ---
 phase: 4
 slug: statistics-achievements
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-06-12
@@ -218,7 +218,7 @@ All strings are German. Sources: CONTEXT.md `<specifics>`, existing component pa
 | Stats screen title | "Statistik" |
 | Profile picker heading | "Profil auswählen" |
 | Per-profile stats heading | "{Profilname}" (player name as page title) |
-| Stat drawer toggle (closed) | "Statistik" |
+| Stat drawer toggle | "Statistik ▾" (closed) / "Statistik ▴" (open) — arrows are decorative; `aria-expanded` carries the semantic state |
 | Stat drawer section — leg | "Dieses Leg" |
 | Stat drawer section — match | "Dieses Match" |
 | Stat drawer label — 3-dart avg | "3-Dart Ø" |
@@ -250,7 +250,7 @@ All strings are German. Sources: CONTEXT.md `<specifics>`, existing component pa
 | **Empty state — stats screen (no profiles)** | Heading: "Noch keine Profile." Body: "Erstelle ein Profil beim nächsten Spiel." |
 | **Empty state — per-profile (no completed matches)** | Heading: "Noch keine Spiele." Body: "Spiele ein Match mit diesem Profil, um Statistiken zu sehen." |
 | **Empty state — chart (insufficient data)** | "Nicht genug Daten." (14px/400/`#888888`, centered in chart area) |
-| **Error state — stats load failure** | "Statistiken konnten nicht geladen werden." (14px/400/`#c0392b`, inline below affected section) |
+| **Error state — stats load failure** | "Statistiken konnten nicht geladen werden. Versuche die Seite neu zu laden." (14px/400/`#c0392b`, inline below affected section) |
 | Destructive actions in Phase 4 | None. Deleting a match (existing, from history/[id]) carries forward the existing ConfirmDialog with "Spiel löschen?" / "Löschen" (destructive) / "Abbrechen". No new destructive actions are introduced in Phase 4. |
 
 ---
@@ -298,11 +298,11 @@ No external component registries. No new npm packages introduced for UI. Charts 
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS (error-state recovery hint + drawer toggle label reconciled)
+- [x] Dimension 2 Visuals: PASS (focal points implied by layout hierarchy; non-blocking)
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved

@@ -120,7 +120,20 @@ Plans:
   2. Player can browse past matches in a match history list showing results and key stats
   3. Player can export all profiles, history, and stats as a JSON file and import that file on another device or after clearing browser data
 
-**Plans**: TBD
+**Plans:** 3 plans
+**Mode:** mvp (vertical slices) · **UI hint**: yes
+
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Start screen hub (D-07) + crash-resume slice (FLOW-03): loadUnfinishedMatch, MatchStore.restore, ResumePrompt, reusable ConfirmDialog, new-match warning (D-02), resume E2E
+
+**Wave 2** *(blocked on Wave 1 — shares match.svelte.ts)*
+
+- [ ] 03-02-PLAN.md — Match history slice (STAT-06): Dexie version(2) matches table, matches.ts CRUD + liveQuery, persist-on-complete (D-08), history list (D-04/D-06), detail view + single-match delete (D-05/D-09)
+
+**Wave 3** *(blocked on Wave 2 — needs matches table + ConfirmDialog)*
+
+- [ ] 03-03-PLAN.md — Export/import slice (PROF-03): dexie-export-import (legitimacy checkpoint), backup.ts export/validate/replace-all import (D-10/D-11), Daten/Backup screen with guarded confirmation (D-12) + storage warning
 
 ### Phase 4: Statistics & Achievements
 
@@ -178,7 +191,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Playable X01 Match | 13/13 | Complete    | 2026-06-11 |
 | 2. Spectator Display | 6/6 | Complete    | 2026-06-11 |
-| 3. Persistence & Data | 0/? | Not started | - |
+| 3. Persistence & Data | 0/3 | Planned | - |
 | 4. Statistics & Achievements | 0/? | Not started | - |
 | 5. Audio & Auto-Pause | 0/? | Not started | - |
 | 6. PWA & Deployment | 0/? | Not started | - |

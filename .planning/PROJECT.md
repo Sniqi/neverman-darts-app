@@ -14,6 +14,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 - **Statistics (live + lifetime + dashboard)** — live 3-dart/first-9 averages, checkout %, score bands, best/worst leg during play; per-profile lifetime stats with hand-rolled SVG charts at `/stats`; match-detail breakdown. *Validated in Phase 4: Statistics & Achievements.*
 - **Achievements: personal records celebrated live AND stored** — highest visit/checkout, best leg, best match average, 180s detected in real time, celebrated on input + spectator views, and persisted (recompute-from-history). Records celebrate once per genuine new best. *Validated in Phase 4 (human UAT 2026-06-12).*
+- **Audio caller + auto-pause** — Web Speech caller announces each non-bust visit (DE/EN) with a checkout-number hint; sound effects on 180/high-finish/record; independent toggles + a master volume slider (default 50%); auto-pause shows a synced countdown overlay on both views after a configurable number of legs, auto-resuming or via "Weiter". *Validated in Phase 5 (human UAT 2026-06-13).* Audio plays from the scoring window (`/match`) only — the spectator window is passive and browsers block its autoplay.
 
 ### Active
 
@@ -23,7 +24,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - [ ] Legs and sets support
 - [ ] Bull-off (Ausbullen) at match start — players throw at bull for real; the app only records the resulting starting order/winner
 - [ ] Checkout suggestions: what to throw with the next 1–3 darts to finish
-- [ ] Auto-pause option: after a configurable number of legs (e.g. 5), a pause screen with countdown timer (e.g. 5 min) appears; continues after timer or button press
+- [x] Auto-pause option: after a configurable number of legs (e.g. 5), a pause screen with countdown timer (e.g. 5 min) appears; continues after timer or button press *(Phase 5)*
 
 **Input**
 - [ ] Manual dart entry on a displayed dartboard, optimized for touch — triple and double segments must be large enough to hit reliably with a finger on a tablet
@@ -72,9 +73,11 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 | PWA hosted on GitHub Pages | Best path to Android + PC with zero install friction; offline via service worker | — Pending |
 | Spectator window only on PC; tablet uses in-app fullscreen view | Android has no freely movable windows | — Pending |
 | Bull-off records result only (no bull throw input) | The real throw happens at the board; app only needs the starting order | — Pending |
-| Auto-pause = pause screen with countdown timer | User preference; continues automatically or by button | — Pending |
+| Auto-pause = pause screen with countdown timer | User preference; continues automatically or by button | ✓ Done (Phase 5) |
 | Achievements celebrated live + persisted in stats | User preference | — Pending |
 | German UI, dark mode native | User preference | — Pending |
+| Audio plays from scoring window (`/match`) only, not the spectator | Browsers block autoplay in a window that never received a user gesture; the passive Observer stays muted | ✓ Done (Phase 5, UAT-decided 2026-06-13) |
+| Master volume slider (default 50%) for caller + SFX; checkout hint speaks the number | User preference during Phase 5 UAT | ✓ Done (Phase 5) |
 
 ## Evolution
 
@@ -94,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-12 — Phase 4 (Statistics & Achievements) complete*
+*Last updated: 2026-06-13 — Phase 5 (Audio & Auto-Pause) complete*

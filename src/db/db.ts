@@ -3,7 +3,10 @@ import type { MatchState } from '../engine/types.js';
 
 // Profile shape is an interface contract for Phases 3-4 — DO NOT rename fields.
 export interface Profile {
-	id?: number; // auto-increment primary key
+	// Required for EntityTable<Profile, 'id'> key typing (so .add() returns number,
+	// not number | undefined). Inserts use Omit<Profile, 'id'> / Dexie's InsertType,
+	// which keeps the id optional at insert time (++id auto-increment).
+	id: number; // auto-increment primary key
 	name: string;
 	color: string; // hex color for avatar, e.g. "#e8a020"
 	initial: string; // first letter of name, uppercase

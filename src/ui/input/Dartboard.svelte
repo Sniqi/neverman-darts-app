@@ -5,15 +5,16 @@
 	// Polar math (screenToBoard → classifyHit) is the source of truth — NOT SVG contains().
 	import { matchStore } from '../../stores/match.svelte.js';
 	import { classifyHit, screenToBoard, SEGMENT_ORDER } from '../../engine/board.js';
+	import type { DartScore } from '../../engine/types.js';
 
-	// Ring radii (board.ts / UI-SPEC.md Dartboard Visual Spec)
-	const R_INNER_BULL = 14.4;
-	const R_OUTER_BULL = 36.5;
-	const R_INNER_SINGLE = 186;
-	const R_TRIPLE_END = 209;
-	const R_OUTER_SINGLE = 303;
-	const R_DOUBLE_END = 325;
-	const R_MISS_OUTER = 390;
+	// Ring radii — touch-optimized: double/triple/bull rings ~2x real-world proportions
+	const R_INNER_BULL = 30;
+	const R_OUTER_BULL = 74;
+	const R_INNER_SINGLE = 150;
+	const R_TRIPLE_END = 200;
+	const R_OUTER_SINGLE = 290;
+	const R_DOUBLE_END = 340;
+	const R_MISS_OUTER = 400;
 	const CX = 200;
 	const CY = 200;
 
@@ -22,6 +23,34 @@
 
 	// SVG element ref for screenToBoard
 	let svgEl = $state<SVGSVGElement | null>(null);
+
+	// Floating score animations
+	interface FloatAnim { id: number; x: number; y: number; label: string; color: string; }
+	let floats = $state<FloatAnim[]>([]);
+	let floatId = 0;
+
+	function spawnFloat(svgX: number, svgY: number, dart: DartScore) {
+		let label: string;
+		let color: string;
+		if (dart.segment === 0) {
+			label = '✕'; color = '#666666';
+		} else if (dart.segment === 25 && dart.multiplier === 2) {
+			// Bulls Eye (50 pts) → triple color
+			label = 'Bull (50)'; color = '#f87171';
+		} else if (dart.segment === 25) {
+			// Outer bull (25 pts) → double color
+			label = 'Bull (25)'; color = '#e8a020';
+		} else if (dart.multiplier === 3) {
+			label = `T${dart.segment} (${dart.multiplier * dart.segment})`; color = '#f87171';
+		} else if (dart.multiplier === 2) {
+			label = `D${dart.segment} (${dart.multiplier * dart.segment})`; color = '#e8a020';
+		} else {
+			label = String(dart.segment); color = '#ffffff';
+		}
+		const id = floatId++;
+		floats = [...floats, { id, x: svgX, y: svgY, label, color }];
+		setTimeout(() => { floats = floats.filter(f => f.id !== id); }, 1600);
+	}
 
 	// Segment angle helpers
 	function segmentStartAngle(idx: number): number {
@@ -125,8 +154,8 @@
 
 	const regions = buildRegions();
 
-	// Segment number label positions (r ≈ 345 per UI-SPEC)
-	const R_LABEL = 345;
+	// Segment number label positions (outside double ring)
+	const R_LABEL = 368;
 	function labelPos(i: number): { x: number; y: number } {
 		const midAngle = segmentStartAngle(i) + 9;
 		return polarToXY(R_LABEL, midAngle);
@@ -137,7 +166,11 @@
 		e.preventDefault();
 
 		const { r, angleDeg } = screenToBoard(e, svgEl);
+		if (r > R_MISS_OUTER) return;
 		const dart = classifyHit(r, angleDeg);
+
+		const rad = (angleDeg * Math.PI) / 180;
+		spawnFloat(CX + r * Math.cos(rad), CY + r * Math.sin(rad), dart);
 
 		// Flash the region that was hit.
 		// classifyHit returns {multiplier:2, segment:25} for inner bull (50 pts)
@@ -162,7 +195,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <svg
 	bind:this={svgEl}
-	viewBox="-190 -190 780 780"
+	viewBox="-200 -200 800 800"
 	xmlns="http://www.w3.org/2000/svg"
 	class="dartboard"
 	style="touch-action: none; width: 100%; height: 100%; max-width: 100%; max-height: 100%;"
@@ -207,14 +240,31 @@
 		pointer-events="none"
 	/>
 
-	<!-- Miss zone overlay: transparent, pointer-events: all, outside double ring -->
+	<!-- Dark outer ring (number zone) — only valid miss tap area -->
 	<path
 		d={`${describeFullCircle(R_MISS_OUTER)} ${describeFullCircle(R_DOUBLE_END)}`}
-		fill="transparent"
-		pointer-events="all"
+		fill={flashKey === 'miss' ? 'rgba(255,255,255,0.15)' : '#0d0d0f'}
 		fill-rule="evenodd"
 		class="miss-zone"
 	/>
+
+	<!-- Floating score animations -->
+	{#each floats as f (f.id)}
+		<text
+			x={f.x}
+			y={f.y}
+			text-anchor="middle"
+			dominant-baseline="central"
+			font-size="52"
+			font-weight="800"
+			fill={f.color}
+			stroke="rgba(0,0,0,0.75)"
+			stroke-width="4"
+			paint-order="stroke"
+			pointer-events="none"
+			class="score-float"
+		>{f.label}</text>
+	{/each}
 
 	<!-- Segment number labels — decorative only, pointer-events: none -->
 	{#each SEGMENT_ORDER as seg, i}
@@ -224,9 +274,9 @@
 			y={pos.y}
 			text-anchor="middle"
 			dominant-baseline="central"
-			font-size="14"
-			font-weight="400"
-			fill="#888888"
+			font-size="28"
+			font-weight="600"
+			fill="#cccccc"
 			pointer-events="none"
 		>{seg}</text>
 	{/each}
@@ -239,5 +289,16 @@
 
 	.miss-zone {
 		cursor: default;
+	}
+
+	@keyframes score-float {
+		0%   { opacity: 1;   transform: translateY(0px)   scale(1.3); }
+		15%  { opacity: 1;   transform: translateY(-18px) scale(1);   }
+		100% { opacity: 0;   transform: translateY(-95px) scale(0.85); }
+	}
+
+	.score-float {
+		animation: score-float 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+		pointer-events: none;
 	}
 </style>

@@ -15,6 +15,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - **Statistics (live + lifetime + dashboard)** — live 3-dart/first-9 averages, checkout %, score bands, best/worst leg during play; per-profile lifetime stats with hand-rolled SVG charts at `/stats`; match-detail breakdown. *Validated in Phase 4: Statistics & Achievements.*
 - **Achievements: personal records celebrated live AND stored** — highest visit/checkout, best leg, best match average, 180s detected in real time, celebrated on input + spectator views, and persisted (recompute-from-history). Records celebrate once per genuine new best. *Validated in Phase 4 (human UAT 2026-06-12).*
 - **Audio caller + auto-pause** — Web Speech caller announces each non-bust visit (DE/EN) with a checkout-number hint; sound effects on 180/high-finish/record; independent toggles + a master volume slider (default 50%); auto-pause shows a synced countdown overlay on both views after a configurable number of legs, auto-resuming or via "Weiter". *Validated in Phase 5 (human UAT 2026-06-13).* Audio plays from the scoring window (`/match`) only — the spectator window is passive and browsers block its autoplay.
+- **PWA & deployment** — installable PWA (manifest + service worker via `@vite-pwa/sveltekit`, `registerType: 'prompt'`); full offline precache incl. SFX; subpath-correct build for GitHub Pages (`BASE_PATH=/neverman-darts-app`); German dark update toast ("Neue Version verfügbar"); GitHub Actions deploy workflow. *Config validated + accepted in Phase 6 (2026-06-13).* Live go-live (create repo, enable Pages, push) is the user's outward-facing step — workflow is committed and ready.
 
 ### Active
 
@@ -40,9 +41,9 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - [ ] Achievements: personal records (e.g. new highest 3-dart score, new highest checkout) — celebrated live with an in-game overlay AND stored in player statistics
 
 **Platform & look**
-- [ ] PWA hosted on GitHub Pages: open once in browser, install to home screen (Android) / as app (desktop), works offline afterwards
-- [ ] Native dark mode design
-- [ ] German UI
+- [x] PWA hosted on GitHub Pages: open once in browser, install to home screen (Android) / as app (desktop), works offline afterwards *(Phase 6 — config ready; user go-live pending)*
+- [x] Native dark mode design *(Phases 1–6)*
+- [x] German UI *(Phases 1–6)*
 
 ### Out of Scope
 
@@ -70,7 +71,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| PWA hosted on GitHub Pages | Best path to Android + PC with zero install friction; offline via service worker | — Pending |
+| PWA hosted on GitHub Pages | Best path to Android + PC with zero install friction; offline via service worker | ✓ Done (Phase 6 — `@vite-pwa/sveltekit`, prompt update, GH Actions deploy; user go-live pending) |
 | Spectator window only on PC; tablet uses in-app fullscreen view | Android has no freely movable windows | — Pending |
 | Bull-off records result only (no bull throw input) | The real throw happens at the board; app only needs the starting order | — Pending |
 | Auto-pause = pause screen with countdown timer | User preference; continues automatically or by button | ✓ Done (Phase 5) |
@@ -97,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 — Phase 5 (Audio & Auto-Pause) complete*
+*Last updated: 2026-06-13 — Phase 6 (PWA & Deployment) complete; milestone v1.0 all 6 phases done*

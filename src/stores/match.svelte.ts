@@ -83,7 +83,23 @@ export class MatchStore {
 		this.#pauseMinutes = prefs.pauseMinutes;
 	}
 
+	/**
+	 * Re-read pause prefs from localStorage when a match starts (FLOW-02/AUD-03).
+	 * Called at the top of dispatch() for START_MATCH so in-session Setup changes
+	 * take effect even without a page reload (singleton constructor only runs once).
+	 */
+	#refreshPauseConfig(): void {
+		const prefs = loadAudioPrefs();
+		this.#pauseEnabled = prefs.pauseEnabled;
+		this.#pauseLegs = prefs.pauseLegs;
+		this.#pauseMinutes = prefs.pauseMinutes;
+	}
+
 	dispatch(action: MatchAction): void {
+		// Refresh pause config on match start so Setup changes take effect without reload.
+		if (action.type === 'START_MATCH') {
+			this.#refreshPauseConfig();
+		}
 		const prevState = this.state;
 		this.state = reduce(this.state, action);
 

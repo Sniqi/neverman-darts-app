@@ -722,6 +722,30 @@ describe('MatchStore', () => {
 			expect(s.pauseActive).toBe(false);
 		});
 
+		it('re-reads pause prefs on START_MATCH (FLOW-02 — in-session config change)', () => {
+			// Simulate: store was created with pauseEnabled=false (stale constructor value),
+			// then user changes to pauseEnabled=true in Setup before starting a match.
+			// The new prefs must be picked up at START_MATCH, not at construction.
+			const s = makeStoreWithPrefs({ pauseEnabled: false, pauseLegs: 1, pauseMinutes: 2 });
+
+			// Now update localStorage to reflect the in-session change
+			vi.stubGlobal('localStorage', {
+				getItem: (key: string) => {
+					if (key === 'nvm_pause_enabled') return 'true';
+					if (key === 'nvm_pause_legs') return '1';
+					if (key === 'nvm_pause_minutes') return '2';
+					return null;
+				},
+				setItem: () => {},
+				removeItem: () => {},
+			});
+
+			// START_MATCH must refresh prefs — pause should now fire after 1 leg
+			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			completeLeg(s);
+			expect(s.pauseActive).toBe(true);
+		});
+
 		it('pause threshold trips correctly at 5-leg default (no pause before 5 legs)', () => {
 			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 5, pauseMinutes: 8 });
 			// Use legsToWin:9 so we can play 5 legs without ending the match

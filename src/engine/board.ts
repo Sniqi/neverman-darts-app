@@ -1,16 +1,16 @@
 // src/engine/board.ts
 // Polar-math hit classification for the SVG dartboard.
-// Ring radii match the D-01 enlarged triple/double widths from UI-SPEC.md.
+// Ring radii are touch-optimized: double/triple/bull rings are ~2x real-world proportions.
 //
-// Board center: (200, 200) in viewBox="0 0 400 400"
-// Ring boundaries (from UI-SPEC.md Dartboard Visual Spec):
-//   inner bull:   0   – 14.4px  → { multiplier: 2, segment: 25 }
-//   outer bull:   14.4 – 36.5px → { multiplier: 1, segment: 25 }
-//   inner single: 36.5 – 186px  → { multiplier: 1, segment: N }
-//   triple:       186  – 209px  → { multiplier: 3, segment: N }
-//   outer single: 209  – 303px  → { multiplier: 1, segment: N }
-//   double:       303  – 325px  → { multiplier: 2, segment: N }
-//   miss:         325+ px       → { multiplier: 1, segment: 0 }
+// Board center: (200, 200) in viewBox="-200 -200 800 800"
+// Ring boundaries (touch-optimized, not true-to-scale):
+//   inner bull:   0   – 30px   → { multiplier: 2, segment: 25 }
+//   outer bull:   30  – 74px   → { multiplier: 1, segment: 25 }
+//   inner single: 74  – 150px  → { multiplier: 1, segment: N }
+//   triple:       150 – 200px  → { multiplier: 3, segment: N }
+//   outer single: 200 – 290px  → { multiplier: 1, segment: N }
+//   double:       290 – 340px  → { multiplier: 2, segment: N }
+//   miss:         340+ px      → { multiplier: 1, segment: 0 }
 
 import type { DartScore } from './types.js';
 
@@ -41,16 +41,16 @@ export function angleToSegment(angleDeg: number): number {
  * angleDeg is the angle in degrees, 0° = right (3 o'clock), clockwise positive.
  */
 export function classifyHit(r: number, angleDeg: number): DartScore {
-	if (r < 14.4) return { multiplier: 2, segment: 25 };   // inner bull (double-bull: 2×25 = 50 pts)
-	if (r < 36.5) return { multiplier: 1, segment: 25 };   // outer bull
-	if (r >= 325)  return { multiplier: 1, segment: 0 };   // miss
+	if (r < 30)  return { multiplier: 2, segment: 25 };  // inner bull (double-bull: 2×25 = 50 pts)
+	if (r < 74)  return { multiplier: 1, segment: 25 };  // outer bull
+	if (r >= 340) return { multiplier: 1, segment: 0 };  // miss
 
 	const segment = angleToSegment(angleDeg);
 
-	if (r < 186) return { multiplier: 1, segment };  // inner single
-	if (r < 209) return { multiplier: 3, segment };  // triple
-	if (r < 303) return { multiplier: 1, segment };  // outer single
-	// 303 ≤ r < 325
+	if (r < 150) return { multiplier: 1, segment };  // inner single
+	if (r < 200) return { multiplier: 3, segment };  // triple
+	if (r < 290) return { multiplier: 1, segment };  // outer single
+	// 290 ≤ r < 340
 	return { multiplier: 2, segment };               // double
 }
 

@@ -6,45 +6,45 @@ import { describe, it, expect } from 'vitest';
 import { classifyHit, angleToSegment, SEGMENT_ORDER } from './board.js';
 
 describe('classifyHit - ring zones', () => {
-	it('r < 14.4 → inner bull (multiplier 2, segment 25 = double bull = 50pts)', () => {
+	it('r < 30 → inner bull (multiplier 2, segment 25 = double bull = 50pts)', () => {
 		expect(classifyHit(0, 0)).toEqual({ multiplier: 2, segment: 25 });
 		expect(classifyHit(10, 0)).toEqual({ multiplier: 2, segment: 25 });
-		expect(classifyHit(14.3, 0)).toEqual({ multiplier: 2, segment: 25 });
+		expect(classifyHit(29.9, 0)).toEqual({ multiplier: 2, segment: 25 });
 	});
 
-	it('14.4 ≤ r < 36.5 → outer bull (multiplier 1, segment 25)', () => {
-		expect(classifyHit(14.4, 0)).toEqual({ multiplier: 1, segment: 25 });
-		expect(classifyHit(25, 0)).toEqual({ multiplier: 1, segment: 25 });
-		expect(classifyHit(36.4, 0)).toEqual({ multiplier: 1, segment: 25 });
+	it('30 ≤ r < 74 → outer bull (multiplier 1, segment 25)', () => {
+		expect(classifyHit(30, 0)).toEqual({ multiplier: 1, segment: 25 });
+		expect(classifyHit(50, 0)).toEqual({ multiplier: 1, segment: 25 });
+		expect(classifyHit(73.9, 0)).toEqual({ multiplier: 1, segment: 25 });
 	});
 
-	it('36.5 ≤ r < 186 → inner single (multiplier 1)', () => {
-		const result = classifyHit(100, 270); // pointing up at top = segment 20
+	it('74 ≤ r < 150 → inner single (multiplier 1)', () => {
+		const result = classifyHit(112, 270); // pointing up at top = segment 20
 		expect(result.multiplier).toBe(1);
 		expect(result.segment).toBe(20);
 	});
 
-	it('186 ≤ r < 209 → triple (multiplier 3)', () => {
-		const result = classifyHit(197, 270); // top = segment 20
+	it('150 ≤ r < 200 → triple (multiplier 3)', () => {
+		const result = classifyHit(175, 270); // top = segment 20
 		expect(result.multiplier).toBe(3);
 		expect(result.segment).toBe(20);
 	});
 
-	it('209 ≤ r < 303 → outer single (multiplier 1)', () => {
-		const result = classifyHit(256, 270); // top = segment 20
+	it('200 ≤ r < 290 → outer single (multiplier 1)', () => {
+		const result = classifyHit(245, 270); // top = segment 20
 		expect(result.multiplier).toBe(1);
 		expect(result.segment).toBe(20);
 	});
 
-	it('303 ≤ r < 325 → double (multiplier 2)', () => {
-		const result = classifyHit(314, 270); // top = segment 20
+	it('290 ≤ r < 340 → double (multiplier 2)', () => {
+		const result = classifyHit(315, 270); // top = segment 20
 		expect(result.multiplier).toBe(2);
 		expect(result.segment).toBe(20);
 	});
 
-	it('r ≥ 325 → miss (multiplier 1, segment 0)', () => {
-		expect(classifyHit(325, 0)).toEqual({ multiplier: 1, segment: 0 });
-		expect(classifyHit(330, 0)).toEqual({ multiplier: 1, segment: 0 });
+	it('r ≥ 340 → miss (multiplier 1, segment 0)', () => {
+		expect(classifyHit(340, 0)).toEqual({ multiplier: 1, segment: 0 });
+		expect(classifyHit(341, 0)).toEqual({ multiplier: 1, segment: 0 });
 		expect(classifyHit(400, 45)).toEqual({ multiplier: 1, segment: 0 });
 	});
 
@@ -53,12 +53,12 @@ describe('classifyHit - ring zones', () => {
 		expect(classifyHit(10, 0)).toEqual({ multiplier: 2, segment: 25 });
 	});
 
-	it('classifyHit(25, 0) returns outer bull', () => {
-		expect(classifyHit(25, 0)).toEqual({ multiplier: 1, segment: 25 });
+	it('classifyHit(50, 0) returns outer bull', () => {
+		expect(classifyHit(50, 0)).toEqual({ multiplier: 1, segment: 25 });
 	});
 
-	it('classifyHit(330, 0) returns miss', () => {
-		expect(classifyHit(330, 0)).toEqual({ multiplier: 1, segment: 0 });
+	it('classifyHit(345, 0) returns miss', () => {
+		expect(classifyHit(345, 0)).toEqual({ multiplier: 1, segment: 0 });
 	});
 });
 

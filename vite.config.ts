@@ -1,4 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
+import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { resolve } from 'node:path';
@@ -6,13 +7,60 @@ import { resolve } from 'node:path';
 // Vitest 4: the provider is a factory from @vitest/browser-playwright,
 // not the string 'playwright' (which was the Vitest 2/3 API).
 
-// Plan 02 will append:
-//   !process.env.VITEST && SvelteKitPWA({ registerType: 'prompt', ... })
-// to the plugins array (with .filter(Boolean)) once the real PWA plugin is added.
-// This guard ensures the existing test suite never loads the real virtual module.
+// SvelteKitPWA is excluded during Vitest runs (VITEST env is set) to prevent
+// virtual:pwa-register/svelte and virtual:pwa-info from being unavailable in tests.
+// Browser tests use aliases in the browser project to redirect these virtual modules
+// to mocks (see test.alias below). (RESEARCH Pattern 7 / Pitfall 5)
+
+const base = process.env.BASE_PATH ?? '';
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [
+		sveltekit(),
+		// Guard: exclude SvelteKitPWA in Vitest so virtual modules don't break tests
+		!process.env.VITEST && SvelteKitPWA({
+			registerType: 'prompt',
+			scope: base + '/',
+			base: base + '/',
+			kit: {
+				spa: true,
+				adapterFallback: '404.html',
+				includeVersionFile: true,
+			},
+			manifest: {
+				name: 'Neverman Darts',
+				short_name: 'Neverman Darts',
+				description: 'X01 Darts Wertung',
+				lang: 'de',
+				start_url: base + '/',
+				scope: base + '/',
+				display: 'standalone',
+				theme_color: '#111318',
+				background_color: '#111318',
+				icons: [
+					{ src: base + '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+					{ src: base + '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+					{
+						src: base + '/maskable-icon-512x512.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'maskable',
+					},
+					{ src: base + '/apple-touch-icon-180x180.png', sizes: '180x180', type: 'image/png' },
+				],
+			},
+			workbox: {
+				// client/** prefix matches .svelte-kit/output/client/ (Pitfall 7)
+				// mp3 explicitly included so SFX are precached for offline play (Pitfall 4)
+				// prerendered/** omitted — pure SPA, no prerendered pages (Anti-Pattern)
+				globPatterns: ['client/**/*.{js,css,ico,png,svg,webp,webmanifest,mp3}'],
+				navigateFallback: base + '/404.html',
+			},
+			devOptions: {
+				enabled: false,
+			},
+		}),
+	].filter(Boolean),
 	test: {
 		projects: [
 			{

@@ -441,21 +441,21 @@
 		cursor: pointer;
 	}
 
-	/* Landscape layout (D-02): score panel left 38%, board right 62% */
+	/* Landscape layout (D-02): score panel left 33%, board right 67% */
 	@media (orientation: landscape) {
 		.match-view {
 			flex-direction: row;
 		}
 
 		.panel-area {
-			flex: 0 0 38%;
+			flex: 0 0 33%;
 			display: flex;
 			flex-direction: column;
-			overflow-y: auto;
+			overflow: hidden;
 		}
 
 		.board-area {
-			flex: 0 0 62%;
+			flex: 0 0 67%;
 		}
 	}
 </style>

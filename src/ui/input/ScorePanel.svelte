@@ -21,10 +21,10 @@
 			</div>
 			<div class="legs-info">
 				{#if matchStore.state.config.setsEnabled}
-					<span>S: {player.setsWon}</span>
-					<span> L: {player.legsWon}</span>
+					<span>Sets: {player.setsWon}</span>
+					<span> Leg: {player.legsWon}</span>
 				{:else}
-					<span>L: {player.legsWon}</span>
+					<span>Leg: {player.legsWon}</span>
 				{/if}
 			</div>
 		</div>
@@ -55,7 +55,7 @@
 	}
 
 	.player-name {
-		font-size: 20px;
+		font-size: 26px;
 		font-weight: 600;
 		color: #f0f0f0;
 		margin-bottom: 4px;
@@ -74,15 +74,15 @@
 	}
 
 	.remaining-active {
-		font-size: 48px;
+		font-size: 64px;
 	}
 
 	.remaining-inactive {
-		font-size: 20px;
+		font-size: 32px;
 	}
 
 	.legs-info {
-		font-size: 14px;
+		font-size: 18px;
 		color: #f0f0f0;
 		margin-top: 4px;
 	}

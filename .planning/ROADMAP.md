@@ -207,12 +207,12 @@ Plans:
   3. When a new version is deployed, a user running the installed app sees a prompt to update rather than silently loading a stale cached build
   4. The entire UI is in German with a native dark mode design
 
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 **Mode:** mvp (vertical slices) · **UI hint**: yes
 
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — ReloadPrompt slice (PLAT-03/04): install PWA toolchain, Vitest test-mode guard + virtual:pwa-register mock, German dark update toast + browser test (keeps the ~421-test suite green)
+- [x] 06-01-PLAN.md — ReloadPrompt slice (PLAT-03/04): install PWA toolchain, Vitest test-mode guard + virtual:pwa-register mock, German dark update toast + browser test (keeps the ~421-test suite green)
 
 **Wave 2** *(blocked on Wave 1 — shares vite.config.ts)*
 
@@ -234,4 +234,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
 | 4. Statistics & Achievements | 5/5 | Complete    | 2026-06-12 |
 | 5. Audio & Auto-Pause | 3/3 | Complete    | 2026-06-12 |
-| 6. PWA & Deployment | 0/3 | Planned | - |
+| 6. PWA & Deployment | 1/3 | In Progress|  |

@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 05-audio-auto-pause/05-03-PLAN.md
-last_updated: "2026-06-13T00:14:18.062Z"
-last_activity: 2026-06-13 -- Phase 6 planning complete
+last_updated: "2026-06-13T00:14:54.643Z"
+last_activity: 2026-06-13 -- Phase 6 execution started
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 30
+  total_plans: 33
   completed_plans: 30
   percent: 83
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 5 — Audio & Auto-Pause
+**Current focus:** Phase 6 — PWA & Deployment
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-13 -- Phase 6 planning complete
+Phase: 6 (PWA & Deployment) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 6
+Last activity: 2026-06-13 -- Phase 6 execution started
 
 Progress: [█████████░] 89%
 

@@ -14,14 +14,17 @@
 //   5. PLAT-04: rendered strings are German; toast has position:fixed + accent border
 
 import { render } from 'vitest-browser-svelte';
-import { expect, test, vi, beforeEach } from 'vitest';
-import { needRefresh, offlineReady } from '../../test-mocks/pwa-register-mock';
+import { expect, test, beforeEach } from 'vitest';
+import { needRefresh, offlineReady, updateSWCalls } from '../../test-mocks/pwa-register-mock';
 import ReloadPrompt from './ReloadPrompt.svelte';
 
-// Reset stores before each test so tests are independent
+// Reset stores and call-tracker before each test so tests are independent.
+// vi.spyOn cannot redefine ESM exports in browser mode (namespace not configurable),
+// so updateSWCalls is a module-level array the mock writes to — reset it here.
 beforeEach(() => {
 	needRefresh.set(false);
 	offlineReady.set(false);
+	updateSWCalls.splice(0);
 });
 
 test('with needRefresh=true the toast renders and contains German "Neue Version verfügbar"', async () => {
@@ -41,18 +44,8 @@ test('with needRefresh=true an "Aktualisieren" button is present', async () => {
 });
 
 test('clicking "Aktualisieren" calls updateServiceWorker with true', async () => {
-	// Import mock module to spy on updateServiceWorker.
-	// Because the alias is active, the component imports this same module.
-	const mockModule = await import('../../test-mocks/pwa-register-mock');
-	const originalUseFn = mockModule.useRegisterSW;
-	const spyUpdateSW = vi.fn(async (_reload?: boolean) => {});
-
-	// Temporarily override useRegisterSW to return a spied updateServiceWorker
-	vi.spyOn(mockModule, 'useRegisterSW').mockImplementation((opts) => {
-		const result = originalUseFn(opts);
-		return { ...result, updateServiceWorker: spyUpdateSW };
-	});
-
+	// ESM modules are not configurable in browser mode — vi.spyOn cannot redefine
+	// exports. Instead the mock tracks calls in the exported updateSWCalls array.
 	needRefresh.set(true);
 	const screen = render(ReloadPrompt, {});
 
@@ -62,9 +55,9 @@ test('clicking "Aktualisieren" calls updateServiceWorker with true', async () =>
 	) as HTMLButtonElement;
 	expect(aktualisierenBtn).toBeTruthy();
 	aktualisierenBtn.click();
-	expect(spyUpdateSW).toHaveBeenCalledWith(true);
 
-	vi.restoreAllMocks();
+	expect(updateSWCalls.length).toBe(1);
+	expect(updateSWCalls[0]).toBe(true);
 });
 
 test('clicking "Schließen" hides the toast (stores set to false)', async () => {

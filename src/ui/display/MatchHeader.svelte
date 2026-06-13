@@ -27,12 +27,11 @@
 
 <style>
 	.match-header {
-		height: 40px;
 		display: flex;
 		align-items: center;
-		padding: 0 var(--space-lg, 24px);
+		padding: var(--space-xs, 4px) var(--space-lg, 24px);
 		background: var(--surface, #1e2027);
-		font-size: clamp(0.75rem, 1.2vw, 1.5rem);
+		font-size: clamp(2rem, 4vw, 5.6rem);
 		font-weight: 400;
 		line-height: 1.2;
 		color: var(--text, #f0f0f0);

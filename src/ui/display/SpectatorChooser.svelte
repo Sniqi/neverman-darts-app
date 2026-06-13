@@ -162,21 +162,24 @@
 
 <style>
 	.chooser-icon-btn {
+		position: fixed;
+		bottom: 16px;
+		right: 16px;
+		z-index: 40;
 		width: 44px;
 		height: 44px;
-		background: none;
-		border: none;
-		border-radius: 6px;
+		background: rgba(30, 32, 39, 0.9);
+		border: 1px solid #444;
+		border-radius: 8px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0;
-		flex-shrink: 0;
 	}
 
 	.chooser-icon-btn:active {
-		background: rgba(232, 160, 32, 0.1);
+		background: rgba(232, 160, 32, 0.15);
 	}
 
 	.chooser-menu {
@@ -206,24 +209,23 @@
 		}
 	}
 
-	/* Landscape: inline popover instead of bottom sheet */
+	/* Landscape: compact popover anchored above the fixed button */
 	@media (orientation: landscape) {
 		.chooser-menu {
-			position: absolute;
-			bottom: auto;
-			top: 100%;
+			bottom: 68px; /* 16px margin + 44px button + 8px gap */
 			left: auto;
-			right: 0;
+			right: 16px;
 			width: 280px;
-			border-radius: 8px;
+			border-top: none;
 			border: 1px solid #444;
+			border-radius: 8px;
 			animation: fadeIn 200ms ease-out;
 		}
 
 		@keyframes fadeIn {
 			from {
 				opacity: 0;
-				transform: translateY(-4px);
+				transform: translateY(4px);
 			}
 			to {
 				opacity: 1;

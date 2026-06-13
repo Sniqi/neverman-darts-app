@@ -145,7 +145,7 @@
 </script>
 
 <div class="bulloff-screen">
-	<h1>Wer hat die Doppel getroffen?</h1>
+	<h1>Spielerreihenfolge</h1>
 	<p class="hint">Tippe in der Reihenfolge des Wurfes oder ziehe zum Sortieren.</p>
 
 	<div class="player-order-list" role="list">

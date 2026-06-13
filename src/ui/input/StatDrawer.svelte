@@ -168,8 +168,23 @@
 	}
 
 	.drawer-panel.open {
-		max-height: 60dvh;
+		max-height: 40dvh;
 		overflow-y: auto;
+		scrollbar-width: thin;
+		scrollbar-color: #444 #1e2027;
+	}
+
+	.drawer-panel.open::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.drawer-panel.open::-webkit-scrollbar-track {
+		background: #1e2027;
+	}
+
+	.drawer-panel.open::-webkit-scrollbar-thumb {
+		background-color: #444;
+		border-radius: 3px;
 	}
 
 	.drawer-content {

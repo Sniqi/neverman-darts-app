@@ -21,11 +21,13 @@ export type SfxEvent = keyof typeof SFX_PATHS;
  * Silently skips if sfxEnabled is false (D-06).
  * Ignores autoplay-policy rejections via .catch(() => {}) (T-05-04).
  * volume is clamped to [0, 1]; defaults to 0.8 (UI-SPEC) when not provided.
+ * base is the SvelteKit `base` path (e.g. '/neverman-darts-app' on GitHub Pages,
+ * '' in dev). Prepended so the resolved URL matches the SW precache scope (AUD-02/PLAT-02).
  */
-export function playSfx(event: SfxEvent, sfxEnabled: boolean, volume = 0.8): void {
+export function playSfx(event: SfxEvent, sfxEnabled: boolean, volume = 0.8, base = ''): void {
 	if (!sfxEnabled) return;
 	try {
-		const audio = new Audio(SFX_PATHS[event]);
+		const audio = new Audio(`${base}${SFX_PATHS[event]}`);
 		audio.volume = Math.min(1, Math.max(0, volume));
 		audio.play().catch(() => {}); // Ignore NotAllowedError (Chrome autoplay policy)
 	} catch {

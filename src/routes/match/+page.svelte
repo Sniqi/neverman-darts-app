@@ -9,6 +9,7 @@
 	import { loadAudioPrefs, saveAudioPref } from '../../lib/audio-prefs.js';
 	import { initVoices, announceVisit } from '../../lib/audio-caller.js';
 	import { playSfx } from '../../lib/audio-sfx.js';
+	import { base } from '$app/paths';
 	import { getSuggestion } from '../../engine/checkout.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
 	import VisitStrip from '../../ui/input/VisitStrip.svelte';
@@ -47,14 +48,14 @@
 
 		const has180 = records.some(r => r.type === '180');
 		if (has180) {
-			playSfx('180', sfxEnabled, audioVolume);
+			playSfx('180', sfxEnabled, audioVolume, base);
 		} else {
-			playSfx('record', sfxEnabled, audioVolume);
+			playSfx('record', sfxEnabled, audioVolume, base);
 		}
 
 		const hasHighFinish = records.some(r => r.type === 'highest-checkout' && (r.value ?? 0) >= 100);
 		if (hasHighFinish) {
-			playSfx('highfinish', sfxEnabled, audioVolume);
+			playSfx('highfinish', sfxEnabled, audioVolume, base);
 		}
 	});
 
@@ -91,7 +92,7 @@
 							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
 							: null;
 						if (score !== null && score >= 100) {
-							playSfx('highfinish', sfxEnabled, audioVolume);
+							playSfx('highfinish', sfxEnabled, audioVolume, base);
 						}
 					}
 				}

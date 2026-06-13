@@ -58,6 +58,16 @@ describe('audio-sfx', () => {
 			expect(MockAudio).toHaveBeenCalledWith('/sfx/record.mp3');
 		});
 
+		it('prepends base path when provided (AUD-02/PLAT-02 — GitHub Pages subpath)', () => {
+			playSfx('180', true, 0.5, '/neverman-darts-app');
+			expect(MockAudio).toHaveBeenCalledWith('/neverman-darts-app/sfx/180.mp3');
+		});
+
+		it('default base "" leaves URL unchanged (dev environment)', () => {
+			playSfx('180', true, 0.5);
+			expect(MockAudio).toHaveBeenCalledWith('/sfx/180.mp3');
+		});
+
 		it('sets volume to 0.8 (default) on the Audio instance', () => {
 			playSfx('180', true);
 			expect(lastAudioInstance?.volume).toBe(0.8);

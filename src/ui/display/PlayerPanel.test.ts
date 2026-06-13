@@ -149,12 +149,12 @@ test('with setsEnabled shows sets and legs; without setsEnabled shows legs only'
 	});
 
 	// No sets: legs only
-	expect(noSetsScreen.container.textContent).toContain('L:');
-	expect(noSetsScreen.container.textContent).not.toContain('S:');
+	expect(noSetsScreen.container.textContent).toContain('Legs:');
+	expect(noSetsScreen.container.textContent).not.toContain('Sets:');
 
 	// With sets: both shown
-	expect(setsScreen.container.textContent).toContain('S:');
-	expect(setsScreen.container.textContent).toContain('L:');
+	expect(setsScreen.container.textContent).toContain('Sets:');
+	expect(setsScreen.container.textContent).toContain('Legs:');
 });
 
 // --- D-06: Checkout route ---

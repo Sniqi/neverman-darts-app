@@ -19,6 +19,14 @@
 
 	let { player, isActive, config, legStartIndex, currentVisit = [] }: Props = $props();
 
+	function formatDart(dart: DartScore): string {
+		if (dart.segment === 0) return '0';
+		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';
+		if (dart.multiplier === 1 && dart.segment === 25) return 'Outer';
+		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
+		return `${prefix}${dart.segment}`;
+	}
+
 	// Live remaining: for the active player subtract the current-visit running total
 	// so the score display counts down dart-by-dart (D-05).
 	let liveRemaining = $derived.by(() => {
@@ -39,49 +47,34 @@
 	});
 
 	// Checkout route (D-06): shown only for the active player on a finishing score.
-	// getSuggestion handles >170 and bogey suppression.
 	let checkoutRoute = $derived.by(() => {
 		if (!isActive) return null;
 		const suggestion = getSuggestion(liveRemaining, config.outRule);
 		return suggestion ? suggestion.join(' ') : null;
 	});
 
-	// Last completed visit for the visit line display
+	// Last 4 completed visits with running score context
+	let recentVisitsWithScores = $derived.by(() => {
+		const visits = player.visits;
+		if (visits.length === 0) return [];
+		let after = player.remaining;
+		const result: Array<{ visit: Visit; scoreBefore: number; scoreAfter: number }> = [];
+		for (let i = visits.length - 1; i >= Math.max(0, visits.length - 4); i--) {
+			const v = visits[i];
+			const total = v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0);
+			const before = v.bust ? after : after + total;
+			result.unshift({ visit: v, scoreBefore: before, scoreAfter: after });
+			after = before;
+		}
+		return result;
+	});
+
+	// Last completed visit — needed for bust flash detection only
 	let lastCompletedVisit: Visit | null = $derived(
 		player.visits.length > 0 ? player.visits[player.visits.length - 1] : null
 	);
 
-	// For numpad visits the total must be computed from the score delta.
-	// We use config.startScore - player.remaining as the match-level scored total,
-	// but we need the visit-level total. For the last numpad visit we approximate:
-	// if darts is empty, the visit total = startScore - player.remaining for 1-visit scenarios,
-	// but for multi-visit: we can't easily reconstruct without the previous remaining.
-	// Resolution per RESEARCH Open Question 1: pass completedTotal from the parent perspective
-	// using the score delta for the *last* visit based on full visits array traversal.
-	let completedTotal: number | null = $derived.by(() => {
-		if (!lastCompletedVisit || lastCompletedVisit.darts.length > 0) return null;
-		// Numpad visit: compute this visit's total from score delta.
-		// We sum all dart visits before it to get remaining before this visit,
-		// then delta = (remaining before visit) - player.remaining.
-		// For simplicity, since we cannot recover previous remaining from Visit alone,
-		// we rely on the approach: total = config.startScore - player.remaining
-		// minus all prior visits' dart scores. But for display purposes, we use
-		// the full match average approach: sum all darts, subtract from startScore.
-		// Simpler: walk visits before the last one:
-		const priorVisits = player.visits.slice(0, player.visits.length - 1);
-		const priorScored = priorVisits.reduce((sum, v) => {
-			if (v.bust) return sum; // bust visits scored 0
-			if (v.darts.length > 0) return sum + v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0);
-			// Another numpad visit before this one — we can't know its total from darts alone.
-			// Fall back to 0 for this degenerate case (consecutive numpad visits).
-			return sum;
-		}, 0);
-		const totalScored = config.startScore - player.remaining;
-		return Math.max(0, totalScored - priorScored);
-	});
-
 	// BUST flash (D-08): show for ~2s when the last visit is a bust.
-	// Uses $state + $effect + setTimeout so it auto-clears.
 	let showBust = $state(false);
 	let bustTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -116,23 +109,40 @@
 		</div>
 	{/if}
 
-	<div class="player-name">{player.name}</div>
-
-	<div class="legs-sets">
-		{#if config.setsEnabled}
-			<span>S: {player.setsWon}</span>
-			<span> L: {player.legsWon}</span>
-		{:else}
-			<span>L: {player.legsWon}</span>
-		{/if}
-	</div>
-
-	<div class="score-block">
+	<div class="name-score-row">
+		<div class="player-name">{player.name}</div>
 		<div
 			class="remaining-score"
 			role="status"
 			aria-live="polite"
 		>{liveRemaining}</div>
+	</div>
+
+	<div class="legs-sets">
+		{#if config.setsEnabled}
+			<span>Sets: {player.setsWon}</span>
+			<span> Legs: {player.legsWon}</span>
+		{:else}
+			<span>Legs: {player.legsWon}</span>
+		{/if}
+	</div>
+
+	<!-- History of last 4 completed visits (≈ last 12 darts) -->
+	<div class="history-section">
+		{#each recentVisitsWithScores as { visit: v, scoreBefore, scoreAfter: scoreAfterVisit }, idx (idx)}
+			{@const isLast = idx === recentVisitsWithScores.length - 1}
+			{@const total = v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)}
+			<div class="history-row" class:bust-row={v.bust} class:last-row={isLast}>
+				<span class="h-score-before">{scoreBefore}</span>
+				<span class="h-sep">-</span>
+				<span class="h-total">{v.bust ? 'BUST' : total}</span>
+				<span class="h-dart">{v.darts[0] ? formatDart(v.darts[0]) : ''}</span>
+				<span class="h-dart">{v.darts[1] ? formatDart(v.darts[1]) : ''}</span>
+				<span class="h-dart">{v.darts[2] ? formatDart(v.darts[2]) : ''}</span>
+				<span class="h-sep">{v.bust ? '' : '='}</span>
+				<span class="h-score-after">{v.bust ? '' : scoreAfterVisit}</span>
+			</div>
+		{/each}
 	</div>
 
 	{#if checkoutRoute}
@@ -141,8 +151,8 @@
 
 	<VisitLine
 		{currentVisit}
-		{lastCompletedVisit}
-		{completedTotal}
+		lastCompletedVisit={null}
+		completedTotal={null}
 	/>
 
 	<div class="stats-line">
@@ -155,7 +165,6 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
 		padding: var(--space-lg, 24px) var(--space-md, 16px);
 		background: var(--surface, #1e2027);
 		border-top: 3px solid transparent;
@@ -163,6 +172,7 @@
 		transition: background 200ms ease, border-color 200ms ease, opacity 200ms ease;
 		height: 100%;
 		overflow: hidden;
+		gap: var(--space-xs, 4px);
 	}
 
 	.player-panel.active {
@@ -203,48 +213,96 @@
 		to   { opacity: 1; transform: scale(1); }
 	}
 
+	.name-score-row {
+		position: relative;
+	}
+
 	.player-name {
-		font-size: clamp(1.5rem, 3vw, 4rem);
+		font-size: clamp(3rem, 6vw, 8.4rem);
 		font-weight: 600;
 		line-height: 1.1;
 		color: var(--text, #f0f0f0);
 	}
 
 	.legs-sets {
-		font-size: clamp(0.875rem, 1.5vw, 1.75rem);
+		font-size: clamp(2rem, 4vw, 5.6rem);
 		font-weight: 600;
 		color: var(--text, #f0f0f0);
-		margin-top: var(--space-sm, 8px);
-	}
-
-	.score-block {
-		flex: 1 1 auto;
-		display: flex;
-		align-items: center;
-		justify-content: center;
 	}
 
 	.remaining-score {
-		font-size: clamp(4rem, 8vw, 12rem);
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		font-size: clamp(5rem, 10vw, 14rem);
 		font-weight: 600;
 		line-height: 1.0;
 		letter-spacing: -0.02em;
 		color: var(--text, #f0f0f0);
+		text-align: center;
+		pointer-events: none;
 	}
 
-	/* Checkout route (D-06): accent color, shown above visit line */
+	/* History of last ~12 darts */
+	.history-section {
+		flex: 1 1 auto;
+		display: grid;
+		grid-template-columns: auto auto auto auto auto auto auto auto;
+		column-gap: 0.8em;
+		align-content: end;
+		justify-content: start;
+		overflow: hidden;
+		padding-bottom: var(--space-xs, 4px);
+	}
+
+	.history-row {
+		display: contents;
+	}
+
+	.history-row > span {
+		font-size: clamp(2.2rem, 3.75vw, 4.375rem);
+		font-weight: 400;
+		line-height: 1.4;
+		color: var(--text, #f0f0f0);
+		opacity: 0.55;
+	}
+
+	.history-row.last-row > span {
+		opacity: 0.9;
+	}
+
+	.history-row.bust-row > span {
+		color: #c0392b;
+	}
+
+	.h-score-before,
+	.h-total,
+	.h-score-after {
+		font-weight: 600;
+		text-align: right;
+	}
+
+	.h-sep {
+		text-align: center;
+	}
+
+	.h-dart {
+		text-align: right;
+		opacity: 0.8;
+	}
+
+	/* Checkout route (D-06): accent color */
 	.checkout-route {
 		font-size: clamp(0.875rem, 1.5vw, 1.75rem);
 		font-weight: 600;
 		color: #e8a020;
-		margin-top: var(--space-sm, 8px);
 	}
 
 	.stats-line {
-		font-size: clamp(0.875rem, 1.5vw, 1.75rem);
+		font-size: clamp(2rem, 4vw, 5.6rem);
 		font-weight: 400;
 		line-height: 1.3;
 		color: var(--text, #f0f0f0);
-		margin-top: var(--space-sm, 8px);
 	}
 </style>

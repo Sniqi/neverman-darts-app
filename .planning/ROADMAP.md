@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Persistence & Data** - Match survives reload/crash; player profiles and match history stored; JSON export/import (completed 2026-06-12)
 - [x] **Phase 4: Statistics & Achievements** - Full per-match and lifetime stats; personal records detected and celebrated live (completed 2026-06-12)
 - [x] **Phase 5: Audio & Auto-Pause** - Caller voice announces scores; sound effects on 180s and records; auto-pause countdown between legs (completed 2026-06-12)
-- [ ] **Phase 6: PWA & Deployment** - Installable offline-capable PWA on GitHub Pages with update prompt and German dark-mode UI
+- [x] **Phase 6: PWA & Deployment** - Installable offline-capable PWA on GitHub Pages with update prompt and German dark-mode UI (completed 2026-06-13)
 
 ## Phase Details
 
@@ -207,7 +207,7 @@ Plans:
   3. When a new version is deployed, a user running the installed app sees a prompt to update rather than silently loading a stale cached build
   4. The entire UI is in German with a native dark mode design
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 **Mode:** mvp (vertical slices) · **UI hint**: yes
 
 **Wave 1**
@@ -220,7 +220,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 — builds the configured PWA)*
 
-- [ ] 06-03-PLAN.md — Deploy slice (PLAT-02/03): GitHub Actions Pages workflow (BASE_PATH from repo name, deploy-pages@v4, least-privilege), .nojekyll guard, deployable-artifact build gate (no push — go-live is a user step)
+- [x] 06-03-PLAN.md — Deploy slice (PLAT-02/03): GitHub Actions Pages workflow (BASE_PATH from repo name, deploy-pages@v4, least-privilege), .nojekyll guard, deployable-artifact build gate (no push — go-live is a user step)
 
 ## Progress
 
@@ -234,4 +234,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
 | 4. Statistics & Achievements | 5/5 | Complete    | 2026-06-12 |
 | 5. Audio & Auto-Pause | 3/3 | Complete    | 2026-06-12 |
-| 6. PWA & Deployment | 2/3 | In Progress|  |
+| 6. PWA & Deployment | 3/3 | Complete   | 2026-06-13 |

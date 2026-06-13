@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 05-audio-auto-pause/05-03-PLAN.md
-last_updated: "2026-06-13T00:14:54.643Z"
+last_updated: "2026-06-13T00:37:46.539Z"
 last_activity: 2026-06-13 -- Phase 6 execution started
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 33
-  completed_plans: 30
-  percent: 83
+  completed_plans: 33
+  percent: 100
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 ## Current Position
 
 Phase: 6 (PWA & Deployment) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 6
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-06-13 -- Phase 6 execution started
 
 Progress: [█████████░] 89%
@@ -124,6 +124,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Pitfall 5 T-04-12 mitigation
 - [Phase ?]: Checkout hint uses getSuggestion(player.remaining + total, outRule) — pre-visit remaining recovered post-dispatch (A3)
 - [Phase ?]: Pause state on MatchStore class not reducer; legCompleted.length for leg counting; type-discriminated pause-tick on BC_CHANNEL
+- [Phase ?]: BASE_PATH derived from github.event.repository.name so workflow stays correct if repo is renamed
 
 ### Pending Todos
 
@@ -142,6 +143,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-12T18:40:00.276Z
+Last session: 2026-06-13T00:37:32.172Z
 Stopped at: Completed 05-audio-auto-pause/05-03-PLAN.md
 Resume file: None

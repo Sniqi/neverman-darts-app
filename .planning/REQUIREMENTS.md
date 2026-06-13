@@ -71,8 +71,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Platform
 
 - [ ] **PLAT-01**: App is installable as a PWA (Android home screen, desktop) and works fully offline after first load
-- [ ] **PLAT-02**: App is deployed to GitHub Pages and works correctly under the repository subpath
-- [ ] **PLAT-03**: When a new version is deployed, the app shows an update prompt instead of silently serving a stale cached build
+- [x] **PLAT-02**: App is deployed to GitHub Pages and works correctly under the repository subpath
+- [x] **PLAT-03**: When a new version is deployed, the app shows an update prompt instead of silently serving a stale cached build
 - [ ] **PLAT-04**: UI is fully German with native dark mode design
 
 ## v2 Requirements
@@ -152,8 +152,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUD-03 | Phase 5 | Complete |
 | FLOW-02 | Phase 5 | Complete |
 | PLAT-01 | Phase 6 | Pending |
-| PLAT-02 | Phase 6 | Pending |
-| PLAT-03 | Phase 6 | Pending |
+| PLAT-02 | Phase 6 | Complete |
+| PLAT-03 | Phase 6 | Complete |
 | PLAT-04 | Phase 6 | Pending |
 
 **Coverage:**

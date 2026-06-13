@@ -207,7 +207,20 @@ Plans:
   3. When a new version is deployed, a user running the installed app sees a prompt to update rather than silently loading a stale cached build
   4. The entire UI is in German with a native dark mode design
 
-**Plans**: TBD
+**Plans:** 3 plans
+**Mode:** mvp (vertical slices) · **UI hint**: yes
+
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — ReloadPrompt slice (PLAT-03/04): install PWA toolchain, Vitest test-mode guard + virtual:pwa-register mock, German dark update toast + browser test (keeps the ~421-test suite green)
+
+**Wave 2** *(blocked on Wave 1 — shares vite.config.ts)*
+
+- [ ] 06-02-PLAN.md — Installable/offline slice (PLAT-01/04): SvelteKitPWA plugin (registerType prompt, subpath scope/manifest, mp3 precache), disable SvelteKit SW, placeholder icons from logo.svg, manifest + ReloadPrompt mount, subpath build gate + manual install/offline verify
+
+**Wave 3** *(blocked on Wave 2 — builds the configured PWA)*
+
+- [ ] 06-03-PLAN.md — Deploy slice (PLAT-02/03): GitHub Actions Pages workflow (BASE_PATH from repo name, deploy-pages@v4, least-privilege), .nojekyll guard, deployable-artifact build gate (no push — go-live is a user step)
 
 ## Progress
 
@@ -221,4 +234,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Persistence & Data | 3/3 | Complete    | 2026-06-12 |
 | 4. Statistics & Achievements | 5/5 | Complete    | 2026-06-12 |
 | 5. Audio & Auto-Pause | 3/3 | Complete    | 2026-06-12 |
-| 6. PWA & Deployment | 0/? | Not started | - |
+| 6. PWA & Deployment | 0/3 | Planned | - |

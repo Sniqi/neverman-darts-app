@@ -20,12 +20,12 @@
 		isGuest: boolean;
 	}
 
-	// Setup config state (D-14 defaults)
-	let startScore = $state<301 | 401 | 501>(501);
-	let outRule = $state<'single' | 'double'>('double');
+	// Setup config state
+	let startScore = $state<301 | 401 | 501>(301);
+	let outRule = $state<'single' | 'double'>('single');
 	let legsToWin = $state(3);
-	let setsEnabled = $state(false);
-	let setsToWin = $state(1);
+	let setsEnabled = $state(true);
+	let setsToWin = $state(2);
 
 	// Player list (bound to PlayerPicker)
 	let players = $state<MatchPlayer[]>([]);
@@ -105,6 +105,13 @@
 </script>
 
 <main class="setup-screen">
+	<button class="back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück zur Startseite">
+		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M15 18l-6-6 6-6" />
+		</svg>
+		Zurück
+	</button>
 	<h1>Neverman Darts</h1>
 
 	<!-- Player picker section -->
@@ -331,6 +338,23 @@
 		flex-direction: column;
 		gap: var(--space-xl);
 		padding-bottom: var(--space-2xl);
+	}
+
+	.back-btn {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		background: none;
+		border: none;
+		color: #888;
+		font-size: 15px;
+		cursor: pointer;
+		padding: 0;
+		margin-bottom: calc(-1 * var(--space-md, 12px));
+	}
+
+	.back-btn:active {
+		opacity: 0.7;
 	}
 
 	h1 {

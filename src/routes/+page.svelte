@@ -11,6 +11,7 @@
 	import { matchStore } from '../stores/match.svelte.js';
 	import ResumePrompt from '../ui/start/ResumePrompt.svelte';
 	import ConfirmDialog from '../ui/dialogs/ConfirmDialog.svelte';
+	import ProfileManager from '../ui/setup/ProfileManager.svelte';
 	import type { MatchState } from '../engine/types.js';
 
 	// Unfinished match loaded on mount; drives conditional render of ResumePrompt
@@ -18,6 +19,9 @@
 
 	// New-match warning dialog visibility
 	let showNewMatchWarning = $state(false);
+
+	// Profile manager toggle
+	let profilesOpen = $state(false);
 
 	onMount(() => {
 		unfinishedMatch = loadUnfinishedMatch();
@@ -97,7 +101,17 @@
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
+		<button class="menu-btn profiles-toggle" onclick={() => (profilesOpen = !profilesOpen)} aria-expanded={profilesOpen}>
+			Spieler verwalten
+			<span class="toggle-arrow" class:open={profilesOpen}>▼</span>
+		</button>
 	</nav>
+
+	{#if profilesOpen}
+		<div class="profiles-panel">
+			<ProfileManager />
+		</div>
+	{/if}
 </main>
 
 {#if showNewMatchWarning}
@@ -159,5 +173,22 @@
 
 	.menu-btn:active {
 		opacity: 0.85;
+	}
+
+	.profiles-toggle {
+		font-weight: 400;
+	}
+
+	.toggle-arrow {
+		font-size: 12px;
+		transition: transform 0.2s;
+	}
+
+	.toggle-arrow.open {
+		transform: rotate(180deg);
+	}
+
+	.profiles-panel {
+		padding: 0 var(--space-xs, 4px);
 	}
 </style>

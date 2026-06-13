@@ -5,7 +5,7 @@ milestone_name: milestone
 status: Awaiting next milestone
 stopped_at: Completed 05-audio-auto-pause/05-03-PLAN.md
 last_updated: "2026-06-13T01:51:03.260Z"
-last_activity: 2026-06-13 — Milestone v1.0 completed and archived
+last_activity: 2026-06-14 — Completed quick task 260614-q01: Profile management on landing page, back button on /setup
 progress:
   total_phases: 6
   completed_phases: 6
@@ -124,6 +124,12 @@ Recent decisions affecting current work:
 - [Phase ?]: Checkout hint uses getSuggestion(player.remaining + total, outRule) — pre-visit remaining recovered post-dispatch (A3)
 - [Phase ?]: Pause state on MatchStore class not reducer; legCompleted.length for leg counting; type-discriminated pause-tick on BC_CHANNEL
 - [Phase ?]: BASE_PATH derived from github.event.repository.name so workflow stays correct if repo is renamed
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260614-q01 | Profile management on landing page, back button on /setup | 2026-06-14 | b9e4ef4 | [260614-q01-profile-on-landing](./quick/260614-q01-profile-on-landing/) |
 
 ### Pending Todos
 

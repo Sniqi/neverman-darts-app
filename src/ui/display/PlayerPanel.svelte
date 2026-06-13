@@ -109,40 +109,44 @@
 		</div>
 	{/if}
 
-	<div class="name-score-row">
-		<div class="player-name">{player.name}</div>
-		<div
-			class="remaining-score"
-			role="status"
-			aria-live="polite"
-		>{liveRemaining}</div>
-	</div>
+	<div class="top-zone">
+		<div class="name-score-row">
+			<div class="player-name">{player.name}</div>
+			<div
+				class="remaining-score"
+				role="status"
+				aria-live="polite"
+			>{liveRemaining}</div>
+		</div>
 
-	<div class="legs-sets">
-		{#if config.setsEnabled}
-			<span>Sets: {player.setsWon}</span>
-			<span> Legs: {player.legsWon}</span>
-		{:else}
-			<span>Legs: {player.legsWon}</span>
-		{/if}
+		<div class="legs-sets">
+			{#if config.setsEnabled}
+				<span class="ls-chip">Sets: {player.setsWon}</span>
+				<span class="ls-chip">Legs: {player.legsWon}</span>
+			{:else}
+				<span class="ls-chip">Legs: {player.legsWon}</span>
+			{/if}
+		</div>
 	</div>
 
 	<!-- History of last 4 completed visits (≈ last 12 darts) -->
-	<div class="history-section">
-		{#each recentVisitsWithScores as { visit: v, scoreBefore, scoreAfter: scoreAfterVisit }, idx (idx)}
-			{@const isLast = idx === recentVisitsWithScores.length - 1}
-			{@const total = v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)}
-			<div class="history-row" class:bust-row={v.bust} class:last-row={isLast}>
-				<span class="h-score-before">{scoreBefore}</span>
-				<span class="h-sep">-</span>
-				<span class="h-total">{v.bust ? 'BUST' : total}</span>
-				<span class="h-dart">{v.darts[0] ? formatDart(v.darts[0]) : ''}</span>
-				<span class="h-dart">{v.darts[1] ? formatDart(v.darts[1]) : ''}</span>
-				<span class="h-dart">{v.darts[2] ? formatDart(v.darts[2]) : ''}</span>
-				<span class="h-sep">{v.bust ? '' : '='}</span>
-				<span class="h-score-after">{v.bust ? '' : scoreAfterVisit}</span>
-			</div>
-		{/each}
+	<div class="history-box">
+		<div class="history-section">
+			{#each recentVisitsWithScores as { visit: v, scoreBefore, scoreAfter: scoreAfterVisit }, idx (idx)}
+				{@const isLast = idx === recentVisitsWithScores.length - 1}
+				{@const total = v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)}
+				<div class="history-row" class:bust-row={v.bust} class:last-row={isLast}>
+					<span class="h-score-before">{scoreBefore}</span>
+					<span class="h-sep">-</span>
+					<span class="h-total">{v.bust ? 'BUST' : total}</span>
+					<span class="h-dart">{v.darts[0] ? formatDart(v.darts[0]) : ''}</span>
+					<span class="h-dart">{v.darts[1] ? formatDart(v.darts[1]) : ''}</span>
+					<span class="h-dart">{v.darts[2] ? formatDart(v.darts[2]) : ''}</span>
+					<span class="h-sep">{v.bust ? '' : '='}</span>
+					<span class="h-score-after">{v.bust ? '' : scoreAfterVisit}</span>
+				</div>
+			{/each}
+		</div>
 	</div>
 
 	{#if checkoutRoute}
@@ -156,7 +160,9 @@
 	/>
 
 	<div class="stats-line">
-		Ø Leg {legAvg} · Ø Match {matchAvg}
+		<span class="stat"><span class="stat-label">Ø Leg</span> <span class="stat-val">{legAvg}</span></span>
+		<span class="stat-div" aria-hidden="true"></span>
+		<span class="stat"><span class="stat-label">Ø Match</span> <span class="stat-val">{matchAvg}</span></span>
 	</div>
 </div>
 
@@ -166,19 +172,22 @@
 		display: flex;
 		flex-direction: column;
 		padding: var(--space-lg, 24px) var(--space-md, 16px);
-		background: var(--surface, #1e2027);
-		border-top: 3px solid transparent;
-		opacity: 0.55;
-		transition: background 200ms ease, border-color 200ms ease, opacity 200ms ease;
+		background: linear-gradient(165deg, #1f222b 0%, #16181f 100%);
+		border-top: 4px solid transparent;
+		opacity: 0.5;
+		transition: background 200ms ease, border-color 200ms ease, opacity 200ms ease,
+			box-shadow 200ms ease;
 		height: 100%;
 		overflow: hidden;
-		gap: var(--space-xs, 4px);
+		gap: var(--space-sm, 8px);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.player-panel.active {
-		background: #22242d;
-		border-top-color: #e8a020;
-		box-shadow: inset 0 0 40px rgba(232, 160, 32, 0.08);
+		background: linear-gradient(165deg, #2b2f3b 0%, #1c1f29 100%);
+		border-top-color: var(--accent, #e8a020);
+		box-shadow: inset 0 0 60px rgba(232, 160, 32, 0.08),
+			inset 0 4px 0 rgba(232, 160, 32, 0.22);
 		opacity: 1;
 	}
 
@@ -213,21 +222,49 @@
 		to   { opacity: 1; transform: scale(1); }
 	}
 
+	/* Top zone: name + score + leg/set chips, closed by a hairline rule */
+	.top-zone {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm, 8px);
+		padding-bottom: var(--space-md, 16px);
+		border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+	}
+
 	.name-score-row {
 		position: relative;
 	}
 
 	.player-name {
 		font-size: clamp(3rem, 6vw, 8.4rem);
-		font-weight: 600;
+		font-weight: 700;
 		line-height: 1.1;
+		letter-spacing: -0.01em;
 		color: var(--text, #f0f0f0);
 	}
 
 	.legs-sets {
-		font-size: clamp(2rem, 4vw, 5.6rem);
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm, 8px);
+	}
+
+	.ls-chip {
+		display: inline-flex;
+		align-items: baseline;
+		font-size: clamp(1.75rem, 3.2vw, 4.6rem);
 		font-weight: 600;
+		line-height: 1.15;
 		color: var(--text, #f0f0f0);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		border-radius: var(--radius-sm, 8px);
+		padding: 0.08em 0.45em;
+	}
+
+	.player-panel.active .ls-chip {
+		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
+		border-color: var(--accent-line, rgba(232, 160, 32, 0.45));
 	}
 
 	.remaining-score {
@@ -236,24 +273,46 @@
 		left: 0;
 		right: 0;
 		font-size: clamp(5rem, 10vw, 14rem);
-		font-weight: 600;
-		line-height: 1.0;
-		letter-spacing: -0.02em;
+		font-weight: 700;
+		line-height: 1;
+		letter-spacing: -0.03em;
 		color: var(--text, #f0f0f0);
 		text-align: center;
 		pointer-events: none;
 	}
 
-	/* History of last ~12 darts */
+	.player-panel.active .remaining-score {
+		color: #ffffff;
+		text-shadow: 0 0 55px rgba(232, 160, 32, 0.4), 0 2px 10px rgba(0, 0, 0, 0.5);
+	}
+
+	/* History of last ~12 darts, framed as a recessed panel */
+	.history-box {
+		flex: 1 1 auto;
+		min-height: 0;
+		display: flex;
+		background: rgba(255, 255, 255, 0.025);
+		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		border-radius: var(--radius-md, 12px);
+		padding: var(--space-sm, 8px) var(--space-md, 16px);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+		overflow: hidden;
+	}
+
+	.player-panel.active .history-box {
+		background: rgba(255, 255, 255, 0.04);
+		border-color: var(--line-strong, rgba(255, 255, 255, 0.14));
+	}
+
 	.history-section {
 		flex: 1 1 auto;
 		display: grid;
 		grid-template-columns: auto auto auto auto auto auto auto auto;
 		column-gap: 0.8em;
+		row-gap: 0.1em;
 		align-content: end;
 		justify-content: start;
 		overflow: hidden;
-		padding-bottom: var(--space-xs, 4px);
 	}
 
 	.history-row {
@@ -269,7 +328,7 @@
 	}
 
 	.history-row.last-row > span {
-		opacity: 0.9;
+		opacity: 1;
 	}
 
 	.history-row.bust-row > span {
@@ -292,17 +351,53 @@
 		opacity: 0.8;
 	}
 
-	/* Checkout route (D-06): accent color */
+	/* Checkout route (D-06): amber callout pill */
 	.checkout-route {
-		font-size: clamp(0.875rem, 1.5vw, 1.75rem);
-		font-weight: 600;
-		color: #e8a020;
+		align-self: flex-start;
+		font-size: clamp(1.2rem, 2.2vw, 2.8rem);
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--accent, #e8a020);
+		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
+		border: 1px solid var(--accent-line, rgba(232, 160, 32, 0.45));
+		border-radius: 999px;
+		padding: 0.12em 0.7em;
+		box-shadow: 0 0 24px rgba(232, 160, 32, 0.12);
 	}
 
+	/* Averages: structured footer stat-bar with a dividing rule */
 	.stats-line {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md, 16px);
+		padding-top: var(--space-sm, 8px);
+		border-top: 1px solid var(--line, rgba(255, 255, 255, 0.08));
 		font-size: clamp(2rem, 4vw, 5.6rem);
 		font-weight: 400;
-		line-height: 1.3;
+		line-height: 1.2;
 		color: var(--text, #f0f0f0);
+	}
+
+	.stat {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.3em;
+		min-width: 0;
+	}
+
+	.stat-label {
+		color: rgba(240, 240, 240, 0.6);
+		font-weight: 500;
+	}
+
+	.stat-val {
+		font-weight: 700;
+	}
+
+	.stat-div {
+		align-self: stretch;
+		width: 1px;
+		margin: 0.15em 0;
+		background: var(--line-strong, rgba(255, 255, 255, 0.14));
 	}
 </style>

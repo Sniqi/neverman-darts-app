@@ -2,13 +2,13 @@
 // localStorage utilities for crash-resume detection and storage health.
 // Plan 03-01, Task 1 (FLOW-03).
 //
-// LS_SNAPSHOT MUST match match.svelte.ts line 21 and display.svelte.ts line 15
-// (SNAPSHOT_KEY). Never rename — spectator hydration depends on the same key.
-// RESEARCH Pitfall 1.
+// LS_SNAPSHOT is the single source of truth in sync-constants.ts.
+// Re-exported here so existing imports of LS_SNAPSHOT from storage.ts
+// continue to work without changes (DATA/SYNC — eliminate duplicate literal).
 
 import type { MatchState } from '../engine/types.js';
-
-export const LS_SNAPSHOT = 'neverman-match-snapshot';
+import { LS_SNAPSHOT } from './sync-constants.js';
+export { LS_SNAPSHOT };
 
 /**
  * Returns the persisted MatchState if an unfinished match exists (phase

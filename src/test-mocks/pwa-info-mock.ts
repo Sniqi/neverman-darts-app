@@ -4,4 +4,6 @@
 // nothing when the value is falsy — aliasing to this stub means any test that
 // transitively reaches the layout resolves the module instead of failing on the
 // plugin-only virtual import (checker W4 hardening).
-export default undefined;
+// Named export to match the real module's `export const pwaInfo` shape, so the
+// `import { pwaInfo }` in +layout.svelte resolves correctly under the test alias (WR-01).
+export const pwaInfo = undefined;

@@ -2,8 +2,13 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ['main']
+    # Deploy from whichever default branch the repo uses (new GitHub repos default
+    # to `main`; this project's local branch is `master`). Covers both (WR-02).
+    branches: ['main', 'master']
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: pages
@@ -21,6 +26,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
+
+      - name: Configure Pages
+        # Enables Pages on first deploy and surfaces base_path (WR-04).
+        uses: actions/configure-pages@v4
 
       - name: Install dependencies
         run: npm ci

@@ -10,16 +10,24 @@
 	// src/test-mocks/pwa-register-mock.ts, which exports module-level writable
 	// stores so the test and component share the same state instance.
 	import { useRegisterSW } from 'virtual:pwa-register/svelte';
+	import { onDestroy } from 'svelte';
+
+	// Periodic SW update check; handle retained so it is cleared on unmount (WR-03).
+	let updateInterval: ReturnType<typeof setInterval> | undefined;
 
 	const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW({
 		onRegistered(registration) {
 			if (registration) {
-				setInterval(() => registration.update(), 60_000);
+				updateInterval = setInterval(() => registration.update(), 60_000);
 			}
 		},
 		onRegisterError(error) {
 			console.error('SW registration error', error);
 		},
+	});
+
+	onDestroy(() => {
+		if (updateInterval) clearInterval(updateInterval);
 	});
 
 	function close() {

@@ -14,6 +14,18 @@
 	--space-lg: 24px;
 	--space-xl: 32px;
 	--space-2xl: 48px;
+
+	/* Elevation + structure (spectator display polish) */
+	--surface-2: #262932;
+	--line: rgba(255, 255, 255, 0.08);
+	--line-strong: rgba(255, 255, 255, 0.14);
+	--accent-soft: rgba(232, 160, 32, 0.12);
+	--accent-line: rgba(232, 160, 32, 0.45);
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-lg: 16px;
+	--shadow-panel: 0 6px 20px rgba(0, 0, 0, 0.45);
+	--shadow-raise: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 * {

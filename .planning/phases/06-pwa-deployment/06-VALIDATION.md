@@ -51,7 +51,7 @@ created: 2026-06-13
 
 ## Wave 0 Requirements
 
-- [ ] `src/lib/ReloadPrompt.test.ts` (browser) — covers PLAT-03/04 update-prompt behavior (appears, Aktualisieren→updateServiceWorker(true), Schließen→hide, German strings)
+- [ ] `src/ui/pwa/ReloadPrompt.test.ts` (browser) — covers PLAT-03/04 update-prompt behavior (appears, Aktualisieren→updateServiceWorker(true), Schließen→hide, German strings)
 - [ ] `src/test-mocks/pwa-register-mock.ts` — shared mock for `virtual:pwa-register/svelte` so the suite never loads the real PWA virtual module
 - [ ] vite.config test-mode guard: exclude `SvelteKitPWA()` when `process.env.VITEST` set + `test.alias` for the virtual module → keeps the existing ~421 tests green
 

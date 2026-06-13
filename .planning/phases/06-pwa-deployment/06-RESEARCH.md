@@ -670,17 +670,17 @@ navigator.serviceWorker.getRegistrations().then(regs =>
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does `navigateFallback: base + '/404.html'` correctly handle deep routes under the subpath?**
    - What we know: `navigateFallback` in Workbox `generateSW` intercepts navigation requests not in the precache and serves the fallback. For a pure SPA this is all routes.
    - What's unclear: Whether Workbox's `navigateFallbackAllowlist` needs configuration to avoid intercepting API-like URL patterns (none exist in this static app, so likely fine).
-   - Recommendation: Test the `/neverman-darts-app/match/` and `/neverman-darts-app/display/` routes offline after first cache population. If they 404, add `navigateFallbackAllowlist: [/^\/neverman-darts-app\//]`.
+   - RESOLVED: Deferred to manual offline UAT (Plan 02). Test the `/neverman-darts-app/match/` and `/neverman-darts-app/display/` routes offline after first cache population. If they 404, add `navigateFallbackAllowlist: [/^\/neverman-darts-app\//]`. Conditional-fix path is documented in the plan.
 
 2. **Will the `prerendered/**` glob cause a build warning?**
    - What we know: No pages are prerendered in this SPA; the glob may match 0 files.
    - What's unclear: Whether `@vite-pwa/sveltekit` suppresses this warning or if the Workbox build step emits it to stderr.
-   - Recommendation: Remove `'prerendered/**/*.{html,json}'` from globPatterns since this is a pure SPA. If the build output in `.svelte-kit/output/prerendered/` ever has content, add it back.
+   - RESOLVED: Remove `'prerendered/**/*.{html,json}'` from globPatterns since this is a pure SPA (Plan 02 omits it). If the build output in `.svelte-kit/output/prerendered/` ever has content, add it back.
 
 ---
 

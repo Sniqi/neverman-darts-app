@@ -1,8 +1,10 @@
 ---
 phase: 06-pwa-deployment
 verified: 2026-06-13T00:00:00Z
-status: human_needed
-score: 7/9 must-haves verified (2 require live device/deploy)
+status: passed
+human_validated: 2026-06-13
+human_note: "User accepted config-ready PWA ('Looks good — wrap up'); live GitHub Pages go-live + cross-deploy update-prompt deferred to the user's outward-facing deploy step (no remote yet)."
+score: 7/9 must-haves verified (2 require live device/deploy — accepted/deferred)
 overrides_applied: 0
 human_verification:
   - test: "Install to Android home screen and open offline"

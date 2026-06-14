@@ -12,10 +12,8 @@
 	import { base } from '$app/paths';
 	import { getSuggestion } from '../../engine/checkout.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
-	import VisitStrip from '../../ui/input/VisitStrip.svelte';
 	import Dartboard from '../../ui/input/Dartboard.svelte';
 	import Numpad from '../../ui/input/Numpad.svelte';
-	import CorrectionWindow from '../../ui/input/CorrectionWindow.svelte';
 	import StatDrawer from '../../ui/input/StatDrawer.svelte';
 	import DartsAtDoubleDialog from '../../ui/input/DartsAtDoubleDialog.svelte';
 	import MatchWinOverlay from '../../ui/overlays/MatchWinOverlay.svelte';
@@ -24,9 +22,11 @@
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
 
-	// ── Audio prefs — read once for stable booleans; volume is $state for live slider ──
-	const { callerEnabled, callerLang, sfxEnabled } = loadAudioPrefs();
-	let audioVolume = $state(loadAudioPrefs().audioVolume);
+	// ── Audio prefs — read once for stable booleans; volumes are $state for live sliders ──
+	const prefs = loadAudioPrefs();
+	const { callerEnabled, callerLang, sfxEnabled } = prefs;
+	let callerVolume = $state(prefs.callerVolume);
+	let musicVolume = $state(prefs.musicVolume);
 
 	// ── Record detection preload (ACHV-01 / D-09) ─────────────────────────────
 	// Load lifetime stats for profile players once at match start so #detectRecords
@@ -45,69 +45,7 @@
 		if (isFreshMatch && callerEnabled) {
 			const firstPlayer = state.players[state.activePlayerIndex];
 			if (firstPlayer) {
-				announceGameStart(firstPlayer.name, base, audioVolume);
-			}
-		}
-	});
-
-	// ── SFX: pendingRecords trigger (AUD-02) ──────────────────────────────────
-	// 180 SFX takes priority; any other record type fires 'record' sound.
-	// High-finish SFX for highest-checkout record with value ≥ 100 also fired here.
-	$effect(() => {
-		const records = matchStore.pendingRecords;
-		if (records.length === 0) return;
-
-		const has180 = records.some(r => r.type === '180');
-		if (has180) {
-			playSfx('180', sfxEnabled, audioVolume, base);
-		} else {
-			playSfx('record', sfxEnabled, audioVolume, base);
-		}
-
-		const hasHighFinish = records.some(r => r.type === 'highest-checkout' && (r.value ?? 0) >= 100);
-		if (hasHighFinish) {
-			playSfx('highfinish', sfxEnabled, audioVolume, base);
-		}
-	});
-
-	// ── High-finish SFX for checkouts ≥ 100 that are NOT new personal records ─
-	// pendingRecords only contains highest-checkout when it is a new personal best;
-	// non-record checkouts ≥ 100 are caught here by watching legCompleted length (A4).
-	let lastLegCounts = $state<Record<string, number>>({});
-	// Tracks visit count per player at the time their last leg ended (CR-01 fix).
-	let lastLegEndVisitCounts = $state<Record<string, number>>({});
-
-	$effect(() => {
-		const state = matchStore.state;
-		if (state.phase !== 'playing') return;
-
-		for (const player of state.players) {
-			const prevLegCount = lastLegCounts[player.id] ?? 0;
-			const nextLegCount = player.legCompleted?.length ?? 0;
-			if (nextLegCount > prevLegCount) {
-				const legStartVisitIdx = lastLegEndVisitCounts[player.id] ?? 0;
-				lastLegCounts = { ...lastLegCounts, [player.id]: nextLegCount };
-				lastLegEndVisitCounts = { ...lastLegEndVisitCounts, [player.id]: player.visits.length };
-
-				// Only fire if the record SFX handler above won't already cover it.
-				const alreadyCovered = matchStore.pendingRecords.some(
-					r => r.type === 'highest-checkout' && r.playerId === player.id && (r.value ?? 0) >= 100
-				);
-				if (alreadyCovered) continue;
-
-				// Inspect only visits from the just-completed leg (CR-01).
-				const legVisits = player.visits.slice(legStartVisitIdx);
-				for (const v of legVisits) {
-					if (v.wasCheckout === true) {
-						const score = v.darts.length > 0
-							? v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)
-							: null;
-						if (score !== null && score >= 100) {
-							playSfx('highfinish', sfxEnabled, audioVolume, base);
-						}
-					}
-				}
-				return;
+				announceGameStart(firstPlayer.name, base, callerVolume);
 			}
 		}
 	});
@@ -122,7 +60,7 @@
 	$effect(() => {
 		const phase = matchStore.state.phase;
 		if (phase === 'match-complete' && _prevPhase !== 'match-complete') {
-			playSfx('game_win', sfxEnabled, audioVolume, base);
+			playSfx('game_win', sfxEnabled, musicVolume, base);
 		}
 		_prevPhase = phase;
 	});
@@ -130,7 +68,7 @@
 	$effect(() => {
 		const active = matchStore.pauseActive;
 		if (active && !_prevPauseActive) {
-			playSfx('pause', sfxEnabled, audioVolume, base);
+			playSfx('pause', sfxEnabled, musicVolume, base);
 		}
 		_prevPauseActive = active;
 	});
@@ -143,7 +81,7 @@
 			const curr = player.setsWon ?? 0;
 			if (curr > prev) {
 				_prevSetsWon[player.id] = curr;
-				playSfx('set_win', sfxEnabled, audioVolume, base);
+				playSfx('set_win', sfxEnabled, musicVolume, base);
 				return;
 			}
 			_prevSetsWon[player.id] = curr;
@@ -188,6 +126,11 @@
 		inputModeByPlayer[matchStore.state.activePlayerIndex] ?? 'board'
 	);
 
+	let activePl = $derived(matchStore.activePlayer);
+	let lastVisit = $derived(activePl?.visits.at(-1));
+	let isBust = $derived(!!(lastVisit?.bust && matchStore.currentVisit.length === 0));
+	let displayDarts = $derived(isBust ? (lastVisit?.darts ?? []) : matchStore.currentVisit);
+
 	function setInputMode(mode: 'board' | 'numpad') {
 		inputModeByPlayer = {
 			...inputModeByPlayer,
@@ -195,63 +138,43 @@
 		};
 	}
 
-	// ── Correction window + caller announcement (CR-04 / AUD-01) ────────────
-	// Tracks completed visits per-player so both the correction window and the
-	// caller announcement fire for every visit, not just the first of the match.
-
-	interface PendingCorrection {
-		darts: DartScore[];
-		isBust: boolean;
-		total: number;
-	}
-
-	let pendingCorrection = $state<PendingCorrection | null>(null);
-	// Per-player visit counts keyed by player.id (CR-04 fix: was a single cross-player counter)
+	// ── Caller announcement (AUD-01) ─────────────────────────────────────────
+	// Fires for every completed visit. Per-player visit counts keyed by player.id.
 	let lastVisitCounts = $state<Record<string, number>>({});
 
-	// Watch for completed visits: open correction window and announce via caller.
 	$effect(() => {
 		const state = matchStore.state;
 		if (state.phase !== 'playing') return;
 
 		for (const player of state.players) {
 			const prevCount = lastVisitCounts[player.id] ?? 0;
-			if (player.visits.length > prevCount && pendingCorrection === null) {
+			if (player.visits.length > prevCount) {
 				const lastVisit = player.visits[player.visits.length - 1];
 				const total = lastVisit.darts.reduce(
 					(s, d) => s + d.multiplier * d.segment,
 					0
 				);
-				// Update immutably so Svelte reactivity fires
 				lastVisitCounts = { ...lastVisitCounts, [player.id]: player.visits.length };
-				pendingCorrection = {
-					darts: lastVisit.darts,
-					isBust: lastVisit.bust,
-					total
-				};
 
-				// AUD-01: announce the visit. Caller fires here (same detection point)
-				// so visit count and caller stay in sync without a second $effect.
 				if (lastVisit.bust || total === 0) {
-					// Bust, or all three darts off the board → "No score".
-					announceNoScore(callerEnabled, callerLang, base, audioVolume);
+					announceNoScore(callerEnabled, callerLang, base, callerVolume);
 				} else {
-					// Announce the checkout for the CURRENT remaining (after this visit) —
-					// i.e. what the player needs on their NEXT throw. remaining===0 (won)
-					// yields no suggestion, so only the score is announced.
-					const suggestion = getSuggestion(player.remaining, state.config.outRule);
-					const checkoutNumber = suggestion !== null ? player.remaining : null;
-					announceVisit(total, checkoutNumber, callerLang, callerEnabled, audioVolume, base, player.name);
+					const nextPlayer = state.players[state.activePlayerIndex];
+					const suggestion = getSuggestion(nextPlayer.remaining, state.config.outRule);
+					const checkoutNumber = suggestion !== null ? nextPlayer.remaining : null;
+					announceVisit(total, checkoutNumber, callerLang, callerEnabled, callerVolume, base, nextPlayer.name);
 				}
 				return;
 			}
 		}
 	});
 
-	// CorrectionWindow is the sole CONFIRM_VISIT dispatcher (it owns the 2.5s timer).
-	// dismissCorrection only clears pendingCorrection so the overlay unmounts.
-	function dismissCorrection() {
-		pendingCorrection = null;
+	function formatDart(dart: DartScore): string {
+		if (dart.segment === 0) return '0';
+		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';
+		if (dart.multiplier === 1 && dart.segment === 25) return 'Bull 25';
+		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
+		return `${prefix}${dart.segment}`;
 	}
 
 	// ── Darts-at-double dialog (D-08, INP-03) ─────────────────────────────
@@ -315,49 +238,49 @@
 		<ScorePanel />
 		<StatDrawer />
 
-		<!-- Correction window overlays the panel area (not the board) -->
-		<div class="panel-relative">
-			<VisitStrip />
-			<div class="undo-bar">
-				<button
-					class="toggle-btn"
-					onclick={() => setInputMode(inputMode === 'board' ? 'numpad' : 'board')}
-				>
-					{inputMode === 'board' ? '🔢 Numpad' : '🎯 Board'}
-				</button>
-				<div class="volume-row" aria-label="Lautstärke">
-					<label class="volume-label" for="match-volume-slider">🔊</label>
-					<input
-						id="match-volume-slider"
-						type="range"
-						min="0"
-						max="1"
-						step="0.05"
-						bind:value={audioVolume}
-						oninput={() => saveAudioPref('audioVolume', audioVolume)}
-						aria-label="Lautstärke"
-						class="volume-slider"
-					/>
-				</div>
-				<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
-					Rückgängig
-				</button>
-			</div>
-
-			{#if pendingCorrection !== null}
-				<CorrectionWindow
-					visible={true}
-					visitDarts={pendingCorrection.darts}
-					isBust={pendingCorrection.isBust}
-					visitTotal={pendingCorrection.total}
-					ondismiss={dismissCorrection}
+		<div class="undo-bar">
+			<button
+				class="toggle-btn"
+				onclick={() => setInputMode(inputMode === 'board' ? 'numpad' : 'board')}
+			>
+				{inputMode === 'board' ? '🔢 Numpad' : '🎯 Board'}
+			</button>
+			<div class="volume-row" aria-label="Lautstärke">
+				<label class="volume-label" for="match-volume-slider">🔊</label>
+				<input
+					id="match-volume-slider"
+					type="range"
+					min="0"
+					max="1"
+					step="0.05"
+					bind:value={callerVolume}
+					oninput={() => saveAudioPref('callerVolume', callerVolume)}
+					aria-label="Lautstärke"
+					class="volume-slider"
 				/>
-			{/if}
+			</div>
+			<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
+				Rückgängig
+			</button>
 		</div>
 	</div>
 
 	<!-- Board or numpad area -->
 	<div class="board-area">
+		<div class="dart-column" class:bust={isBust}>
+			{#each [0, 1, 2] as slotIdx}
+				{@const dart = displayDarts[slotIdx]}
+				<button
+					class="dart-pill"
+					class:filled={!!dart}
+					onclick={undo}
+					disabled={matchStore.currentVisit.length === 0}
+					aria-label={dart ? `Rückgängig: ${formatDart(dart)}` : 'Leerer Slot'}
+				>
+					{dart ? formatDart(dart) : '—'}
+				</button>
+			{/each}
+		</div>
 		{#if inputMode === 'board'}
 			<Dartboard />
 		{:else}
@@ -403,6 +326,8 @@
 
 <SpectatorChooser />
 
+<a href="{base}/" class="back-btn" aria-label="Zurück zur Startseite">✕</a>
+
 <style>
 	.match-view {
 		display: flex;
@@ -419,17 +344,57 @@
 		position: relative;
 	}
 
-	.panel-relative {
-		position: relative;
-	}
-
 	.board-area {
 		flex: 1 1 auto;
 		min-height: 0;
 		display: flex;
+		flex-direction: row;
 		align-items: center;
 		justify-content: center;
+		gap: 12px;
 		padding: var(--space-sm, 8px);
+	}
+
+	.dart-column {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+
+	.dart-column.bust .dart-pill {
+		border-color: rgba(192, 57, 43, 0.5);
+		color: #c0392b;
+	}
+
+	.dart-pill {
+		width: 76px;
+		height: 52px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #1e2027;
+		border: 1px solid #444444;
+		border-radius: 8px;
+		font-size: 16px;
+		font-weight: 400;
+		color: #555;
+		cursor: pointer;
+		transition: background 120ms ease, border-color 120ms ease;
+	}
+
+	.dart-pill.filled {
+		border-color: #e8a020;
+		color: #f0f0f0;
+		font-weight: 600;
+	}
+
+	.dart-pill:not(:disabled):active {
+		background: #2d2d2d;
+	}
+
+	.dart-pill:disabled {
+		cursor: default;
 	}
 
 	.undo-bar {
@@ -493,6 +458,31 @@
 		height: 44px;
 		accent-color: #e8a020;
 		cursor: pointer;
+	}
+
+	.back-btn {
+		position: fixed;
+		top: 10px;
+		right: 10px;
+		z-index: 30;
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(28, 31, 39, 0.7);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 6px;
+		color: #888;
+		font-size: 14px;
+		text-decoration: none;
+		backdrop-filter: blur(6px);
+		transition: color 150ms ease, border-color 150ms ease;
+	}
+
+	.back-btn:hover {
+		color: #f0f0f0;
+		border-color: rgba(255, 255, 255, 0.3);
 	}
 
 	/* Landscape layout (D-02): score panel left 33%, board right 67% */

@@ -86,4 +86,39 @@
 		color: #f0f0f0;
 		margin-top: 4px;
 	}
+
+	/* Landscape: grow to fill the panel column and use space properly */
+	@media (orientation: landscape) {
+		.score-panel {
+			flex: 1 1 0;
+			min-height: 0;
+			align-items: stretch;
+			gap: 2px;
+			padding: 4px;
+		}
+
+		.player-card {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding: 24px 20px;
+			min-width: 0;
+		}
+
+		.player-name {
+			font-size: 32px;
+		}
+
+		.remaining-active {
+			font-size: 80px;
+		}
+
+		.remaining-inactive {
+			font-size: 52px;
+		}
+
+		.legs-info {
+			font-size: 22px;
+		}
+	}
 </style>

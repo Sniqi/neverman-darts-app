@@ -130,6 +130,7 @@ Recent decisions affecting current work:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260614-q01 | Profile management on landing page, back button on /setup | 2026-06-14 | b9e4ef4 | [260614-q01-profile-on-landing](./quick/260614-q01-profile-on-landing/) |
+| 260614-q02 | Setup page: rename Legs/Sätze labels to "First to" format, default legs 2 | 2026-06-14 | 877828b | — |
 
 ### Pending Todos
 

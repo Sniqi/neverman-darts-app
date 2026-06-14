@@ -1,0 +1,9 @@
+# Normalize line endings to LF in the repository AND in working trees on
+# every platform (including Windows). This makes line-ending handling
+# deterministic regardless of each machine's core.autocrlf setting.
+* text=auto eol=lf
+
+# Binary assets — never normalize or diff as text.
+*.mp3 binary
+*.png binary
+*.ico binary

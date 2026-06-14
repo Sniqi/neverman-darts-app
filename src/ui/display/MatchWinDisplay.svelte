@@ -21,12 +21,12 @@
 	// (the reducer sets activePlayerIndex to the winner on match completion).
 	let winner = $derived(state.players[state.activePlayerIndex]);
 
-	// Build final standing subtitle: "[n] – [m] Legs" or "Sätze" when setsEnabled
+	// Build final standing subtitle: "[n] – [m] Legs" or "Sets" when setsEnabled
 	let standingText = $derived.by(() => {
 		const p = state.players;
 		if (state.config.setsEnabled) {
 			const scores = p.map(pl => pl.setsWon).join(' – ');
-			return `${scores} Sätze`;
+			return `${scores} Sets`;
 		} else {
 			const scores = p.map(pl => pl.legsWon).join(' – ');
 			return `${scores} Legs`;

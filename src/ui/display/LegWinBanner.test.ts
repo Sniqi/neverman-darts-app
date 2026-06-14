@@ -50,16 +50,16 @@ test('accent-colored name element is rendered inside banner', async () => {
 
 test('with subtitle prop the subtitle text is rendered', async () => {
 	const screen = render(LegWinBanner, {
-		message: 'Satz für Bob!',
-		subtitle: '1 : 0 Sätze',
+		message: 'Set für Bob!',
+		subtitle: '1 : 0 Sets',
 	});
-	expect(screen.container.textContent).toContain('Satz für Bob!');
-	expect(screen.container.textContent).toContain('1 : 0 Sätze');
+	expect(screen.container.textContent).toContain('Set für Bob!');
+	expect(screen.container.textContent).toContain('1 : 0 Sets');
 });
 
 test('different message string renders correctly', async () => {
 	const screen = render(LegWinBanner, {
-		message: 'Satz für Claudia!',
+		message: 'Set für Claudia!',
 	});
-	expect(screen.container.textContent).toContain('Satz für Claudia!');
+	expect(screen.container.textContent).toContain('Set für Claudia!');
 });

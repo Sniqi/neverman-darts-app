@@ -42,7 +42,7 @@
 		const { config } = record.state;
 		const outRule = config.outRule === 'double' ? 'Double Out' : 'Single Out';
 		if (config.setsEnabled) {
-			const plural = config.setsToWin === 1 ? 'Satz' : 'Sätze';
+			const plural = config.setsToWin === 1 ? 'Set' : 'Sets';
 			return `${config.startScore} ${outRule} · Best of ${config.setsToWin} ${plural}`;
 		} else {
 			const plural = config.legsToWin === 1 ? 'Leg' : 'Legs';

@@ -68,14 +68,14 @@
 
 	.banner-subtitle {
 		margin: var(--space-lg, 24px) 0 0;
-		font-size: clamp(1rem, 2vw, 2.5rem);
+		font-size: clamp(2rem, 4vw, 5rem);
 		font-weight: 400;
 		color: var(--text, #f0f0f0);
 	}
 
 	.record-badge {
 		margin: var(--space-sm, 8px) 0 0;
-		font-size: 16px;
+		font-size: clamp(1.5rem, 3vw, 3.5rem);
 		font-weight: 400;
 		color: #e8a020;
 	}

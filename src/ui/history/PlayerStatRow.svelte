@@ -17,11 +17,11 @@
 
 	let { player, isWinner, config, totalLegsPlayed, legStartVisitIndex }: Props = $props();
 
-	/** Legs or sets won label with correct German singular/plural. */
+	/** Legs or sets won label with correct singular/plural. */
 	const winsLabel = $derived.by(() => {
 		if (config.setsEnabled) {
 			const n = player.setsWon;
-			return n === 1 ? '1 Satz' : `${n} Sätze`;
+			return n === 1 ? '1 Set' : `${n} Sets`;
 		} else {
 			const n = player.legsWon;
 			return n === 1 ? '1 Leg' : `${n} Legs`;

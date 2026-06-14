@@ -92,19 +92,22 @@
 		// Detect leg/set win: a player's legsWon or setsWon increased
 		// Only detect when transitioning back to 'playing' (leg-complete → playing)
 		if (s.phase === 'playing' && prevLegsWon.length === s.players.length) {
+			// Two players → "Name - x : y - Name"; otherwise "x : y : z Unit".
+			const subtitle = (values: number[], unit: string) =>
+				s.players.length === 2
+					? `${s.players[0].name} - ${values.join(' : ')} - ${s.players[1].name}`
+					: `${values.join(' : ')} ${unit}`;
 			for (let i = 0; i < s.players.length; i++) {
 				const player = s.players[i];
 				if (s.config.setsEnabled && player.setsWon > (prevSetsWon[i] ?? 0)) {
 					// Set win
-					const scores = s.players.map(p => p.setsWon).join(' : ');
-					legWinMessage = `Satz für ${player.name}!`;
-					legWinSubtitle = `${scores} Sätze`;
+					legWinMessage = `Set für ${player.name}!`;
+					legWinSubtitle = subtitle(s.players.map(p => p.setsWon), 'Sets');
 					break;
 				} else if (player.legsWon > (prevLegsWon[i] ?? 0)) {
 					// Leg win
-					const scores = s.players.map(p => p.legsWon).join(' : ');
 					legWinMessage = `Leg für ${player.name}!`;
-					legWinSubtitle = `${scores} Legs`;
+					legWinSubtitle = subtitle(s.players.map(p => p.legsWon), 'Legs');
 					break;
 				}
 			}

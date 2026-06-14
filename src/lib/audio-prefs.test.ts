@@ -25,12 +25,13 @@ describe('audio-prefs', () => {
 			const prefs = loadAudioPrefs();
 			expect(prefs).toEqual({
 				callerEnabled: false,
-				callerLang: 'de',
+				callerLang: 'en',
 				sfxEnabled: false,
 				pauseEnabled: true,
 				pauseLegs: 5,
 				pauseMinutes: 8,
-				audioVolume: 0.5,
+				callerVolume: 0.5,
+				musicVolume: 0.25,
 			});
 		});
 
@@ -76,28 +77,42 @@ describe('audio-prefs', () => {
 			expect(prefs.pauseMinutes).toBe(10);
 		});
 
-		it('audioVolume defaults to 0.5 when key is absent', () => {
-			expect(loadAudioPrefs().audioVolume).toBe(0.5);
+		it('callerVolume defaults to 0.5 when key is absent', () => {
+			expect(loadAudioPrefs().callerVolume).toBe(0.5);
 		});
 
-		it('audioVolume reads back a saved value', () => {
-			saveAudioPref('audioVolume', 0.75);
-			expect(loadAudioPrefs().audioVolume).toBe(0.75);
+		it('musicVolume defaults to 0.25 when key is absent', () => {
+			expect(loadAudioPrefs().musicVolume).toBe(0.25);
 		});
 
-		it('audioVolume clamps values above 1 to 1', () => {
-			localStorage.setItem('nvm_audio_volume', '1.5');
-			expect(loadAudioPrefs().audioVolume).toBe(1);
+		it('callerVolume reads back a saved value', () => {
+			saveAudioPref('callerVolume', 0.75);
+			expect(loadAudioPrefs().callerVolume).toBe(0.75);
 		});
 
-		it('audioVolume clamps values below 0 to 0', () => {
-			localStorage.setItem('nvm_audio_volume', '-0.2');
-			expect(loadAudioPrefs().audioVolume).toBe(0);
+		it('musicVolume reads back a saved value', () => {
+			saveAudioPref('musicVolume', 0.4);
+			expect(loadAudioPrefs().musicVolume).toBe(0.4);
 		});
 
-		it('audioVolume falls back to 0.5 when key is non-numeric', () => {
-			localStorage.setItem('nvm_audio_volume', 'loud');
-			expect(loadAudioPrefs().audioVolume).toBe(0.5);
+		it('callerVolume clamps values above 1 to 1', () => {
+			localStorage.setItem('nvm_caller_volume', '1.5');
+			expect(loadAudioPrefs().callerVolume).toBe(1);
+		});
+
+		it('callerVolume clamps values below 0 to 0', () => {
+			localStorage.setItem('nvm_caller_volume', '-0.2');
+			expect(loadAudioPrefs().callerVolume).toBe(0);
+		});
+
+		it('callerVolume falls back to 0.5 when key is non-numeric', () => {
+			localStorage.setItem('nvm_caller_volume', 'loud');
+			expect(loadAudioPrefs().callerVolume).toBe(0.5);
+		});
+
+		it('musicVolume falls back to 0.25 when key is non-numeric', () => {
+			localStorage.setItem('nvm_music_volume', 'loud');
+			expect(loadAudioPrefs().musicVolume).toBe(0.25);
 		});
 	});
 
@@ -137,9 +152,14 @@ describe('audio-prefs', () => {
 			expect(localStorage.getItem('nvm_pause_enabled')).toBe('false');
 		});
 
-		it('writes nvm_audio_volume = "0.75" for audioVolume=0.75', () => {
-			saveAudioPref('audioVolume', 0.75);
-			expect(localStorage.getItem('nvm_audio_volume')).toBe('0.75');
+		it('writes nvm_caller_volume = "0.75" for callerVolume=0.75', () => {
+			saveAudioPref('callerVolume', 0.75);
+			expect(localStorage.getItem('nvm_caller_volume')).toBe('0.75');
+		});
+
+		it('writes nvm_music_volume = "0.4" for musicVolume=0.4', () => {
+			saveAudioPref('musicVolume', 0.4);
+			expect(localStorage.getItem('nvm_music_volume')).toBe('0.4');
 		});
 	});
 });

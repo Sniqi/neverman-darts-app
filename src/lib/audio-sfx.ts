@@ -1,16 +1,10 @@
 // src/lib/audio-sfx.ts
-// Fire-and-forget SFX helper for 180, high-finish, and record events (AUD-02).
+// Fire-and-forget music helper for game-win, set-win, and pause events (AUD-02).
 // Paths are compile-time constants — never built from input (T-05-04).
 // Follows the try/catch no-throw pattern from src/lib/storage.ts.
 
-/** Compile-time map of SFX event names to their static asset paths. */
+/** Compile-time map of music event names to their static asset paths. */
 const SFX_PATHS = {
-	/** Sound for a 180 visit (maximum score). */
-	'180': '/sfx/180.mp3',
-	/** Sound for a high finish (checkout ≥ 100). */
-	highfinish: '/sfx/highfinish.mp3',
-	/** Sound for a new personal record (any record type). */
-	record: '/sfx/record.mp3',
 	/** Music played when the full match is won. */
 	game_win: '/music/game_win.mp3',
 	/** Music played when a set is won (match continues). */

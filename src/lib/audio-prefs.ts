@@ -10,18 +10,21 @@ export interface AudioPrefs {
 	pauseEnabled: boolean;
 	pauseLegs: number;
 	pauseMinutes: number;
-	/** Master volume for both caller voice and SFX. Range 0..1, default 0.5. */
-	audioVolume: number;
+	/** Volume for the caller voice. Range 0..1, default 0.5. */
+	callerVolume: number;
+	/** Volume for music (game_win, set_win, pause). Range 0..1, default 0.5. */
+	musicVolume: number;
 }
 
 const DEFAULTS: AudioPrefs = {
 	callerEnabled: false,   // D-06: caller OFF by default
-	callerLang: 'de',
-	sfxEnabled: false,      // D-06: SFX OFF by default
+	callerLang: 'en',
+	sfxEnabled: false,      // D-06: music OFF by default
 	pauseEnabled: true,     // D-08: auto-pause ON by default
 	pauseLegs: 5,           // D-08: every 5 legs
 	pauseMinutes: 8,        // D-08: 8-minute countdown
-	audioVolume: 0.5,       // UAT: 50% default volume
+	callerVolume: 0.5,
+	musicVolume: 0.25,
 };
 
 const KEY_MAP: Record<keyof AudioPrefs, string> = {
@@ -31,27 +34,29 @@ const KEY_MAP: Record<keyof AudioPrefs, string> = {
 	pauseEnabled: 'nvm_pause_enabled',
 	pauseLegs: 'nvm_pause_legs',
 	pauseMinutes: 'nvm_pause_minutes',
-	audioVolume: 'nvm_audio_volume',
+	callerVolume: 'nvm_caller_volume',
+	musicVolume: 'nvm_music_volume',
 };
 
 /**
  * Reads all audio/pause preferences from localStorage.
  * Returns defaults on any failure — never throws.
- * T-05-02: all values are coerced to typed defaults before use.
  */
 export function loadAudioPrefs(): AudioPrefs {
 	try {
 		const rawLang = localStorage.getItem(KEY_MAP.callerLang);
-		const rawVolume = parseFloat(localStorage.getItem(KEY_MAP.audioVolume) ?? '');
-		const audioVolume = isNaN(rawVolume) ? 0.5 : Math.min(1, Math.max(0, rawVolume));
+		const rawCaller = parseFloat(localStorage.getItem(KEY_MAP.callerVolume) ?? '');
+		const rawMusic = parseFloat(localStorage.getItem(KEY_MAP.musicVolume) ?? '');
+		const clamp = (v: number, fb: number) => isNaN(v) ? fb : Math.min(1, Math.max(0, v));
 		return {
 			callerEnabled: localStorage.getItem(KEY_MAP.callerEnabled) === 'true',
-			callerLang: (rawLang === 'de' || rawLang === 'en') ? rawLang : 'de',
+			callerLang: (rawLang === 'de' || rawLang === 'en') ? rawLang : 'en',
 			sfxEnabled: localStorage.getItem(KEY_MAP.sfxEnabled) === 'true',
-			pauseEnabled: localStorage.getItem(KEY_MAP.pauseEnabled) !== 'false', // default true
+			pauseEnabled: localStorage.getItem(KEY_MAP.pauseEnabled) !== 'false',
 			pauseLegs: Number(localStorage.getItem(KEY_MAP.pauseLegs)) || 5,
 			pauseMinutes: Number(localStorage.getItem(KEY_MAP.pauseMinutes)) || 8,
-			audioVolume,
+			callerVolume: clamp(rawCaller, DEFAULTS.callerVolume),
+			musicVolume: clamp(rawMusic, DEFAULTS.musicVolume),
 		};
 	} catch {
 		return { ...DEFAULTS };

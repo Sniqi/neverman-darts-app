@@ -26,70 +26,70 @@ beforeEach(() => {
 describe('audio-sfx', () => {
 	describe('playSfx — disabled guard (D-06)', () => {
 		it('does NOT construct Audio when sfxEnabled=false', () => {
-			playSfx('180', false);
+			playSfx('game_win', false);
 			expect(MockAudio).not.toHaveBeenCalled();
 		});
 
 		it('does NOT call play() when sfxEnabled=false', () => {
-			playSfx('180', false);
+			playSfx('game_win', false);
 			expect(mockPlay).not.toHaveBeenCalled();
 		});
 
 		it('is a no-op for all event types when disabled', () => {
-			playSfx('highfinish', false);
-			playSfx('record', false);
+			playSfx('set_win', false);
+			playSfx('pause', false);
 			expect(MockAudio).not.toHaveBeenCalled();
 		});
 	});
 
 	describe('playSfx — enabled (AUD-02)', () => {
-		it('constructs Audio with /sfx/180.mp3 for "180" event', () => {
-			playSfx('180', true);
-			expect(MockAudio).toHaveBeenCalledWith('/sfx/180.mp3');
+		it('constructs Audio with /music/game_win.mp3 for "game_win" event', () => {
+			playSfx('game_win', true);
+			expect(MockAudio).toHaveBeenCalledWith('/music/game_win.mp3');
 		});
 
-		it('constructs Audio with /sfx/highfinish.mp3 for "highfinish" event', () => {
-			playSfx('highfinish', true);
-			expect(MockAudio).toHaveBeenCalledWith('/sfx/highfinish.mp3');
+		it('constructs Audio with /music/set_win.mp3 for "set_win" event', () => {
+			playSfx('set_win', true);
+			expect(MockAudio).toHaveBeenCalledWith('/music/set_win.mp3');
 		});
 
-		it('constructs Audio with /sfx/record.mp3 for "record" event', () => {
-			playSfx('record', true);
-			expect(MockAudio).toHaveBeenCalledWith('/sfx/record.mp3');
+		it('constructs Audio with /music/pause.mp3 for "pause" event', () => {
+			playSfx('pause', true);
+			expect(MockAudio).toHaveBeenCalledWith('/music/pause.mp3');
 		});
 
 		it('prepends base path when provided (AUD-02/PLAT-02 — GitHub Pages subpath)', () => {
-			playSfx('180', true, 0.5, '/neverman-darts-app');
-			expect(MockAudio).toHaveBeenCalledWith('/neverman-darts-app/sfx/180.mp3');
+			playSfx('game_win', true, 0.5, '/neverman-darts-app');
+			expect(MockAudio).toHaveBeenCalledWith('/neverman-darts-app/music/game_win.mp3');
 		});
 
 		it('default base "" leaves URL unchanged (dev environment)', () => {
-			playSfx('180', true, 0.5);
-			expect(MockAudio).toHaveBeenCalledWith('/sfx/180.mp3');
+			playSfx('game_win', true, 0.5);
+			expect(MockAudio).toHaveBeenCalledWith('/music/game_win.mp3');
 		});
 
 		it('sets volume to 0.8 (default) on the Audio instance', () => {
-			playSfx('180', true);
+			playSfx('game_win', true);
 			expect(lastAudioInstance?.volume).toBe(0.8);
 		});
 
 		it('applies a custom volume when provided', () => {
-			playSfx('180', true, 0.5);
+			playSfx('game_win', true, 0.5);
 			expect(lastAudioInstance?.volume).toBe(0.5);
 		});
 
 		it('clamps volume above 1 to 1', () => {
-			playSfx('180', true, 1.5);
+			playSfx('game_win', true, 1.5);
 			expect(lastAudioInstance?.volume).toBe(1);
 		});
 
 		it('clamps volume below 0 to 0', () => {
-			playSfx('180', true, -0.3);
+			playSfx('game_win', true, -0.3);
 			expect(lastAudioInstance?.volume).toBe(0);
 		});
 
 		it('calls play() on the Audio instance', () => {
-			playSfx('180', true);
+			playSfx('game_win', true);
 			expect(mockPlay).toHaveBeenCalledOnce();
 		});
 	});
@@ -99,12 +99,12 @@ describe('audio-sfx', () => {
 			MockAudio.mockImplementationOnce(() => {
 				throw new Error('Audio unavailable');
 			});
-			expect(() => playSfx('180', true)).not.toThrow();
+			expect(() => playSfx('game_win', true)).not.toThrow();
 		});
 
 		it('does not throw when play() rejects (autoplay policy)', () => {
 			mockPlay.mockRejectedValueOnce(new DOMException('NotAllowedError'));
-			expect(() => playSfx('record', true)).not.toThrow();
+			expect(() => playSfx('pause', true)).not.toThrow();
 		});
 	});
 });

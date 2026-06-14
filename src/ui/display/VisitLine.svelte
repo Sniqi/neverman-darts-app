@@ -73,7 +73,7 @@
 
 <style>
 	.visit-line {
-		font-size: clamp(0.875rem, 1.5vw, 1.75rem);
+		font-size: clamp(1rem, 5cqw, 3.2rem);
 		font-weight: 400;
 		line-height: 1.3;
 		color: var(--text, #f0f0f0);

@@ -7,7 +7,6 @@
 	import { legAverage, matchAverage } from '../../engine/averages.js';
 	import { getSuggestion } from '../../engine/checkout.js';
 	import type { PlayerState, MatchConfig, DartScore, Visit } from '../../engine/types.js';
-	import VisitLine from './VisitLine.svelte';
 
 	interface Props {
 		player: PlayerState;
@@ -27,13 +26,18 @@
 		return `${prefix}${dart.segment}`;
 	}
 
+	let liveVisitTotal = $derived(currentVisit.reduce((s, d) => s + d.multiplier * d.segment, 0));
+
 	// Live remaining: for the active player subtract the current-visit running total
 	// so the score display counts down dart-by-dart (D-05).
 	let liveRemaining = $derived.by(() => {
 		if (!isActive || currentVisit.length === 0) return player.remaining;
-		const visitTotal = currentVisit.reduce((s, d) => s + d.multiplier * d.segment, 0);
-		return player.remaining - visitTotal;
+		return player.remaining - liveVisitTotal;
 	});
+
+	// Live in-progress visit shown as the bottom history row (replaces the separate
+	// VisitLine): present only for the active player once at least one dart is thrown.
+	let hasLiveRow = $derived(isActive && currentVisit.length > 0);
 
 	let legAvg = $derived.by(() => {
 		const legVisits = player.visits.slice(legStartIndex);
@@ -58,12 +62,12 @@
 		const visits = player.visits;
 		if (visits.length === 0) return [];
 		let after = player.remaining;
-		const result: Array<{ visit: Visit; scoreBefore: number; scoreAfter: number }> = [];
+		const result: Array<{ visit: Visit; total: number; scoreAfter: number }> = [];
 		for (let i = visits.length - 1; i >= Math.max(0, visits.length - 4); i--) {
 			const v = visits[i];
 			const total = v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0);
 			const before = v.bust ? after : after + total;
-			result.unshift({ visit: v, scoreBefore: before, scoreAfter: after });
+			result.unshift({ visit: v, total, scoreAfter: after });
 			after = before;
 		}
 		return result;
@@ -129,35 +133,45 @@
 		</div>
 	</div>
 
-	<!-- History of last 4 completed visits (≈ last 12 darts) -->
-	<div class="history-box">
-		<div class="history-section">
-			{#each recentVisitsWithScores as { visit: v, scoreBefore, scoreAfter: scoreAfterVisit }, idx (idx)}
-				{@const isLast = idx === recentVisitsWithScores.length - 1}
-				{@const total = v.darts.reduce((s, d) => s + d.multiplier * d.segment, 0)}
-				<div class="history-row" class:bust-row={v.bust} class:last-row={isLast}>
-					<span class="h-score-before">{scoreBefore}</span>
-					<span class="h-sep">-</span>
-					<span class="h-total">{v.bust ? 'BUST' : total}</span>
-					<span class="h-dart">{v.darts[0] ? formatDart(v.darts[0]) : ''}</span>
-					<span class="h-dart">{v.darts[1] ? formatDart(v.darts[1]) : ''}</span>
-					<span class="h-dart">{v.darts[2] ? formatDart(v.darts[2]) : ''}</span>
-					<span class="h-sep">{v.bust ? '' : '='}</span>
-					<span class="h-score-after">{v.bust ? '' : scoreAfterVisit}</span>
-				</div>
+	{#snippet dartPills(darts: DartScore[])}
+		<div class="h-darts">
+			{#each darts as d}
+				<span
+					class="dart-pill"
+					class:triple={d.multiplier === 3 && d.segment !== 25}
+					class:double={d.multiplier === 2 && d.segment !== 25}
+					class:bull={d.segment === 25}
+					class:miss={d.segment === 0}
+				>{formatDart(d)}</span>
 			{/each}
 		</div>
-	</div>
+	{/snippet}
 
+	<!-- Checkout suggestion (D-06): the darts to throw, shown above the history -->
 	{#if checkoutRoute}
 		<div class="checkout-route">{checkoutRoute}</div>
 	{/if}
 
-	<VisitLine
-		{currentVisit}
-		lastCompletedVisit={null}
-		completedTotal={null}
-	/>
+	<!-- Recent completed visits + the live in-progress visit as the bottom row -->
+	<div class="history-box">
+		<div class="history-section">
+			{#each recentVisitsWithScores as { visit: v, total, scoreAfter: scoreAfterVisit }, idx (idx)}
+				{@const isLast = idx === recentVisitsWithScores.length - 1 && !hasLiveRow}
+				<div class="history-row" class:bust-row={v.bust} class:last-row={isLast}>
+					{@render dartPills(v.darts)}
+					<span class="h-total">{v.bust ? 'BUST' : total}</span>
+					<span class="h-remaining"><span class="h-arrow" aria-hidden="true">→</span>{scoreAfterVisit}</span>
+				</div>
+			{/each}
+			{#if hasLiveRow}
+				<div class="history-row last-row live-row">
+					{@render dartPills(currentVisit)}
+					<span class="h-total">{liveVisitTotal}</span>
+					<span class="h-remaining"><span class="h-arrow" aria-hidden="true">→</span>{liveRemaining}</span>
+				</div>
+			{/if}
+		</div>
+	</div>
 
 	<div class="stats-line">
 		<span class="stat"><span class="stat-label">Ø Leg</span> <span class="stat-val">{legAvg}</span></span>
@@ -171,7 +185,7 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		padding: var(--space-lg, 24px) var(--space-md, 16px);
+		padding: clamp(8px, 2cqw, 24px) clamp(8px, 2cqw, 18px);
 		background: linear-gradient(165deg, #1f222b 0%, #16181f 100%);
 		border-top: 4px solid transparent;
 		opacity: 0.5;
@@ -179,8 +193,11 @@
 			box-shadow 200ms ease;
 		height: 100%;
 		overflow: hidden;
-		gap: var(--space-sm, 8px);
+		gap: clamp(4px, 1.2cqw, 12px);
 		font-variant-numeric: tabular-nums;
+		/* Each panel sizes its own text to its column width (cqw) — so 2/3/4-player
+		   layouts and any viewport scale proportionally instead of bleeding over. */
+		container-type: inline-size;
 	}
 
 	.player-panel.active {
@@ -205,7 +222,7 @@
 	}
 
 	.bust-label {
-		font-size: clamp(2rem, 5vw, 6rem);
+		font-size: clamp(1.5rem, 17cqw, 6rem);
 		font-weight: 600;
 		color: #c0392b;
 		letter-spacing: 0.05em;
@@ -232,11 +249,20 @@
 	}
 
 	.name-score-row {
-		position: relative;
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.3em;
+		min-width: 0;
 	}
 
 	.player-name {
-		font-size: clamp(3rem, 6vw, 8.4rem);
+		flex: 0 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: clamp(1.6rem, 11cqw, 8.5rem);
 		font-weight: 700;
 		line-height: 1.1;
 		letter-spacing: -0.01em;
@@ -252,9 +278,10 @@
 	.ls-chip {
 		display: inline-flex;
 		align-items: baseline;
-		font-size: clamp(1.75rem, 3.2vw, 4.6rem);
+		font-size: clamp(1.1rem, 6.5cqw, 4.4rem);
 		font-weight: 600;
 		line-height: 1.15;
+		white-space: nowrap;
 		color: var(--text, #f0f0f0);
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
@@ -268,16 +295,13 @@
 	}
 
 	.remaining-score {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		font-size: clamp(5rem, 10vw, 14rem);
+		flex: 0 0 auto;
+		font-size: clamp(3rem, 23cqw, 16rem);
 		font-weight: 700;
 		line-height: 1;
 		letter-spacing: -0.03em;
 		color: var(--text, #f0f0f0);
-		text-align: center;
+		text-align: right;
 		pointer-events: none;
 	}
 
@@ -294,7 +318,7 @@
 		background: rgba(255, 255, 255, 0.025);
 		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
 		border-radius: var(--radius-md, 12px);
-		padding: var(--space-sm, 8px) var(--space-md, 16px);
+		padding: clamp(4px, 1cqw, 10px);
 		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 		overflow: hidden;
 	}
@@ -304,57 +328,140 @@
 		border-color: var(--line-strong, rgba(255, 255, 255, 0.14));
 	}
 
+	/* Full-width visit rows. A single 3-column grid aligns darts | total | rest
+	   across every row; each row re-exposes those tracks via subgrid so it can
+	   carry its own rounded background while staying column-aligned. */
 	.history-section {
 		flex: 1 1 auto;
 		display: grid;
-		grid-template-columns: auto auto auto auto auto auto auto auto;
-		column-gap: 0.8em;
-		row-gap: 0.1em;
+		grid-template-columns: 1fr auto auto;
 		align-content: end;
-		justify-content: start;
+		row-gap: clamp(3px, 0.8cqw, 9px);
 		overflow: hidden;
 	}
 
 	.history-row {
-		display: contents;
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		align-items: center;
+		column-gap: clamp(0.4em, 1.5cqw, 0.9em);
+		padding: clamp(3px, 0.9cqw, 9px) clamp(6px, 1.6cqw, 14px);
+		border-radius: var(--radius-sm, 8px);
+		background: rgba(255, 255, 255, 0.03);
+		opacity: 0.62;
+		transition: opacity 200ms ease, background 200ms ease;
 	}
 
-	.history-row > span {
-		font-size: clamp(2.2rem, 3.75vw, 4.375rem);
-		font-weight: 400;
-		line-height: 1.4;
-		color: var(--text, #f0f0f0);
-		opacity: 0.55;
-	}
-
-	.history-row.last-row > span {
+	/* Newest visit reads first: brighter, accent-tinted, amber edge */
+	.history-row.last-row {
 		opacity: 1;
+		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
+		box-shadow: inset 3px 0 0 var(--accent, #e8a020);
 	}
 
-	.history-row.bust-row > span {
-		color: #c0392b;
+	/* Live in-progress visit: stronger tint + gentle pulse on the amber edge */
+	.history-row.live-row {
+		background: rgba(232, 160, 32, 0.18);
+		animation: liveRowPulse 1.6s ease-in-out infinite;
 	}
 
-	.h-score-before,
-	.h-total,
-	.h-score-after {
+	@keyframes liveRowPulse {
+		0%, 100% { box-shadow: inset 3px 0 0 var(--accent, #e8a020); }
+		50%      { box-shadow: inset 5px 0 0 var(--accent, #e8a020); }
+	}
+
+	/* Darts: pills, left-aligned, wrap only as a last resort */
+	.h-darts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: clamp(0.2em, 0.8cqw, 0.5em);
+		min-width: 0;
+	}
+
+	.dart-pill {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: clamp(1rem, 5cqw, 3.2rem);
+		font-weight: 600;
+		line-height: 1.1;
+		letter-spacing: 0.01em;
+		padding: 0.12em 0.5em;
+		border-radius: 999px;
+		white-space: nowrap;
+		color: rgba(240, 240, 240, 0.78);
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+	}
+
+	/* High-value darts glow amber so big visits pop from across the room */
+	.dart-pill.triple,
+	.dart-pill.bull {
+		color: var(--accent, #e8a020);
+		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
+		border-color: var(--accent-line, rgba(232, 160, 32, 0.45));
+	}
+
+	.dart-pill.double {
+		color: #f0d8a8;
+		background: rgba(232, 160, 32, 0.07);
+		border-color: rgba(232, 160, 32, 0.3);
+	}
+
+	.dart-pill.miss {
+		color: rgba(240, 240, 240, 0.35);
+		border-style: dashed;
+	}
+
+	/* Visit total — the headline number for the row */
+	.h-total {
+		font-size: clamp(1.2rem, 6.7cqw, 4.5rem);
+		font-weight: 700;
+		line-height: 1;
+		text-align: right;
+		color: var(--text, #f0f0f0);
+		white-space: nowrap;
+	}
+
+	/* Remaining after the visit — quieter, with a direction cue */
+	.h-remaining {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.25em;
+		font-size: clamp(1rem, 5.4cqw, 3.6rem);
 		font-weight: 600;
 		text-align: right;
+		color: rgba(240, 240, 240, 0.5);
+		white-space: nowrap;
 	}
 
-	.h-sep {
-		text-align: center;
+	.history-row.last-row .h-remaining {
+		color: rgba(240, 240, 240, 0.78);
 	}
 
-	.h-dart {
-		text-align: right;
-		opacity: 0.8;
+	.h-arrow {
+		opacity: 0.45;
+		font-weight: 400;
+	}
+
+	/* Bust: red total, struck-through dart pills, score unchanged */
+	.history-row.bust-row .h-total {
+		color: var(--destructive, #c0392b);
+		font-size: clamp(1rem, 4.8cqw, 3.2rem);
+	}
+
+	.history-row.bust-row .dart-pill {
+		color: rgba(192, 57, 43, 0.7);
+		background: rgba(192, 57, 43, 0.08);
+		border-color: rgba(192, 57, 43, 0.3);
+		text-decoration: line-through;
 	}
 
 	/* Checkout route (D-06): amber callout pill */
 	.checkout-route {
 		align-self: flex-start;
-		font-size: clamp(1.2rem, 2.2vw, 2.8rem);
+		font-size: clamp(1rem, 5.5cqw, 3rem);
 		font-weight: 700;
 		letter-spacing: 0.02em;
 		color: var(--accent, #e8a020);
@@ -369,10 +476,11 @@
 	.stats-line {
 		display: flex;
 		align-items: center;
-		gap: var(--space-md, 16px);
+		flex-wrap: wrap;
+		gap: var(--space-xs, 4px) var(--space-md, 16px);
 		padding-top: var(--space-sm, 8px);
 		border-top: 1px solid var(--line, rgba(255, 255, 255, 0.08));
-		font-size: clamp(2rem, 4vw, 5.6rem);
+		font-size: clamp(1rem, 5.8cqw, 3.8rem);
 		font-weight: 400;
 		line-height: 1.2;
 		color: var(--text, #f0f0f0);
@@ -382,7 +490,7 @@
 		display: inline-flex;
 		align-items: baseline;
 		gap: 0.3em;
-		min-width: 0;
+		white-space: nowrap;
 	}
 
 	.stat-label {

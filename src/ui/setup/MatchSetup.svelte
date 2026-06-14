@@ -1,6 +1,6 @@
 <script lang="ts">
 	// MatchSetup.svelte — single scrollable setup screen (D-13, D-14).
-	// Defaults: 501, Double Out, first-to 3 legs, sets off (D-14).
+	// Defaults: 501, Double Out, first-to 2 legs, sets off (D-14).
 	// "Spiel starten" disabled until ≥1 player added (T-04-03, FLOW-01).
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
@@ -22,7 +22,7 @@
 	// Setup config state
 	let startScore = $state<301 | 401 | 501>(301);
 	let outRule = $state<'single' | 'double'>('single');
-	let legsToWin = $state(3);
+	let legsToWin = $state(2);
 	let setsEnabled = $state(true);
 	let setsToWin = $state(2);
 
@@ -153,7 +153,7 @@
 	<section>
 		<h2>Format</h2>
 		<div class="stepper-row">
-			<span class="stepper-label">Legs</span>
+			<span class="stepper-label">Legs - First to</span>
 			<div class="stepper">
 				<button class="stepper-btn" onclick={() => adjustLegs(-1)} disabled={legsToWin <= 1} aria-label="Legs verringern">−</button>
 				<span class="stepper-value">{legsToWin}</span>
@@ -162,7 +162,7 @@
 		</div>
 
 		<div class="toggle-row">
-			<label class="toggle-label" for="sets-toggle">Sätze</label>
+			<label class="toggle-label" for="sets-toggle">Sets</label>
 			<input
 				id="sets-toggle"
 				type="checkbox"
@@ -173,7 +173,7 @@
 
 		{#if setsEnabled}
 			<div class="stepper-row">
-				<span class="stepper-label">Sätze</span>
+				<span class="stepper-label">Sets - First to</span>
 				<div class="stepper">
 					<button class="stepper-btn" onclick={() => adjustSets(-1)} disabled={setsToWin <= 1} aria-label="Sätze verringern">−</button>
 					<span class="stepper-value">{setsToWin}</span>

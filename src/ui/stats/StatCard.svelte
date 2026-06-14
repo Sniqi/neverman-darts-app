@@ -28,14 +28,14 @@
 	}
 
 	.stat-value {
-		font-size: 20px;
+		font-size: 28px;
 		font-weight: 600;
 		color: #f0f0f0;
 		line-height: 1.2;
 	}
 
 	.stat-label {
-		font-size: 14px;
+		font-size: 18px;
 		font-weight: 400;
 		color: #888888;
 		line-height: 1.4;

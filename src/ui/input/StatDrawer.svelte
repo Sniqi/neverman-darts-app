@@ -201,7 +201,7 @@
 	}
 
 	.column-heading {
-		font-size: 14px;
+		font-size: 18px;
 		font-weight: 400;
 		color: #888888;
 		margin: 0;

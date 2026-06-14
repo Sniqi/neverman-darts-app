@@ -562,10 +562,10 @@ describe('MatchStore', () => {
 
 	// ── Auto-pause (FLOW-02 / D-08) ──────────────────────────────────────────
 	//
-	// Uses a 1-leg pause interval so the threshold is hit quickly in tests.
+	// Uses a 1-set pause interval so the threshold is hit quickly in tests.
 	// BroadcastChannel is stubbed (same as record detection tests above).
 	// localStorage is stubbed to inject test prefs so #checkAutoPause reads
-	// the desired pauseEnabled/pauseLegs/pauseMinutes values.
+	// the desired pauseEnabled/pauseSets/pauseMinutes values.
 	//
 	// NOTE: MatchStore reads prefs once in its constructor via loadAudioPrefs().
 	// Tests must stub localStorage BEFORE creating the store instance.
@@ -579,24 +579,26 @@ describe('MatchStore', () => {
 			s.dispatch({ type: 'NUMPAD_VISIT', total: 40, dartsUsed: 1, dartsAtDouble: 1 });
 		}
 
-		const config3Legs: MatchConfig = {
+		// Pause is set-based: each completeLeg() must also win a set.
+		// legsToWin:1 means 1 leg wins a set; setsToWin:9 keeps the match alive.
+		const configSets1Leg: MatchConfig = {
 			startScore: 501,
 			outRule: 'double',
-			legsToWin: 3,
-			setsEnabled: false,
-			setsToWin: 1,
+			legsToWin: 1,
+			setsEnabled: true,
+			setsToWin: 9,
 		};
 
 		/** Create a fresh MatchStore with prefs injected via localStorage stub. */
 		function makeStoreWithPrefs(prefs: {
 			pauseEnabled: boolean;
-			pauseLegs: number;
+			pauseSets: number;
 			pauseMinutes: number;
 		}): MatchStore {
 			vi.stubGlobal('localStorage', {
 				getItem: (key: string) => {
 					if (key === 'nvm_pause_enabled') return prefs.pauseEnabled ? 'true' : 'false';
-					if (key === 'nvm_pause_legs') return String(prefs.pauseLegs);
+					if (key === 'nvm_pause_sets') return String(prefs.pauseSets);
 					if (key === 'nvm_pause_minutes') return String(prefs.pauseMinutes);
 					return null;
 				},
@@ -615,44 +617,44 @@ describe('MatchStore', () => {
 			});
 		});
 
-		it('initial values: pauseLegCount=0, pauseActive=false, pauseRemainingSeconds=0', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 2 });
-			expect(s.pauseLegCount).toBe(0);
+		it('initial values: pauseSetCount=0, pauseActive=false, pauseRemainingSeconds=0', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 2 });
+			expect(s.pauseSetCount).toBe(0);
 			expect(s.pauseActive).toBe(false);
 			expect(s.pauseRemainingSeconds).toBe(0);
 		});
 
-		it('pauseActive becomes true after completing the configured number of legs (1-leg interval)', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 2 });
-			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+		it('pauseActive becomes true after completing the configured number of sets (1-set interval)', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 2 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
 			completeLeg(s);
-			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseSetCount).toBe(1);
 			expect(s.pauseActive).toBe(true);
 			expect(s.pauseRemainingSeconds).toBe(120); // 2 * 60
 		});
 
 		it('pauseActive stays false when pauseEnabled=false', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: false, pauseLegs: 1, pauseMinutes: 2 });
-			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			const s = makeStoreWithPrefs({ pauseEnabled: false, pauseSets: 1, pauseMinutes: 2 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
 			completeLeg(s);
-			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseSetCount).toBe(1);
 			expect(s.pauseActive).toBe(false);
 		});
 
-		it('pauseLegCount increments per completed leg (2-leg interval, no pause at leg 1)', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 2, pauseMinutes: 1 });
-			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+		it('pauseSetCount increments per completed set (2-set interval, no pause at set 1)', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 2, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
 			completeLeg(s);
-			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseSetCount).toBe(1);
 			expect(s.pauseActive).toBe(false);
 			completeLeg(s);
-			expect(s.pauseLegCount).toBe(2);
+			expect(s.pauseSetCount).toBe(2);
 			expect(s.pauseActive).toBe(true);
 		});
 
 		it('decrementPause reduces remainingSeconds and does not go negative', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 1 });
-			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
 			completeLeg(s);
 			expect(s.pauseActive).toBe(true);
 			expect(s.pauseRemainingSeconds).toBe(60);
@@ -665,8 +667,8 @@ describe('MatchStore', () => {
 		it('decrementPause to 0: shows zero state (UI-1 flash), then auto-resumes after 800ms', () => {
 			vi.useFakeTimers();
 			try {
-				const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 1 });
-				s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+				const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 1 });
+				s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
 				completeLeg(s);
 				// Drain all but the last second
 				for (let i = 0; i < 59; i++) {
@@ -688,8 +690,8 @@ describe('MatchStore', () => {
 		});
 
 		it('resumePause immediately clears pauseActive and pauseRemainingSeconds', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 1, pauseMinutes: 5 });
-			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 5 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
 			completeLeg(s);
 			expect(s.pauseActive).toBe(true);
 			s.resumePause();
@@ -697,8 +699,7 @@ describe('MatchStore', () => {
 			expect(s.pauseRemainingSeconds).toBe(0);
 		});
 
-		it('pauseLegCount still advances after a set win (legsWon resets but legCompleted does not)', () => {
-			// Use a sets-enabled config so legsWon resets mid-match
+		it('pauseSetCount advances per set won; no pause at match-complete even when threshold hit', () => {
 			const configSets: MatchConfig = {
 				startScore: 501,
 				outRule: 'double',
@@ -706,18 +707,18 @@ describe('MatchStore', () => {
 				setsEnabled: true,
 				setsToWin: 2,       // 2 sets to win the match
 			};
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 2, pauseMinutes: 1 });
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 2, pauseMinutes: 1 });
 			s.dispatch({ type: 'START_MATCH', config: configSets, players: [player1], order: ['p1'] });
 
 			// Complete leg 1 (wins set 1; legsWon resets to 0)
 			completeLeg(s);
-			expect(s.pauseLegCount).toBe(1);
+			expect(s.pauseSetCount).toBe(1);
 			expect(s.pauseActive).toBe(false); // threshold=2, not reached yet
 
-			// Complete leg 2 (wins set 2 → match-complete; but pauseLegCount should be 2)
+			// Complete leg 2 (wins set 2 → match-complete; but pauseSetCount should be 2)
 			// pauseActive should NOT fire because phase === 'match-complete'
 			completeLeg(s);
-			expect(s.pauseLegCount).toBe(2);
+			expect(s.pauseSetCount).toBe(2);
 			// match is complete so pause should not trigger
 			expect(s.pauseActive).toBe(false);
 		});
@@ -726,13 +727,13 @@ describe('MatchStore', () => {
 			// Simulate: store was created with pauseEnabled=false (stale constructor value),
 			// then user changes to pauseEnabled=true in Setup before starting a match.
 			// The new prefs must be picked up at START_MATCH, not at construction.
-			const s = makeStoreWithPrefs({ pauseEnabled: false, pauseLegs: 1, pauseMinutes: 2 });
+			const s = makeStoreWithPrefs({ pauseEnabled: false, pauseSets: 1, pauseMinutes: 2 });
 
 			// Now update localStorage to reflect the in-session change
 			vi.stubGlobal('localStorage', {
 				getItem: (key: string) => {
 					if (key === 'nvm_pause_enabled') return 'true';
-					if (key === 'nvm_pause_legs') return '1';
+					if (key === 'nvm_pause_sets') return '1';
 					if (key === 'nvm_pause_minutes') return '2';
 					return null;
 				},
@@ -740,30 +741,29 @@ describe('MatchStore', () => {
 				removeItem: () => {},
 			});
 
-			// START_MATCH must refresh prefs — pause should now fire after 1 leg
-			s.dispatch({ type: 'START_MATCH', config: config3Legs, players: [player1], order: ['p1'] });
+			// START_MATCH must refresh prefs — pause should now fire after 1 set
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
 			completeLeg(s);
 			expect(s.pauseActive).toBe(true);
 		});
 
-		it('pause threshold trips correctly at 5-leg default (no pause before 5 legs)', () => {
-			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseLegs: 5, pauseMinutes: 8 });
-			// Use legsToWin:9 so we can play 5 legs without ending the match
+		it('pause threshold trips correctly at 2-set default (no pause before 2 sets)', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 2, pauseMinutes: 8 });
+			// setsToWin:9 so we can play 2 sets without ending the match
 			const configLong: MatchConfig = {
 				startScore: 501,
 				outRule: 'double',
-				legsToWin: 9,
-				setsEnabled: false,
-				setsToWin: 1,
+				legsToWin: 1,
+				setsEnabled: true,
+				setsToWin: 9,
 			};
 			s.dispatch({ type: 'START_MATCH', config: configLong, players: [player1], order: ['p1'] });
 
-			for (let i = 1; i <= 4; i++) {
-				completeLeg(s);
-				expect(s.pauseActive).toBe(false);
-			}
 			completeLeg(s);
-			expect(s.pauseLegCount).toBe(5);
+			expect(s.pauseSetCount).toBe(1);
+			expect(s.pauseActive).toBe(false);
+			completeLeg(s);
+			expect(s.pauseSetCount).toBe(2);
 			expect(s.pauseActive).toBe(true);
 			expect(s.pauseRemainingSeconds).toBe(480); // 8 * 60
 		});

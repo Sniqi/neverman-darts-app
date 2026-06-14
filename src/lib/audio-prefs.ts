@@ -8,7 +8,7 @@ export interface AudioPrefs {
 	callerLang: 'de' | 'en';
 	sfxEnabled: boolean;
 	pauseEnabled: boolean;
-	pauseLegs: number;
+	pauseSets: number;
 	pauseMinutes: number;
 	/** Volume for the caller voice. Range 0..1, default 0.5. */
 	callerVolume: number;
@@ -21,7 +21,7 @@ const DEFAULTS: AudioPrefs = {
 	callerLang: 'en',
 	sfxEnabled: false,      // D-06: music OFF by default
 	pauseEnabled: true,     // D-08: auto-pause ON by default
-	pauseLegs: 5,           // D-08: every 5 legs
+	pauseSets: 2,           // D-08: every 2 sets
 	pauseMinutes: 8,        // D-08: 8-minute countdown
 	callerVolume: 0.5,
 	musicVolume: 0.25,
@@ -32,7 +32,7 @@ const KEY_MAP: Record<keyof AudioPrefs, string> = {
 	callerLang: 'nvm_caller_lang',
 	sfxEnabled: 'nvm_sfx_enabled',
 	pauseEnabled: 'nvm_pause_enabled',
-	pauseLegs: 'nvm_pause_legs',
+	pauseSets: 'nvm_pause_sets',
 	pauseMinutes: 'nvm_pause_minutes',
 	callerVolume: 'nvm_caller_volume',
 	musicVolume: 'nvm_music_volume',
@@ -53,7 +53,7 @@ export function loadAudioPrefs(): AudioPrefs {
 			callerLang: (rawLang === 'de' || rawLang === 'en') ? rawLang : 'en',
 			sfxEnabled: localStorage.getItem(KEY_MAP.sfxEnabled) === 'true',
 			pauseEnabled: localStorage.getItem(KEY_MAP.pauseEnabled) !== 'false',
-			pauseLegs: Number(localStorage.getItem(KEY_MAP.pauseLegs)) || 5,
+			pauseSets: Number(localStorage.getItem(KEY_MAP.pauseSets)) || 2,
 			pauseMinutes: Number(localStorage.getItem(KEY_MAP.pauseMinutes)) || 8,
 			callerVolume: clamp(rawCaller, DEFAULTS.callerVolume),
 			musicVolume: clamp(rawMusic, DEFAULTS.musicVolume),

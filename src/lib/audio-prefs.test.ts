@@ -28,7 +28,7 @@ describe('audio-prefs', () => {
 				callerLang: 'en',
 				sfxEnabled: false,
 				pauseEnabled: true,
-				pauseLegs: 5,
+				pauseSets: 2,
 				pauseMinutes: 8,
 				callerVolume: 0.5,
 				musicVolume: 0.25,
@@ -57,8 +57,8 @@ describe('audio-prefs', () => {
 			expect(loadAudioPrefs().pauseEnabled).toBe(false);
 		});
 
-		it('pauseLegs falls back to 5 when key is absent', () => {
-			expect(loadAudioPrefs().pauseLegs).toBe(5);
+		it('pauseSets falls back to 2 when key is absent', () => {
+			expect(loadAudioPrefs().pauseSets).toBe(2);
 		});
 
 		it('pauseMinutes falls back to 8 when key is absent', () => {
@@ -68,12 +68,12 @@ describe('audio-prefs', () => {
 		it('reads back values written by saveAudioPref', () => {
 			saveAudioPref('callerEnabled', true);
 			saveAudioPref('callerLang', 'en');
-			saveAudioPref('pauseLegs', 3);
+			saveAudioPref('pauseSets', 3);
 			saveAudioPref('pauseMinutes', 10);
 			const prefs = loadAudioPrefs();
 			expect(prefs.callerEnabled).toBe(true);
 			expect(prefs.callerLang).toBe('en');
-			expect(prefs.pauseLegs).toBe(3);
+			expect(prefs.pauseSets).toBe(3);
 			expect(prefs.pauseMinutes).toBe(10);
 		});
 
@@ -127,9 +127,9 @@ describe('audio-prefs', () => {
 			expect(localStorage.getItem('nvm_caller_enabled')).toBe('false');
 		});
 
-		it('writes nvm_pause_legs = "7" for pauseLegs=7', () => {
-			saveAudioPref('pauseLegs', 7);
-			expect(localStorage.getItem('nvm_pause_legs')).toBe('7');
+		it('writes nvm_pause_sets = "7" for pauseSets=7', () => {
+			saveAudioPref('pauseSets', 7);
+			expect(localStorage.getItem('nvm_pause_sets')).toBe('7');
 		});
 
 		it('writes nvm_pause_minutes = "12" for pauseMinutes=12', () => {

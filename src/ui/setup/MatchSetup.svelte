@@ -85,16 +85,16 @@
 	let callerEnabled = $state(audioPrefs.callerEnabled);
 	let sfxEnabled = $state(audioPrefs.sfxEnabled);
 	let pauseEnabled = $state(audioPrefs.pauseEnabled);
-	let pauseLegs = $state(audioPrefs.pauseLegs);
+	let pauseSets = $state(audioPrefs.pauseSets);
 	let pauseMinutes = $state(audioPrefs.pauseMinutes);
 	let callerVolume = $state(audioPrefs.callerVolume);
 	let musicVolume = $state(audioPrefs.musicVolume);
 
-	function adjustPauseLegs(delta: number) {
-		const next = pauseLegs + delta;
-		if (next >= 1 && next <= 20) {
-			pauseLegs = next;
-			saveAudioPref('pauseLegs', next);
+	function adjustPauseSets(delta: number) {
+		const next = pauseSets + delta;
+		if (next >= 1 && next <= 9) {
+			pauseSets = next;
+			saveAudioPref('pauseSets', next);
 		}
 	}
 
@@ -307,11 +307,11 @@
 			<div class="stepper-row">
 				<span class="stepper-label">Pause nach</span>
 				<div class="stepper">
-					<button class="stepper-btn" onclick={() => adjustPauseLegs(-1)} disabled={pauseLegs <= 1} aria-label="Legs verringern">−</button>
-					<span class="stepper-value">{pauseLegs}</span>
-					<button class="stepper-btn" onclick={() => adjustPauseLegs(1)} disabled={pauseLegs >= 20} aria-label="Legs erhöhen">+</button>
+					<button class="stepper-btn" onclick={() => adjustPauseSets(-1)} disabled={pauseSets <= 1} aria-label="Sets verringern">−</button>
+					<span class="stepper-value">{pauseSets}</span>
+					<button class="stepper-btn" onclick={() => adjustPauseSets(1)} disabled={pauseSets >= 9} aria-label="Sets erhöhen">+</button>
 				</div>
-				<span class="stepper-unit">Legs</span>
+				<span class="stepper-unit">Sets</span>
 			</div>
 
 			<div class="stepper-row">

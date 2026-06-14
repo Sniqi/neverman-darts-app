@@ -61,11 +61,11 @@ export class MatchStore {
 
 	// ── Auto-pause state (FLOW-02 / D-08) ─────────────────────────────────────
 	// These are session/UI state — NOT added to MatchState/reducer (RESEARCH Pattern 3).
-	// pauseLegCount: total legs completed across the whole match (monotonic, set-reset-safe).
+	// pauseSetCount: total sets won across the whole match (monotonic).
 	// pauseActive: true while the pause countdown is visible.
 	// pauseRemainingSeconds: countdown seconds left (set to pauseMinutes*60 on trigger).
-	/** Total completed legs in the current match, used to detect the pause threshold. */
-	pauseLegCount = $state(0);
+	/** Total sets won in the current match, used to detect the pause threshold. */
+	pauseSetCount = $state(0);
 	/** True when the auto-pause countdown overlay should be shown. */
 	pauseActive = $state(false);
 	/** Remaining seconds on the countdown; 0 when not paused. */
@@ -73,13 +73,13 @@ export class MatchStore {
 
 	/** Pause config read once at construction from localStorage prefs (D-08). */
 	#pauseEnabled: boolean;
-	#pauseLegs: number;
+	#pauseSets: number;
 	#pauseMinutes: number;
 
 	constructor() {
 		const prefs = loadAudioPrefs();
 		this.#pauseEnabled = prefs.pauseEnabled;
-		this.#pauseLegs = prefs.pauseLegs;
+		this.#pauseSets = prefs.pauseSets;
 		this.#pauseMinutes = prefs.pauseMinutes;
 	}
 
@@ -91,7 +91,7 @@ export class MatchStore {
 	#refreshPauseConfig(): void {
 		const prefs = loadAudioPrefs();
 		this.#pauseEnabled = prefs.pauseEnabled;
-		this.#pauseLegs = prefs.pauseLegs;
+		this.#pauseSets = prefs.pauseSets;
 		this.#pauseMinutes = prefs.pauseMinutes;
 	}
 
@@ -365,28 +365,23 @@ export class MatchStore {
 	 * the auto-pause threshold has been reached. Called after every dispatch.
 	 * Never calls dispatch/reduce — only mutates pause $state fields (FLOW-02 / T-04-14).
 	 *
-	 * Uses legCompleted.length (monotonic across sets) NOT legsWon (resets on set win).
+	 * Uses setsWon (monotonic across the whole match) NOT legsWon (resets on set win).
 	 */
 	#checkAutoPause(prev: MatchState, next: MatchState): void {
-		// Count total completed legs across ALL players in both states.
-		// legCompleted is monotonically growing: set wins do NOT reset it (unlike legsWon).
-		const prevTotal = prev.players.reduce(
-			(sum, p) => sum + (p.legCompleted?.length ?? 0), 0
-		);
-		const nextTotal = next.players.reduce(
-			(sum, p) => sum + (p.legCompleted?.length ?? 0), 0
-		);
+		// Count total sets won across ALL players in both states (monotonically increasing).
+		const prevTotal = prev.players.reduce((sum, p) => sum + p.setsWon, 0);
+		const nextTotal = next.players.reduce((sum, p) => sum + p.setsWon, 0);
 
-		if (nextTotal <= prevTotal) return; // no leg completed this dispatch
+		if (nextTotal <= prevTotal) return; // no set won this dispatch
 
 		const delta = nextTotal - prevTotal;
-		this.pauseLegCount += delta;
+		this.pauseSetCount += delta;
 
 		// Only trigger when: enabled, threshold hit, not already paused, match still in play
 		if (
 			this.#pauseEnabled &&
-			this.#pauseLegs > 0 &&
-			this.pauseLegCount % this.#pauseLegs === 0 &&
+			this.#pauseSets > 0 &&
+			this.pauseSetCount % this.#pauseSets === 0 &&
 			!this.pauseActive &&
 			next.phase !== 'match-complete'
 		) {

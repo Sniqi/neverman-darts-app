@@ -13,6 +13,7 @@
 //   checkout_1.mp3 … checkout_170.mp3, checkout_180.mp3  ("You require N")
 //   name_<name>.mp3                        (per known player)
 //   throws_first.mp3, game_on.mp3          (game-start sequence)
+//   no_score.mp3                           (bust / all darts off the board)
 //
 // Skips existing files — safe to re-run if interrupted.
 // Estimated API usage: ~2,600 characters (well within 10k free tier).
@@ -85,8 +86,10 @@ const CHECKOUT_VOICE_SETTINGS = { stability: 0.55, similarity_boost: 0.75, style
 // Names: announcing quality, slightly warmer than checkout
 const NAME_VOICE_SETTINGS = { stability: 0.50, similarity_boost: 0.75, style: 0.22, use_speaker_boost: true };
 
-// Game start ("to throw first" / "Game on") — calm, even delivery (high stability, low style)
+// "Game on" — calm, even delivery (high stability, low style)
 const GAME_START_SETTINGS = { stability: 0.70, similarity_boost: 0.75, style: 0.05, use_speaker_boost: true };
+// "to throw first" — even calmer: max stability, no style
+const THROWS_FIRST_SETTINGS = { stability: 0.92, similarity_boost: 0.75, style: 0.0, use_speaker_boost: true };
 
 async function exists(path) {
 	try {
@@ -171,8 +174,13 @@ async function main() {
 	// ── Game start files ───────────────────────────────────────────────────
 	// Shared phrase, played after the per-player name_*.mp3: "{name} to throw first."
 	console.log(`\nGenerating game start files`);
-	await generateAudio('to throw first.', join(OUTPUT_DIR, 'throws_first.mp3'), GAME_START_SETTINGS);
+	await generateAudio('to throw first.', join(OUTPUT_DIR, 'throws_first.mp3'), THROWS_FIRST_SETTINGS);
 	await generateAudio('Game on.', join(OUTPUT_DIR, 'game_on.mp3'), GAME_START_SETTINGS);
+	process.stdout.write('\n');
+
+	// ── Misc caller files ───────────────────────────────────────────────────
+	console.log(`\nGenerating misc files`);
+	await generateAudio('No score.', join(OUTPUT_DIR, 'no_score.mp3'), CHECKOUT_VOICE_SETTINGS);
 	process.stdout.write('\n');
 
 	console.log('\nDone! Files written to static/sfx/caller/en/');

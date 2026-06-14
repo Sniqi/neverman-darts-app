@@ -59,16 +59,15 @@ test('miss-zone tap dispatches segment 0', async () => {
 	const rect = svg.getBoundingClientRect();
 
 	// Tap near the right edge (well outside double ring when rendered).
-	// viewBox="-190 -190 780 780": center=(200,200), double ring ends at r=325.
-	// Miss zone starts at r=325. In the rendered element, the SVG maps
-	// the 780-unit-wide viewBox onto rect.width pixels.
-	// To reach r=350 (safely in miss zone): screen offset = (rect.width / 780) * 350.
-	// r=350 is in miss zone (>325) and well within the board edge (r=390).
+	// viewBox="-200 -200 800 800": center=(200,200), double ring ends at r=340 (board.ts).
+	// Miss zone is r=340–400. In the rendered element, the SVG maps
+	// the 800-unit-wide viewBox onto rect.width pixels.
+	// To reach r=350 (safely in miss zone): screen offset = (rect.width / 800) * 350.
+	// r=350 is in miss zone (>340) and well within the board edge (r=400).
 	const centerX = rect.left + rect.width / 2;
 	const centerY = rect.top + rect.height / 2;
-	// In SVG space r=350 is miss zone (>325). Map to screen:
-	// scale = rect.width / 780  (since viewBox width = 780)
-	const scale = rect.width / 780;
+	// scale = rect.width / 800  (since viewBox width = 800)
+	const scale = rect.width / 800;
 	const missX = centerX + 350 * scale;
 	const missY = centerY;
 
@@ -97,12 +96,12 @@ test('triple-20 tap dispatches {multiplier:3, segment:20}', async () => {
 	const rect = svg.getBoundingClientRect();
 
 	// Segment 20 is centered at top (270° in SVG coords = 12 o'clock).
-	// Triple ring: r=186–209 in viewBox space. Use r=197.5 (midpoint), angle=270° (straight up).
-	// In screen space: directly above center, at ~(197.5/780)*renderedWidth from center.
-	// viewBox="-190 -190 780 780": the SVG maps 780 user-space units onto rect.width pixels.
+	// Triple ring: r=150–200 in viewBox space (board.ts). Use r=175 (midpoint), angle=270° (straight up).
+	// In screen space: directly above center, at ~(175/800)*renderedWidth from center.
+	// viewBox="-200 -200 800 800": the SVG maps 800 user-space units onto rect.width pixels.
 	const centerX = rect.left + rect.width / 2;
 	const centerY = rect.top + rect.height / 2;
-	const tripleRadius = (rect.width / 780) * 197.5; // midpoint of triple ring (186-209)
+	const tripleRadius = (rect.width / 800) * 175; // midpoint of triple ring (150-200)
 	// 270° in standard math = straight up (negative Y direction in screen)
 	const tripleX = centerX;
 	const tripleY = centerY - tripleRadius;

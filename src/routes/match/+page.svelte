@@ -7,7 +7,7 @@
 	import { reduce } from '../../engine/reducer.js';
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
 	import { loadAudioPrefs, saveAudioPref } from '../../lib/audio-prefs.js';
-	import { initVoices, announceVisit, announceGameStart } from '../../lib/audio-caller.js';
+	import { initVoices, announceVisit, announceGameStart, announceNoScore } from '../../lib/audio-caller.js';
 	import { playSfx } from '../../lib/audio-sfx.js';
 	import { base } from '$app/paths';
 	import { getSuggestion } from '../../engine/checkout.js';
@@ -230,12 +230,17 @@
 					total
 				};
 
-				// AUD-01: announce non-bust visits. Caller fires here (same detection point)
+				// AUD-01: announce the visit. Caller fires here (same detection point)
 				// so visit count and caller stay in sync without a second $effect.
-				if (!lastVisit.bust) {
-					const preVisitRemaining = player.remaining + total;
-					const suggestion = getSuggestion(preVisitRemaining, state.config.outRule);
-					const checkoutNumber = suggestion !== null ? preVisitRemaining : null;
+				if (lastVisit.bust || total === 0) {
+					// Bust, or all three darts off the board → "No score".
+					announceNoScore(callerEnabled, callerLang, base, audioVolume);
+				} else {
+					// Announce the checkout for the CURRENT remaining (after this visit) —
+					// i.e. what the player needs on their NEXT throw. remaining===0 (won)
+					// yields no suggestion, so only the score is announced.
+					const suggestion = getSuggestion(player.remaining, state.config.outRule);
+					const checkoutNumber = suggestion !== null ? player.remaining : null;
 					announceVisit(total, checkoutNumber, callerLang, callerEnabled, audioVolume, base, player.name);
 				}
 				return;

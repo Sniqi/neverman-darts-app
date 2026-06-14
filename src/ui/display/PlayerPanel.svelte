@@ -4,6 +4,7 @@
 	// Prop-driven — does NOT read any store directly.
 	// Player name rendered via Svelte {interpolation} only (T-03-04: no {@html}).
 	// Props: player, isActive, config, legStartIndex, currentVisit (active player only)
+	import { onDestroy } from 'svelte';
 	import { legAverage, matchAverage } from '../../engine/averages.js';
 	import { getSuggestion } from '../../engine/checkout.js';
 	import type { PlayerState, MatchConfig, DartScore, Visit } from '../../engine/types.js';
@@ -78,31 +79,32 @@
 		player.visits.length > 0 ? player.visits[player.visits.length - 1] : null
 	);
 
-	// BUST flash (D-08): show for ~2s when the last visit is a bust.
+	// BUST flash (D-08): flash for ~2s the moment a bust visit is appended.
+	// Detected by transition (visit count grows AND the new last visit is a bust),
+	// NOT by `isActive`: on a bust the reducer immediately passes the turn to the
+	// next player, so this panel is no longer active when the bust lands. Gating on
+	// isActive made the flash appear one turn late (when play cycled back).
 	let showBust = $state(false);
 	let bustTimer: ReturnType<typeof setTimeout> | null = null;
+	// null until the first effect run — so a bust already present on mount does not
+	// flash (only a genuine new bust does).
+	let prevVisitCount: number | null = null;
 
 	$effect(() => {
-		const isBust = isActive && lastCompletedVisit?.bust === true;
-		if (isBust && !showBust) {
+		const count = player.visits.length;
+		if (prevVisitCount !== null && count > prevVisitCount && lastCompletedVisit?.bust === true) {
 			showBust = true;
+			if (bustTimer !== null) clearTimeout(bustTimer);
 			bustTimer = setTimeout(() => {
 				showBust = false;
 				bustTimer = null;
 			}, 2000);
-		} else if (!isBust) {
-			if (bustTimer !== null) {
-				clearTimeout(bustTimer);
-				bustTimer = null;
-			}
-			showBust = false;
 		}
-		return () => {
-			if (bustTimer !== null) {
-				clearTimeout(bustTimer);
-				bustTimer = null;
-			}
-		};
+		prevVisitCount = count;
+	});
+
+	onDestroy(() => {
+		if (bustTimer !== null) clearTimeout(bustTimer);
 	});
 </script>
 

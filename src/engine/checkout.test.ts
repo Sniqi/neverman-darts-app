@@ -109,6 +109,69 @@ describe('getSuggestion - single out', () => {
 		const result = getSuggestion(20, rule);
 		expect(result).not.toBeNull();
 	});
+
+	it('20 → ["S20"] (finishes on a single, not D10)', () => {
+		expect(getSuggestion(20, rule)).toEqual(['S20']);
+	});
+
+	it('2 → ["S2"] (single finish, not D1)', () => {
+		expect(getSuggestion(2, rule)).toEqual(['S2']);
+	});
+
+	it('1 → ["S1"] (reachable in single-out, unlike double-out)', () => {
+		expect(getSuggestion(1, rule)).toEqual(['S1']);
+	});
+
+	it('57 → ["T19"] (single dart)', () => {
+		expect(getSuggestion(57, rule)).toEqual(['T19']);
+	});
+
+	it('40 → ["D20"] (only a double makes 40 in one dart)', () => {
+		expect(getSuggestion(40, rule)).toEqual(['D20']);
+	});
+
+	it('50 → ["Bull"]', () => {
+		expect(getSuggestion(50, rule)).toEqual(['Bull']);
+	});
+
+	it('100 → ["T20","D20"] (two-dart route)', () => {
+		expect(getSuggestion(100, rule)).toEqual(['T20', 'D20']);
+	});
+
+	it('180 → ["T20","T20","T20"]', () => {
+		expect(getSuggestion(180, rule)).toEqual(['T20', 'T20', 'T20']);
+	});
+
+	it('170 → ["T20","T20","Bull"]', () => {
+		expect(getSuggestion(170, rule)).toEqual(['T20', 'T20', 'Bull']);
+	});
+
+	it('never forces a double when a single finish exists', () => {
+		// Every score ≤ 20 must finish on the plain single (Sn), never Dn/Tn.
+		for (let n = 1; n <= 20; n++) {
+			expect(getSuggestion(n, rule)).toEqual([`S${n}`]);
+		}
+	});
+
+	it('double-out bogeys that ARE makable in 3 darts still get a single-out route', () => {
+		// 159/162/165/168 have no double finish (double-out → null) but are reachable
+		// in single-out, e.g. 159 = T20 T20 T13.
+		for (const n of [159, 162, 165, 168]) {
+			expect(getSuggestion(n, rule)).not.toBeNull();
+		}
+		expect(getSuggestion(159, rule)).toEqual(['T20', 'T20', 'T13']);
+	});
+
+	it('returns null only for scores impossible in 3 darts', () => {
+		for (const b of [163, 166, 169]) {
+			expect(getSuggestion(b, rule)).toBeNull();
+		}
+	});
+
+	it('returns null for scores > 180', () => {
+		expect(getSuggestion(181, rule)).toBeNull();
+		expect(getSuggestion(501, rule)).toBeNull();
+	});
 });
 
 describe('CHECKOUT_TABLE', () => {

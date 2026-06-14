@@ -185,21 +185,84 @@ export const CHECKOUT_TABLE: Record<number, string[] | null> = {
 	159: null,
 };
 
+// ── Single-out route generation ─────────────────────────────────────────────
+// Double-out uses the fixed CHECKOUT_TABLE above (every route ends on a double).
+// Single-out may finish on ANY segment, so its routes are computed by exhaustive
+// ≤3-dart search: T20-led setup darts, finishing on the easiest hittable segment
+// (a plain single wherever possible). Returns null only for the genuine bogey
+// numbers (159, 162, 163, 165, 166, 168, 169) and scores > 180, none of which can
+// be made in three darts at all — regardless of the out rule.
+
+/** Easiest single-dart label to FINISH exactly on `v` (single preferred), or null. */
+function finishDart(v: number): string | null {
+	if (v >= 1 && v <= 20) return `S${v}`;
+	if (v % 2 === 0 && v / 2 <= 20) return `D${v / 2}`;
+	if (v === 25) return '25';
+	if (v === 50) return 'Bull';
+	if (v % 3 === 0 && v / 3 <= 20) return `T${v / 3}`;
+	return null;
+}
+
+/** Canonical scoring label for a SETUP dart of value `v` (triple preferred), or null. */
+function setupDart(v: number): string | null {
+	if (v % 3 === 0 && v / 3 <= 20) return `T${v / 3}`;
+	if (v === 50) return 'Bull';
+	if (v % 2 === 0 && v / 2 <= 20) return `D${v / 2}`;
+	if (v === 25) return '25';
+	if (v >= 1 && v <= 20) return `S${v}`;
+	return null;
+}
+
+/** Computes a single-out route (≤3 darts, T20-led setups), or null if impossible. */
+function singleOutRoute(remaining: number): string[] | null {
+	if (remaining < 1 || remaining > 180) return null;
+
+	// 1 dart
+	const one = finishDart(remaining);
+	if (one) return [one];
+
+	// 2 darts: highest-scoring setup that leaves a single-dart finish
+	for (let v = 60; v >= 1; v--) {
+		const setup = setupDart(v);
+		if (!setup || v >= remaining) continue;
+		const fin = finishDart(remaining - v);
+		if (fin) return [setup, fin];
+	}
+
+	// 3 darts: two setups (highest-first) + finish
+	for (let v1 = 60; v1 >= 1; v1--) {
+		const s1 = setupDart(v1);
+		if (!s1 || v1 >= remaining) continue;
+		for (let v2 = 60; v2 >= 1; v2--) {
+			const s2 = setupDart(v2);
+			if (!s2 || v2 >= remaining - v1) continue;
+			const fin = finishDart(remaining - v1 - v2);
+			if (fin) return [s1, s2, fin];
+		}
+	}
+
+	return null;
+}
+
 /**
  * Returns the single recommended checkout route for `remaining` under `outRule`,
  * or null if no route exists (bogey number, > 170 in double-out, or unknown score).
  *
  * D-10: single live-recalculated route.
  * D-12: double-out → bogey numbers and > 170 return null.
- *       single-out → any score with a route returns that route.
+ *       single-out → any score with a ≤3-dart route returns that route, finishing
+ *       on a single wherever possible (computed, not table-driven).
  */
 export function getSuggestion(remaining: number, outRule: OutRule): string[] | null {
-	if (outRule === 'double' && remaining > 170) return null;
 	if (remaining <= 0) return null;
 
-	const route = CHECKOUT_TABLE[remaining];
-	if (route === null) return null;       // bogey number
-	if (route === undefined) return null;  // no table entry
+	if (outRule === 'single') {
+		return singleOutRoute(remaining);
+	}
 
+	// double-out
+	if (remaining > 170) return null;
+	const route = CHECKOUT_TABLE[remaining];
+	if (route === null || route === undefined) return null;
 	return route;
 }

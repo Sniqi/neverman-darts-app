@@ -24,7 +24,7 @@
 	let outRule = $state<'single' | 'double'>('single');
 	let legsToWin = $state(2);
 	let setsEnabled = $state(true);
-	let setsToWin = $state(2);
+	let setsToWin = $state(3);
 
 	// Player list (bound to PlayerPicker)
 	let players = $state<MatchPlayer[]>([]);
@@ -74,14 +74,21 @@
 		if (next >= 1 && next <= 9) setsToWin = next;
 	}
 
+	// Info tooltips — tap an info icon to toggle its explanation (touch-friendly;
+	// opening one closes any other). openTip holds the id of the open bubble.
+	let openTip = $state<string | null>(null);
+	function toggleTip(id: string) {
+		openTip = openTip === id ? null : id;
+	}
+
 	// ── Audio & Pause state (AUD-03 / D-07) ──────────────────────────────────
 	let callerEnabled = $state(audioPrefs.callerEnabled);
-	let callerLang = $state<'de' | 'en'>(audioPrefs.callerLang);
 	let sfxEnabled = $state(audioPrefs.sfxEnabled);
 	let pauseEnabled = $state(audioPrefs.pauseEnabled);
 	let pauseLegs = $state(audioPrefs.pauseLegs);
 	let pauseMinutes = $state(audioPrefs.pauseMinutes);
-	let audioVolume = $state(audioPrefs.audioVolume);
+	let callerVolume = $state(audioPrefs.callerVolume);
+	let musicVolume = $state(audioPrefs.musicVolume);
 
 	function adjustPauseLegs(delta: number) {
 		const next = pauseLegs + delta;
@@ -100,6 +107,50 @@
 	}
 </script>
 
+<!-- Info tooltip: small tap target next to a setting name -->
+{#snippet infoBtn(id: string)}
+	<button
+		type="button"
+		class="info-btn"
+		aria-label="Erklärung anzeigen"
+		aria-expanded={openTip === id}
+		aria-controls={`hint-${id}`}
+		onclick={() => toggleTip(id)}
+	>
+		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<circle cx="12" cy="12" r="10" />
+			<line x1="12" y1="16" x2="12" y2="12" />
+			<line x1="12" y1="8" x2="12.01" y2="8" />
+		</svg>
+	</button>
+{/snippet}
+
+<!-- Info tooltip: expanded explanation, shown in-flow under its row when open -->
+{#snippet infoHint(id: string, text: string)}
+	{#if openTip === id}
+		<p class="info-hint" id={`hint-${id}`}>{text}</p>
+	{/if}
+{/snippet}
+
+<!-- Volume slider row: shared by caller and music (current value + persist callback) -->
+{#snippet volumeSlider(id: string, label: string, value: number, onInput: (v: number) => void)}
+	<div class="stepper-row volume-sub">
+		<input
+			{id}
+			type="range"
+			min="0"
+			max="1"
+			step="0.05"
+			value={value}
+			oninput={(e) => onInput(e.currentTarget.valueAsNumber)}
+			aria-label={label}
+			class="volume-slider"
+		/>
+		<span class="stepper-unit">{Math.round(value * 100)}%</span>
+	</div>
+{/snippet}
+
 <main class="setup-screen">
 	<button class="back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück zur Startseite">
 		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -117,7 +168,8 @@
 
 	<!-- Game mode chips: 301 / 401 / 501 -->
 	<section>
-		<h2>Spielmodus</h2>
+		<h2>Spielmodus {@render infoBtn('mode')}</h2>
+		{@render infoHint('mode', 'Startpunktzahl pro Leg. Jeder Spieler beginnt mit diesem Wert und spielt auf genau 0 herunter.')}
 		<div class="chip-group" role="group" aria-label="Spielmodus">
 			{#each [301, 401, 501] as score}
 				<button
@@ -132,7 +184,8 @@
 
 	<!-- Out rule segmented control -->
 	<section>
-		<h2>Abwurfregel</h2>
+		<h2>Abwurfregel {@render infoBtn('out')}</h2>
+		{@render infoHint('out', 'Double Out: Ein Leg muss mit einem Doppelfeld (Bull zählt als Doppel) auf genau 0 beendet werden. Single Out: Jedes Feld darf das Leg beenden.')}
 		<div class="seg-control" role="group" aria-label="Abwurfregel">
 			<button
 				class="seg-btn"
@@ -153,16 +206,23 @@
 	<section>
 		<h2>Format</h2>
 		<div class="stepper-row">
-			<span class="stepper-label">Legs - First to</span>
+			<span class="label-with-info">
+				<span class="stepper-label">Legs - First to</span>
+				{@render infoBtn('legs')}
+			</span>
 			<div class="stepper">
 				<button class="stepper-btn" onclick={() => adjustLegs(-1)} disabled={legsToWin <= 1} aria-label="Legs verringern">−</button>
 				<span class="stepper-value">{legsToWin}</span>
 				<button class="stepper-btn" onclick={() => adjustLegs(1)} disabled={legsToWin >= 9} aria-label="Legs erhöhen">+</button>
 			</div>
 		</div>
+		{@render infoHint('legs', 'Wie viele Legs man gewinnen muss. Mit Sätzen: Legs pro Satz. Ohne Sätze: Legs fürs ganze Spiel.')}
 
 		<div class="toggle-row">
-			<label class="toggle-label" for="sets-toggle">Sets</label>
+			<span class="label-with-info">
+				<label class="toggle-label" for="sets-toggle">Sets</label>
+				{@render infoBtn('sets')}
+			</span>
 			<input
 				id="sets-toggle"
 				type="checkbox"
@@ -170,24 +230,29 @@
 				role="switch"
 			/>
 		</div>
+		{@render infoHint('sets', 'Legs zu Sätzen zusammenfassen (wie im Profi-Darts). Aus: Es wird nur auf Legs gespielt.')}
 
 		{#if setsEnabled}
 			<div class="stepper-row">
-				<span class="stepper-label">Sets - First to</span>
+				<span class="label-with-info">
+					<span class="stepper-label">Sets - First to</span>
+					{@render infoBtn('sets-count')}
+				</span>
 				<div class="stepper">
-					<button class="stepper-btn" onclick={() => adjustSets(-1)} disabled={setsToWin <= 1} aria-label="Sätze verringern">−</button>
+					<button class="stepper-btn" onclick={() => adjustSets(-1)} disabled={setsToWin <= 1} aria-label="Sets verringern">−</button>
 					<span class="stepper-value">{setsToWin}</span>
-					<button class="stepper-btn" onclick={() => adjustSets(1)} disabled={setsToWin >= 9} aria-label="Sätze erhöhen">+</button>
+					<button class="stepper-btn" onclick={() => adjustSets(1)} disabled={setsToWin >= 9} aria-label="Sets erhöhen">+</button>
 				</div>
 			</div>
+			{@render infoHint('sets-count', 'Wie viele Sätze man gewinnen muss, um das Match zu gewinnen.')}
 		{/if}
 	</section>
 
-	<!-- Audio & Pause (AUD-03 / D-07) -->
+	<!-- Audio (AUD-03) -->
 	<section>
-		<h2>Audio &amp; Pause</h2>
+		<h2>Audio</h2>
 
-		<!-- Caller toggle -->
+		<!-- Caller toggle + volume -->
 		<div class="toggle-row">
 			<label class="toggle-label" for="caller-toggle">Caller</label>
 			<input
@@ -199,31 +264,13 @@
 				onchange={() => saveAudioPref('callerEnabled', callerEnabled)}
 			/>
 		</div>
-
-		<!-- Language seg-control — only when caller is on -->
 		{#if callerEnabled}
-			<div class="stepper-row">
-				<span class="stepper-label">Sprache</span>
-				<div class="seg-control" role="group" aria-label="Sprache">
-					<button
-						class="seg-btn"
-						class:active={callerLang === 'de'}
-						onclick={() => { callerLang = 'de'; saveAudioPref('callerLang', 'de'); }}
-						aria-pressed={callerLang === 'de'}
-					>Deutsch</button>
-					<button
-						class="seg-btn"
-						class:active={callerLang === 'en'}
-						onclick={() => { callerLang = 'en'; saveAudioPref('callerLang', 'en'); }}
-						aria-pressed={callerLang === 'en'}
-					>Englisch</button>
-				</div>
-			</div>
+			{@render volumeSlider('caller-volume-slider', 'Caller Lautstärke', callerVolume, (v) => { callerVolume = v; saveAudioPref('callerVolume', v); })}
 		{/if}
 
-		<!-- SFX toggle -->
+		<!-- Music toggle + volume -->
 		<div class="toggle-row">
-			<label class="toggle-label" for="sfx-toggle">Soundeffekte</label>
+			<label class="toggle-label" for="sfx-toggle">Musik</label>
 			<input
 				id="sfx-toggle"
 				type="checkbox"
@@ -233,23 +280,14 @@
 				onchange={() => saveAudioPref('sfxEnabled', sfxEnabled)}
 			/>
 		</div>
+		{#if sfxEnabled}
+			{@render volumeSlider('music-volume-slider', 'Musik Lautstärke', musicVolume, (v) => { musicVolume = v; saveAudioPref('musicVolume', v); })}
+		{/if}
+	</section>
 
-		<!-- Volume slider (UAT) -->
-		<div class="stepper-row">
-			<label class="stepper-label" for="volume-slider">Lautstärke</label>
-			<input
-				id="volume-slider"
-				type="range"
-				min="0"
-				max="1"
-				step="0.05"
-				bind:value={audioVolume}
-				oninput={() => saveAudioPref('audioVolume', audioVolume)}
-				aria-label="Lautstärke"
-				class="volume-slider"
-			/>
-			<span class="stepper-unit">{Math.round(audioVolume * 100)}%</span>
-		</div>
+	<!-- Pause (D-07) -->
+	<section>
+		<h2>Pause</h2>
 
 		<!-- Auto-pause toggle -->
 		<div class="toggle-row">
@@ -516,7 +554,55 @@
 		text-align: center;
 	}
 
+	/* Info tooltips */
+	.label-with-info {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs, 4px);
+	}
+
+	.info-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 34px;
+		height: 34px;
+		margin: -8px 0; /* keep rows compact; 34px stays a comfortable tap target */
+		padding: 0;
+		background: none;
+		border: none;
+		color: #888;
+		cursor: pointer;
+		border-radius: 50%;
+		flex-shrink: 0;
+		vertical-align: middle;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.info-btn:active,
+	.info-btn[aria-expanded='true'] {
+		color: var(--accent);
+	}
+
+	.info-hint {
+		margin: 0;
+		background: #272a33;
+		color: #cfd2d8;
+		border: 1px solid #444;
+		border-left: 3px solid var(--accent);
+		border-radius: 4px;
+		padding: var(--space-sm) var(--space-md);
+		font-size: 14px;
+		line-height: 1.45;
+	}
+
 	/* Volume slider (UAT) */
+	.volume-sub {
+		padding-left: var(--space-md, 16px);
+		padding-top: 0;
+		margin-top: -4px;
+	}
+
 	.volume-slider {
 		flex: 1;
 		height: 44px;

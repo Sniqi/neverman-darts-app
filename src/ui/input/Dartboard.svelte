@@ -234,7 +234,7 @@
 		cx={CX}
 		cy={CY}
 		r={R_INNER_BULL}
-		fill={flashKey === 'inner-bull' ? 'rgba(255,255,255,0.35)' : '#c0392b'}
+		fill={flashKey === 'inner-bull' ? 'rgba(255,255,255,0.35)' : '#8b1a1a'}
 		stroke="#444444"
 		stroke-width="0.5"
 		pointer-events="none"

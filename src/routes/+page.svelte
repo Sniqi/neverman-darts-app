@@ -80,15 +80,12 @@
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
+		<button class="menu-btn profiles-toggle" onclick={() => (profilesOpen = !profilesOpen)} aria-expanded={profilesOpen}>
+			Spieler verwalten
+			<span class="toggle-arrow" class:open={profilesOpen}>▼</span>
+		</button>
 		<button class="menu-btn" onclick={() => goto(`${base}/history`)}>
 			Match-Verlauf
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-				<path d="M9 18l6-6-6-6" />
-			</svg>
-		</button>
-		<button class="menu-btn" onclick={() => goto(`${base}/data`)}>
-			Daten / Backup
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M9 18l6-6-6-6" />
@@ -101,9 +98,12 @@
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
-		<button class="menu-btn profiles-toggle" onclick={() => (profilesOpen = !profilesOpen)} aria-expanded={profilesOpen}>
-			Spieler verwalten
-			<span class="toggle-arrow" class:open={profilesOpen}>▼</span>
+		<button class="menu-btn" onclick={() => goto(`${base}/data`)}>
+			Daten / Backup
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path d="M9 18l6-6-6-6" />
+			</svg>
 		</button>
 	</nav>
 

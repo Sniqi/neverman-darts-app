@@ -22,9 +22,11 @@
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import type { DartScore } from '../../engine/types.js';
 
-	// ── Audio prefs — read once for stable booleans; volumes are $state for live sliders ──
+	// ── Audio prefs — enabled flags + volumes are $state so the in-match audio bar updates live ──
 	const prefs = loadAudioPrefs();
-	const { callerEnabled, callerLang, sfxEnabled } = prefs;
+	const callerLang = prefs.callerLang;
+	let callerEnabled = $state(prefs.callerEnabled);
+	let sfxEnabled = $state(prefs.sfxEnabled);
 	let callerVolume = $state(prefs.callerVolume);
 	let musicVolume = $state(prefs.musicVolume);
 
@@ -238,30 +240,67 @@
 		<ScorePanel />
 		<StatDrawer />
 
-		<div class="undo-bar">
-			<button
-				class="toggle-btn"
-				onclick={() => setInputMode(inputMode === 'board' ? 'numpad' : 'board')}
-			>
-				{inputMode === 'board' ? '🔢 Numpad' : '🎯 Board'}
-			</button>
-			<div class="volume-row" aria-label="Lautstärke">
-				<label class="volume-label" for="match-volume-slider">🔊</label>
-				<input
-					id="match-volume-slider"
-					type="range"
-					min="0"
-					max="1"
-					step="0.05"
-					bind:value={callerVolume}
-					oninput={() => saveAudioPref('callerVolume', callerVolume)}
-					aria-label="Lautstärke"
-					class="volume-slider"
-				/>
+		<div class="control-deck">
+			<div class="undo-bar">
+				<button
+					class="toggle-btn"
+					onclick={() => setInputMode(inputMode === 'board' ? 'numpad' : 'board')}
+				>
+					{inputMode === 'board' ? '🔢 Numpad' : '🎯 Board'}
+				</button>
+				<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
+					Rückgängig
+				</button>
 			</div>
-			<button class="undo-btn" onclick={undo} aria-label="Letzten Dart rückgängig machen">
-				Rückgängig
-			</button>
+
+			<div class="audio-bar">
+				<div class="audio-row">
+					<label class="audio-label" for="match-caller-toggle">Caller</label>
+					<input
+						id="match-caller-toggle"
+						type="checkbox"
+						role="switch"
+						checked={callerEnabled}
+						onchange={(e) => { callerEnabled = e.currentTarget.checked; saveAudioPref('callerEnabled', callerEnabled); }}
+						class="audio-check"
+					/>
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.05"
+						bind:value={callerVolume}
+						oninput={() => saveAudioPref('callerVolume', callerVolume)}
+						aria-label="Caller Lautstärke"
+						class="audio-slider"
+						disabled={!callerEnabled}
+					/>
+					<span class="audio-pct">{Math.round(callerVolume * 100)}%</span>
+				</div>
+				<div class="audio-row">
+					<label class="audio-label" for="match-sfx-toggle">Musik</label>
+					<input
+						id="match-sfx-toggle"
+						type="checkbox"
+						role="switch"
+						checked={sfxEnabled}
+						onchange={(e) => { sfxEnabled = e.currentTarget.checked; saveAudioPref('sfxEnabled', sfxEnabled); }}
+						class="audio-check"
+					/>
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.05"
+						bind:value={musicVolume}
+						oninput={() => saveAudioPref('musicVolume', musicVolume)}
+						aria-label="Musik Lautstärke"
+						class="audio-slider"
+						disabled={!sfxEnabled}
+					/>
+					<span class="audio-pct">{Math.round(musicVolume * 100)}%</span>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -342,6 +381,10 @@
 	.panel-area {
 		flex: 0 0 auto;
 		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm, 8px);
+		padding: var(--space-sm, 8px);
 	}
 
 	.board-area {
@@ -397,21 +440,31 @@
 		cursor: default;
 	}
 
+	/* Control deck — groups input toggle, undo, and audio into one bordered card */
+	.control-deck {
+		flex: 0 0 auto;
+		background: var(--surface, #1e2027);
+		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		border-radius: var(--radius-md, 12px);
+		overflow: hidden;
+	}
+
 	.undo-bar {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 4px var(--space-md, 16px);
+		padding: 10px var(--space-md, 16px);
 		gap: var(--space-sm, 8px);
+		border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.08));
 	}
 
 	.toggle-btn {
 		height: 40px;
 		padding: 0 var(--space-md, 16px);
-		background: #1e2027;
-		border: 1px solid #444444;
-		border-radius: 6px;
-		color: #f0f0f0;
+		background: var(--surface-2, #262932);
+		border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.14));
+		border-radius: var(--radius-sm, 8px);
+		color: var(--text, #f0f0f0);
 		font-size: 14px;
 		cursor: pointer;
 	}
@@ -421,14 +474,14 @@
 	}
 
 	.undo-btn {
-		height: 48px;
+		height: 44px;
 		padding: 0 var(--space-lg, 24px);
 		background: transparent;
-		border: 1px solid #e8a020;
-		border-radius: 6px;
-		color: #e8a020;
+		border: 1px solid var(--accent, #e8a020);
+		border-radius: var(--radius-sm, 8px);
+		color: var(--accent, #e8a020);
 		font-size: 16px;
-		font-weight: 400;
+		font-weight: 600;
 		cursor: pointer;
 		min-width: 120px;
 	}
@@ -437,27 +490,56 @@
 		background: rgba(232, 160, 32, 0.1);
 	}
 
-	/* Volume row — compact slider between toggle and undo buttons */
-	.volume-row {
+	/* Audio controls — lower section of the control deck */
+	.audio-bar {
 		display: flex;
-		align-items: center;
-		gap: 4px;
-		flex: 1;
-		min-width: 0;
-		padding: 0 var(--space-sm, 8px);
+		flex-direction: column;
+		gap: 2px;
+		padding: 8px var(--space-md, 16px);
+		background: var(--surface, #1e2027);
 	}
 
-	.volume-label {
-		font-size: 14px;
+	.audio-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		height: 36px;
+	}
+
+	.audio-label {
+		font-size: 13px;
+		color: #888;
+		width: 42px;
 		flex-shrink: 0;
 	}
 
-	.volume-slider {
+	.audio-check {
+		width: 36px;
+		height: 20px;
+		flex-shrink: 0;
+		cursor: pointer;
+		accent-color: #e8a020;
+	}
+
+	.audio-slider {
 		flex: 1;
 		min-width: 0;
-		height: 44px;
+		height: 36px;
 		accent-color: #e8a020;
 		cursor: pointer;
+	}
+
+	.audio-slider:disabled {
+		opacity: 0.3;
+		cursor: default;
+	}
+
+	.audio-pct {
+		font-size: 12px;
+		color: #666;
+		width: 30px;
+		text-align: right;
+		flex-shrink: 0;
 	}
 
 	.back-btn {
@@ -485,21 +567,33 @@
 		border-color: rgba(255, 255, 255, 0.3);
 	}
 
-	/* Landscape layout (D-02): score panel left 33%, board right 67% */
+	/* Landscape layout (D-02): score panel left ~34%, board right.
+	   The left column is a fixed vertical stack: scores (never shrink) on top,
+	   stat drawer flexes + scrolls in the middle, control deck pinned at bottom. */
 	@media (orientation: landscape) {
 		.match-view {
 			flex-direction: row;
 		}
 
 		.panel-area {
-			flex: 0 0 33%;
+			flex: 0 0 34%;
 			display: flex;
 			flex-direction: column;
+			gap: 10px;
+			padding: 12px;
 			overflow: hidden;
 		}
 
 		.board-area {
-			flex: 0 0 67%;
+			flex: 1 1 0;
+			min-width: 0;
+		}
+
+		/* Pin the control deck to the bottom of the column. When the stat drawer
+		   is open it consumes the free space (no effect); when collapsed the auto
+		   margin pushes the deck down so it stays anchored. */
+		.control-deck {
+			margin-top: auto;
 		}
 	}
 </style>

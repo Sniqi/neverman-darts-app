@@ -36,22 +36,27 @@
 		display: flex;
 		flex-direction: row;
 		gap: var(--space-sm, 8px);
-		padding: var(--space-md, 16px);
-		background: #111318;
 		flex-wrap: wrap;
 	}
 
 	.player-card {
 		flex: 1;
 		min-width: 120px;
-		background: #1e2027;
-		border-radius: 6px;
+		display: flex;
+		flex-direction: column;
+		background: var(--surface, #1e2027);
+		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		border-left: 3px solid transparent;
+		border-radius: var(--radius-md, 12px);
 		padding: var(--space-md, 16px);
-		border-left: 2px solid transparent;
 	}
 
 	.player-card.active {
-		border-left-color: #e8a020;
+		border-color: var(--accent-line, rgba(232, 160, 32, 0.45));
+		border-left-color: var(--accent, #e8a020);
+		background:
+			linear-gradient(var(--accent-soft, rgba(232, 160, 32, 0.12)), var(--accent-soft, rgba(232, 160, 32, 0.12))),
+			var(--surface, #1e2027);
 	}
 
 	.player-name {
@@ -87,21 +92,18 @@
 		margin-top: 4px;
 	}
 
-	/* Landscape: grow to fill the panel column and use space properly */
+	/* Landscape: natural height at the top of the panel column so the big score
+	   numbers are never clipped when the stat drawer is open. */
 	@media (orientation: landscape) {
 		.score-panel {
-			flex: 1 1 0;
-			min-height: 0;
+			flex: 0 0 auto;
 			align-items: stretch;
-			gap: 2px;
-			padding: 4px;
+			gap: 10px;
 		}
 
 		.player-card {
-			display: flex;
-			flex-direction: column;
 			justify-content: center;
-			padding: 24px 20px;
+			padding: 20px;
 			min-width: 0;
 		}
 

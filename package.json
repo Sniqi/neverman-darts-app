@@ -11,7 +11,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "test:unit": "vitest run --project=unit",
-    "test:browser": "vitest run --project=browser"
+    "test:browser": "vitest run --project=browser",
+    "generate:caller-audio": "node scripts/generate-caller-audio.mjs"
   },
   "dependencies": {
     "@sveltejs/kit": "^2.64.0",

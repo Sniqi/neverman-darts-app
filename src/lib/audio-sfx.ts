@@ -11,6 +11,12 @@ const SFX_PATHS = {
 	highfinish: '/sfx/highfinish.mp3',
 	/** Sound for a new personal record (any record type). */
 	record: '/sfx/record.mp3',
+	/** Music played when the full match is won. */
+	game_win: '/music/game_win.mp3',
+	/** Music played when a set is won (match continues). */
+	set_win: '/music/set_win.mp3',
+	/** Music played when a pause begins. */
+	pause: '/music/pause.mp3',
 } as const;
 
 /** Union of valid SFX event identifiers. */

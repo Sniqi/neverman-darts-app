@@ -1,16 +1,14 @@
 // src/lib/audio-caller.ts
-// Web Speech API caller: voice selection, announcement, silent fallback (AUD-01).
-// D-01: uses speechSynthesis, no external TTS service.
-// D-02: silently degrades when speechSynthesis is unavailable or no matching voice.
-// T-05-01: only computed numeric scores and getSuggestion() output reach utterance.text.
+// Caller audio: plays pre-generated ElevenLabs MP3s (static/sfx/caller/en/).
+// Falls back to Web Speech API when the Audio constructor is unavailable
+// (SSR, Node test environment) or a file fails to load/play.
+// D-01/D-02: silent degradation — never throws, never blocks the scoring loop.
 
 let cachedVoices: SpeechSynthesisVoice[] = [];
 
 /**
  * Warm the voice list once at match start (or component mount).
  * Chrome loads voices asynchronously — Pitfall 1: getVoices() returns [] on first call.
- * Register onvoiceschanged to re-cache when the async load completes.
- * Never throws.
  */
 export function initVoices(): void {
 	if (typeof speechSynthesis === 'undefined') return;
@@ -26,10 +24,9 @@ export function initVoices(): void {
  * Select the best available voice for the given BCP-47 language prefix.
  * Pitfall 2: Android returns lang strings with underscores (e.g. "de_DE") — normalize.
  * Prefers localService voices (offline-capable for PWA).
- * Returns null when no matching voice exists — caller degrades silently (D-02).
  */
 function findVoice(langPrefix: string): SpeechSynthesisVoice | null {
-	const normalized = cachedVoices.map(v => ({
+	const normalized = cachedVoices.map((v) => ({
 		v,
 		lang: v.lang.replace(/_/g, '-'),
 	}));
@@ -40,52 +37,141 @@ function findVoice(langPrefix: string): SpeechSynthesisVoice | null {
 	return (matches.find(({ v }) => v.localService) ?? matches[0]).v;
 }
 
+/** Web Speech API fallback — same text logic as before MP3 caller was added. */
+function webSpeechFallback(
+	score: number,
+	checkoutNumber: number | null,
+	lang: 'de' | 'en',
+	volume: number
+): void {
+	if (typeof speechSynthesis === 'undefined') return;
+	const voice = findVoice(lang === 'de' ? 'de' : 'en');
+	if (!voice) return;
+
+	let text: string;
+	if (lang === 'de') {
+		text =
+			checkoutNumber !== null ? `${score} — du brauchst ${checkoutNumber}` : `${score}`;
+	} else {
+		text = checkoutNumber !== null ? `${score} — you need ${checkoutNumber}` : `${score}`;
+	}
+
+	try {
+		speechSynthesis.cancel();
+		const utterance = new SpeechSynthesisUtterance(text);
+		utterance.lang = lang === 'de' ? 'de-DE' : 'en-GB';
+		utterance.voice = voice;
+		utterance.rate = 1.1;
+		utterance.volume = Math.min(1, Math.max(0, volume));
+		utterance.onerror = () => {};
+		speechSynthesis.speak(utterance);
+	} catch {
+		// Silently degrade
+	}
+}
+
 /**
- * Announce a visit score via speech synthesis. Fire-and-forget — never throws.
- * Must be called from a user-gesture context (tap/click handler chain) — Pitfall 4.
- *
- * D-03: appends checkout hint when checkoutNumber is non-null, speaking the remaining
- * number (e.g. "141 — du brauchst 141") rather than the dart route (UAT change).
- * D-02: returns silently when speechSynthesis is unavailable or no matching voice.
- * D-06: returns immediately when callerEnabled=false.
- * T-05-01: utterance text is built from numeric score and remaining number only.
- * volume is clamped to [0, 1].
+ * Play "{name}" → "to throw first." → 3 s silence → "Game on.".
+ * Re-uses the per-player name_*.mp3 plus shared throws_first.mp3 / game_on.mp3.
+ * Fire-and-forget — never throws. Call once on match start when no visits thrown yet.
  */
+export function announceGameStart(playerName: string, base = '', volume = 1.0): void {
+	const vol = Math.min(1, Math.max(0, volume));
+
+	const playGameOn = () => {
+		setTimeout(() => {
+			if (typeof Audio === 'undefined') return;
+			const go = new Audio(`${base}/sfx/caller/en/game_on.mp3`);
+			go.volume = vol;
+			go.play().catch(() => {});
+		}, 3000);
+	};
+
+	const playThrowsFirst = () => {
+		const tf = new Audio(`${base}/sfx/caller/en/throws_first.mp3`);
+		tf.volume = vol;
+		tf.play().then(() => {
+			tf.addEventListener('ended', playGameOn, { once: true });
+		}).catch(playGameOn);
+	};
+
+	if (typeof Audio === 'undefined') {
+		playGameOn();
+		return;
+	}
+
+	// name_<name>.mp3 → throws_first.mp3 → (3s) → game_on.mp3.
+	// Unknown name (no file) skips straight to game_on.
+	const name = new Audio(`${base}/sfx/caller/en/name_${playerName.toLowerCase()}.mp3`);
+	name.volume = vol;
+	name.play().then(() => {
+		name.addEventListener('ended', playThrowsFirst, { once: true });
+	}).catch(playGameOn);
+}
+
+/**
+ * Announce a visit score. Fire-and-forget — never throws.
+ *
+ * Primary path: plays score_N.mp3, then checkout_N.mp3 on 'ended'.
+ * Fallback: Web Speech API (triggered when Audio is unavailable or a file fails).
+ *
+ * D-06: returns immediately when callerEnabled=false.
+ * base: SvelteKit base path (e.g. '/neverman-darts-app') — required for GitHub Pages.
+ */
+
 export function announceVisit(
 	score: number,
 	checkoutNumber: number | null,
 	lang: 'de' | 'en',
 	callerEnabled: boolean,
-	volume = 1.0
+	volume = 1.0,
+	base = '',
+	playerName = ''
 ): void {
 	if (!callerEnabled) return;
-	if (typeof speechSynthesis === 'undefined') return;
 
-	const voice = findVoice(lang === 'de' ? 'de' : 'en');
-	if (!voice) return; // D-02: silent fallback when no matching voice
+	const vol = Math.min(1, Math.max(0, volume));
 
-	const langTag = lang === 'de' ? 'de-DE' : 'en-GB';
-	let text: string;
-	if (lang === 'de') {
-		text = checkoutNumber !== null
-			? `${score} — du brauchst ${checkoutNumber}`
-			: `${score}`;
-	} else {
-		text = checkoutNumber !== null
-			? `${score} — you need ${checkoutNumber}`
-			: `${score}`;
+	if (typeof Audio === 'undefined') {
+		webSpeechFallback(score, checkoutNumber, lang, vol);
+		return;
 	}
 
-	try {
-		speechSynthesis.cancel(); // Clear queued utterances from rapid scoring (T-05-03)
-		const utterance = new SpeechSynthesisUtterance(text);
-		utterance.lang = langTag;
-		utterance.voice = voice;
-		utterance.rate = 1.1; // Slightly faster for caller feel
-		utterance.volume = Math.min(1, Math.max(0, volume));
-		utterance.onerror = () => {}; // Silence "interrupted" errors from cancel()
-		speechSynthesis.speak(utterance);
-	} catch {
-		// Silently degrade — never block the scoring loop
-	}
+	const scoreAudio = new Audio(`${base}/sfx/caller/en/score_${score}.mp3`);
+	scoreAudio.volume = vol;
+
+	let fell = false;
+	const fallback = () => {
+		if (!fell) {
+			fell = true;
+			webSpeechFallback(score, checkoutNumber, lang, vol);
+		}
+	};
+
+	const playCheckout = () => {
+		const coAudio = new Audio(`${base}/sfx/caller/en/checkout_${checkoutNumber}.mp3`);
+		coAudio.volume = vol;
+		coAudio.play().catch(() => {});
+	};
+
+	const playNameThenCheckout = () => {
+		const nameAudio = new Audio(`${base}/sfx/caller/en/name_${playerName.toLowerCase()}.mp3`);
+		nameAudio.volume = vol;
+		nameAudio.play().then(() => {
+			nameAudio.addEventListener('ended', playCheckout, { once: true });
+		}).catch(playCheckout); // no file for this name — skip straight to checkout
+	};
+
+	// error fires for 404/unsupported; catch handles autoplay-policy rejection
+	scoreAudio.addEventListener('error', fallback, { once: true });
+	scoreAudio.play().then(() => {
+		scoreAudio.removeEventListener('error', fallback);
+		if (checkoutNumber !== null) {
+			scoreAudio.addEventListener(
+				'ended',
+				playerName ? playNameThenCheckout : playCheckout,
+				{ once: true }
+			);
+		}
+	}).catch(fallback);
 }

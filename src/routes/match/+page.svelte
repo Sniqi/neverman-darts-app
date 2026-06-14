@@ -7,7 +7,7 @@
 	import { reduce } from '../../engine/reducer.js';
 	import { acquireWakeLock, releaseWakeLock } from '../../lib/wake-lock.svelte.js';
 	import { loadAudioPrefs, saveAudioPref } from '../../lib/audio-prefs.js';
-	import { initVoices, announceVisit } from '../../lib/audio-caller.js';
+	import { initVoices, announceVisit, announceGameStart } from '../../lib/audio-caller.js';
 	import { playSfx } from '../../lib/audio-sfx.js';
 	import { base } from '$app/paths';
 	import { getSuggestion } from '../../engine/checkout.js';
@@ -37,6 +37,17 @@
 		}
 		// AUD-01: warm the voice list so the first announcement has a voice ready.
 		initVoices();
+
+		// AUD-03: announce game start once when no visits have been thrown yet.
+		const state = matchStore.state;
+		const isFreshMatch = state.phase === 'playing' &&
+			state.players.every(p => p.visits.length === 0);
+		if (isFreshMatch && callerEnabled) {
+			const firstPlayer = state.players[state.activePlayerIndex];
+			if (firstPlayer) {
+				announceGameStart(firstPlayer.name, base, audioVolume);
+			}
+		}
 	});
 
 	// ── SFX: pendingRecords trigger (AUD-02) ──────────────────────────────────
@@ -98,6 +109,44 @@
 				}
 				return;
 			}
+		}
+	});
+
+	// ── Music: game win / set win / pause (AUD-03) ───────────────────────────
+	// Plain (non-reactive) vars track previous state — no $state needed because
+	// these are write-only inside the effects and never read by the template.
+	let _prevPhase = matchStore.state.phase;
+	let _prevPauseActive = matchStore.pauseActive;
+	let _prevSetsWon: Record<string, number> = {};
+
+	$effect(() => {
+		const phase = matchStore.state.phase;
+		if (phase === 'match-complete' && _prevPhase !== 'match-complete') {
+			playSfx('game_win', sfxEnabled, audioVolume, base);
+		}
+		_prevPhase = phase;
+	});
+
+	$effect(() => {
+		const active = matchStore.pauseActive;
+		if (active && !_prevPauseActive) {
+			playSfx('pause', sfxEnabled, audioVolume, base);
+		}
+		_prevPauseActive = active;
+	});
+
+	$effect(() => {
+		const state = matchStore.state;
+		if (!state.config.setsEnabled) return;
+		for (const player of state.players) {
+			const prev = _prevSetsWon[player.id] ?? 0;
+			const curr = player.setsWon ?? 0;
+			if (curr > prev) {
+				_prevSetsWon[player.id] = curr;
+				playSfx('set_win', sfxEnabled, audioVolume, base);
+				return;
+			}
+			_prevSetsWon[player.id] = curr;
 		}
 	});
 
@@ -187,7 +236,7 @@
 					const preVisitRemaining = player.remaining + total;
 					const suggestion = getSuggestion(preVisitRemaining, state.config.outRule);
 					const checkoutNumber = suggestion !== null ? preVisitRemaining : null;
-					announceVisit(total, checkoutNumber, callerLang, callerEnabled, audioVolume);
+					announceVisit(total, checkoutNumber, callerLang, callerEnabled, audioVolume, base, player.name);
 				}
 				return;
 			}

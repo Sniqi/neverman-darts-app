@@ -327,9 +327,12 @@ function handleLegWinFromPlayers(
 					eventLog: newLog,
 				};
 			}
-			// Won a set but not the match — start next set
-			const totalLegsCompleted = 0; // reset after set win
-			const nextLegStarter = legStarterIndex(totalLegsCompleted, numPlayers);
+			// Won a set but not the match — start next set.
+			// Offizielle WDF/PDC-Regel: der Anwurf des ersten Legs jedes Satzes
+			// wechselt pro abgeschlossenem Satz (nicht zurück auf Spieler 0).
+			// legsInSet ist hier 0, daher Rotation = abgeschlossene Sätze % Spielerzahl.
+			const setsCompleted = updatedPlayers.reduce((sum, p) => sum + p.setsWon, 0);
+			const nextLegStarter = legStarterIndex(setsCompleted, numPlayers);
 			// Record each player's visits.length as the start of the new leg
 			const newLegStartVisitIndex: Record<string, number> = {};
 			for (const p of updatedPlayers) {
@@ -358,10 +361,14 @@ function handleLegWinFromPlayers(
 		}
 	}
 
-	// Leg won but not match: advance to next leg
-	// Total legs completed = sum of all legsWon
-	const totalLegsCompleted = playersWithLeg.reduce((sum, p) => sum + p.legsWon, 0);
-	const nextLegStarter = legStarterIndex(totalLegsCompleted, numPlayers);
+	// Leg won but not match: advance to next leg.
+	// Anwurf-Rotation (offizielle WDF/PDC-Regel): der Anwurf wechselt pro Leg
+	// innerhalb eines Satzes UND pro Satz für das erste Leg jedes Satzes.
+	// Rotation = (abgeschlossene Sätze + Legs im aktuellen Satz) % Spielerzahl.
+	// Nur-Legs-Modus: setsWon bleibt 0 → reines Leg-Alternieren wie bisher.
+	const setsCompleted = playersWithLeg.reduce((sum, p) => sum + p.setsWon, 0);
+	const legsInSet = playersWithLeg.reduce((sum, p) => sum + p.legsWon, 0);
+	const nextLegStarter = legStarterIndex(setsCompleted + legsInSet, numPlayers);
 
 	// Reset all players' remaining for the new leg
 	const resetPlayers = playersWithLeg.map(p => ({ ...p, remaining: config.startScore }));

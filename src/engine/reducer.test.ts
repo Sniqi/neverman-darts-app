@@ -501,6 +501,52 @@ describe('Sets (ENG-02)', () => {
 		s = throwDart(s, 2, 20); // win leg 0 → win set 0 (legsToWin=1)
 		expect(s.players[0].setsWon).toBe(1);
 	});
+
+	// Official WDF/PDC rule: the player who throws first in a set alternates per
+	// set (set 1 → bull-off winner, set 2 → opponent, set 3 → bull-off winner…).
+	// Regression for the old bug that reset the set starter to player 0 every set.
+	it('set starter alternates each set (2 players, legsToWin=1)', () => {
+		// legsToWin=1 makes each set exactly one leg, so set boundaries are explicit.
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 1, setsEnabled: true, setsToWin: 3 }),
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		});
+		expect(s.activePlayerIndex).toBe(0); // set 1 (index 0) → player 0 throws first
+		s = throwDart(s, 2, 20); // player A wins set 1 → set 2 begins
+		expect(s.activePlayerIndex).toBe(1); // set 2 → player 1 throws first
+		expect(s.legStarterIndex).toBe(1);
+		s = throwDart(s, 2, 20); // player B (now active, reset to 40) wins set 2 → set 3 begins
+		expect(s.activePlayerIndex).toBe(0); // set 3 → back to player 0
+		expect(s.legStarterIndex).toBe(0);
+	});
+
+	// Within a later set, legs must still alternate — and starting from that set's
+	// starter, not from player 0. Set 2 should run player1, player0, player1…
+	it('leg alternation inside the second set is offset by the set starter', () => {
+		// legsToWin=2 so a set spans multiple legs; setsToWin=2 keeps the match going.
+		let s = reduce(initialState(), {
+			type: 'START_MATCH',
+			config: cfg({ startScore: 40, legsToWin: 2, setsEnabled: true, setsToWin: 2 }),
+			players: [playerA, playerB],
+			order: ['a', 'b'],
+		});
+		// ── Set 1: player A wins both legs (2-0) ──
+		s = throwDart(s, 2, 20); // leg 0 (A active) → A wins, legsWon A=1
+		expect(s.activePlayerIndex).toBe(1); // leg 1 of set 1 → player 1
+		// Player B (active) deliberately does not finish; player A wins on next turn.
+		s = numpadVisit(s, 20); // player B: remaining 20
+		s = throwDart(s, 2, 20); // player A: D20=40 → wins leg 1 → wins set 1 (2-0)
+		// Set 2 begins → starter must be player 1 (set alternation)
+		expect(s.players[0].setsWon).toBe(1);
+		expect(s.activePlayerIndex).toBe(1);
+		expect(s.legStarterIndex).toBe(1);
+		// Finish leg 0 of set 2 so we can observe the next within-set starter.
+		s = throwDart(s, 2, 20); // player B wins leg 0 of set 2
+		expect(s.activePlayerIndex).toBe(0); // leg 1 of set 2 → player 0 (alternates from 1)
+		expect(s.legStarterIndex).toBe(0);
+	});
 });
 
 // ── legStartVisitIndex ─────────────────────────────────────────────────────

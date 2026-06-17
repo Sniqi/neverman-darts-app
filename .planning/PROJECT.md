@@ -8,6 +8,17 @@ A touch-optimized darts scoring web app (PWA) for home play with steel darts. Pl
 
 A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
 
+## Current Milestone: v1.1 Chromecast-Integration
+
+**Goal:** Den Live-Spielstand vom Tablet (`/match`) per Google Cast auf einen Chromecast am TV bringen — `/display` läuft eigenständig als Custom Cast Receiver, das Tablet bleibt frei zum Scoren.
+
+**Target features:**
+- Cast Sender in `/match`: offizieller Cast-Button, Geräte-Discovery, Session-Start/-Stop, Verbindungsstatus-UI
+- Custom Web Receiver: `/display` als eigenständige Receiver-App auf dem Chromecast (gehostet auf GitHub Pages, HTTPS)
+- Zustands-Sync über Cast-Custom-Channel: voller Snapshot beim Verbinden (Hydration) + Deltas pro Wurf
+- Koexistenz: bestehendes PC-Zweitfenster (BroadcastChannel) und Tablet-Fullscreen bleiben funktionsfähig; Cast ist additiv
+- Setup: Receiver bleibt unpublished, eigener Chromecast per Seriennummer registriert; App-ID-Handling im Build
+
 ## Requirements
 
 ### Validated
@@ -45,10 +56,17 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - [x] Native dark mode design *(Phases 1–6)*
 - [x] German UI *(Phases 1–6)*
 
+**Cast / Chromecast (v1.1)**
+- [ ] Cast the live display from the tablet (`/match`) to a Chromecast at the TV via Google Cast — board stays free for touch scoring
+- [ ] `/display` runs standalone as a Custom Web Receiver on the Chromecast (no screen-mirroring)
+- [ ] Live state sync over the Cast session: full snapshot on connect + per-throw deltas
+- [ ] Existing PC second-window and tablet fullscreen spectator paths keep working unchanged (Cast is additive)
+- [ ] Receiver stays unpublished; user registers their own Chromecast by serial number
+
 ### Out of Scope
 
 - Camera-based automatic dart detection (autodarts/Scolia style) — manual input is the design; no camera hardware assumed
-- Online multiplayer / cross-device live sync — one device runs the match; the spectator window is a second window on the same PC, not a second device
+- Online/cloud multiplayer or internet-based cross-device sync — no backend; the match runs on one device. *(As of v1.1, local Chromecast cast-session sync to a TV IS in scope — see Current Milestone. This exclusion now covers internet/cloud sync only; the Chromecast is synced LAN-locally over the Cast session, not via a server.)*
 - App store distribution (Play Store etc.) — PWA install covers Android sufficiently
 - Backend/server — GitHub Pages is static hosting only; all data stays on-device
 
@@ -79,6 +97,8 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 | German UI, dark mode native | User preference | — Pending |
 | Audio plays from scoring window (`/match`) only, not the spectator | Browsers block autoplay in a window that never received a user gesture; the passive Observer stays muted | ✓ Done (Phase 5, UAT-decided 2026-06-13) |
 | Master volume slider (default 50%) for caller + SFX; checkout hint speaks the number | User preference during Phase 5 UAT | ✓ Done (Phase 5) |
+| Chromecast via Google Cast SDK (Custom Receiver), not screen-mirroring or a cloud relay | Casts data, not pixels: tablet stays free for scoring; no backend needed (sync runs over the Cast session on the LAN); fits GitHub Pages static hosting; receiver stays unpublished on the user's own device (one-time $5 Cast dev registration) | — Pending (v1.1) |
+| Reversed "cross-device sync = out of scope" for local Cast only | The Chromecast is a genuine second device, but sync is LAN-local via the Cast session — still no backend, still offline-capable at home; internet/cloud sync remains out of scope | — Pending (v1.1) |
 
 ## Evolution
 
@@ -98,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 — Phase 6 (PWA & Deployment) complete; milestone v1.0 all 6 phases done*
+*Last updated: 2026-06-18 — Milestone v1.1 (Chromecast-Integration) started*

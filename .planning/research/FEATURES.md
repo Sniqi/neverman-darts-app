@@ -1,194 +1,198 @@
 # Feature Research
 
-**Domain:** Darts scoring app (steel darts, manual touch input, local/offline, home/hobby, up to 4 players)
-**Researched:** 2026-06-10
-**Confidence:** HIGH for table-stakes and training-game rules (corroborated across DartCounter, n01, Russ Bray, Score Darts); MEDIUM for prioritization calls (judgment applied to this specific offline 4-player home context).
+**Domain:** Google Cast (Chromecast) integration — "second screen / live scoreboard" for a private home darts-scoring PWA
+**Researched:** 2026-06-18
+**Confidence:** HIGH for Cast UX and SDK behavior (official Google Cast Design Checklist, CAF documentation, web sender integration guide); MEDIUM for PWA-specific edge cases and private/unpublished receiver nuances.
 
-> Scope note: The committed feature list in PROJECT.md (X01 301/401/501 single/double-out, legs & sets, ≤4 players, touch board input, checkout suggestions, bull-off result entry, spectator display, auto-pause, profiles, history, long-term stats, achievements, German UI, dark mode) is treated as **already decided**. This document covers features *beyond* that list and classifies the committed ones only where useful for dependency/MVP reasoning. The driving question was "what ELSE is sensible."
+> Scope note: This file covers v1.1 Cast features only. Darts gameplay, scoring rules, stats, achievements, and the spectator layout itself are built (v1.0). The question is: what does the Cast interaction layer need to look like from the user's perspective, and what must the receiver show in each state?
+
+---
+
+## Cast Interaction Model (Context)
+
+The `/match` page on the tablet is the **Cast sender** — it holds scoring authority and posts state. The `/display` page runs on the Chromecast as a **Custom Web Receiver** — it displays the live scoreboard and receives state over a custom channel (`urn:x-cast:` namespace). Sync is a full snapshot on connect followed by per-throw JSON deltas, mirroring the existing BroadcastChannel pattern. The existing PC second-window and tablet fullscreen paths remain unchanged; Cast is additive.
+
+---
 
 ## Feature Landscape
 
 ### Table Stakes (Users Expect These)
 
-Missing these makes a scoring app feel broken or frustrating during real play. All are present in essentially every reference app (DartCounter, n01, Russ Bray, Score Darts, DARTS Scorekeeper).
+Features whose absence makes the Cast integration feel broken or half-finished. A user who has a Chromecast expects these from any "Cast-enabled" app.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Undo / correct last entry | Mis-taps are constant on touch; without one-tap undo the app is unusable for live scoring | LOW–MEDIUM | One-tap "remove last entry". **Critical correctness trap (Russ Bray bug):** undoing a leg-winning score must also revert the leg/set count, or a leg can be "won twice". Model the game state as an event log / reversible reducer from day one. |
-| Bust handling | Going over, or leaving 1 on double-out, must auto-revert the visit to the start-of-visit score | MEDIUM | Standard rule: score >remaining, or =1 (double out), or finishing on a non-double in double-out = bust → score reverts, turn passes. Score Darts: bust = enter 0 / no score. Bust must be visually obvious. |
-| Per-visit total entry (numeric keypad) | The fastest input method experienced scorers expect; many prefer typing "140" over tapping three segments | LOW–MEDIUM | Offer **alongside** the per-dart board input. Per-visit is faster for scoring; per-dart is needed for checkout/double tracking. See dependency notes. |
-| Checkout / double-attempt tracking | Required to compute checkout % — the headline finishing stat. Needs to know which darts were thrown at a double | MEDIUM | App must record "darts at double" and "doubles hit". Per-visit total entry alone can't infer this, so you need a prompt: "how many darts at double? did you finish?" on possible-checkout visits. |
-| Core stats: 3-dart match average, first-9 average, checkout %, highest score, highest checkout, best/worst leg (darts) | These are THE darts metrics; every serious app shows them. Average = score/darts ×3 | MEDIUM | first-9 avg = scoring power; checkout % = finishing; both are universally displayed. Average is computed over the whole match, not per leg. |
-| Score-band counts: 180s, 140+, 100+, 60+, tons | Players brag about and track these; "number of 180s" is the single most celebrated stat in darts | LOW | Simple counters per leg/match/lifetime. Cheap to add, high perceived value. |
-| Screen wake lock | A scoring app whose screen sleeps mid-leg is infuriating; tablet is the primary device | LOW | Web `navigator.wakeLock` API. Re-acquire on visibility change. Easy win, frequently forgotten. |
-| Match setup flexibility (best-of vs first-to legs/sets, start score, in/out rules, player order) | Users expect to configure the match like the pros (sets & legs, single/double out) | LOW–MEDIUM | Mostly committed. Add **best-of vs first-to** semantics explicitly (best-of 5 = first-to-3). |
-| Clear "whose turn / what's left / what was thrown" live state | Core scoring affordance; must show remaining score, last visit, darts-this-visit, suggested checkout | LOW | This is the main scoring screen; already implied by committed scope. |
+| Feature | Why Expected | Complexity | Notes / Existing UI Touch Point |
+|---------|--------------|------------|----------------------------------|
+| **Cast button in the `/match` toolbar** | Every Cast-enabled app shows `<google-cast-launcher>` visibly; absence breaks discoverability. Must appear on all screens with castable content. | LOW | Use the `<google-cast-launcher>` web component (styling via `--connected-color` / `--disconnected-color` CSS custom properties). Place top-right of the `/match` control bar — consistent with the Cast design checklist "right side of content area." The button is self-managing: the SDK drives its visual state. |
+| **Three distinct button states** | Users read the button to know if Cast is available, if they are connecting, and if they are connected. | LOW | States are automatic when using the web component: (1) **Disconnected/available** — standard button icon (waves + frame outline); (2) **Connecting** — animated progressive-wave pulse; (3) **Connected** — filled frame icon (colored via `--connected-color`). Unavailable state: button is hidden on Chrome web when no receivers are found (acceptable for home Wi-Fi). |
+| **Device picker (Cast dialog)** | User needs to see and select their Chromecast by name. The SDK provides this natively on tap of the cast button. | LOW | Fully SDK-managed. Tapping the button opens the Cast dialog listing nearby Cast-capable devices by their friendly name (e.g. "Wohnzimmer TV"). User taps the device name → session starts. No custom UI required here. |
+| **Session start — receiver shows "connecting" then scoreboard** | TV must give feedback immediately on tap; a blank or frozen screen reads as broken. | MEDIUM | Receiver must implement two screen states: (1) a **launcher/loading screen** (app logo + animated spinner) shown while the CAF framework bootstraps; (2) a **connected/active state** showing the live scoreboard once the first snapshot arrives. The existing `/display` layout covers (2). Add (1) as a pre-load overlay. |
+| **Receiver shows match state after connection** | The whole point of casting is that the TV immediately shows the live score. If the receiver shows a blank or a previous state, users lose trust. | MEDIUM | On `SENDER_CONNECTED` event (or on first custom-channel message received), the receiver must hydrate from the snapshot sent by the sender. This is the late-join / initial-sync requirement — the sender must always send a full state snapshot as its first message to any new receiver session. |
+| **Stop casting / disconnect** | Users must be able to end the Cast session from the tablet without navigating away. The Cast dialog (opened via the cast button) shows a "STOP CASTING" button; this is required by the Google Cast design checklist. | LOW | SDK-managed via the Cast dialog. The sender should also listen to `SESSION_STATE_CHANGED → SESSION_ENDED` to update its local UI (re-enable the button, clear any "casting" status indicator). |
+| **Sender UI reflects connected state** | While casting, the `/match` UI must visually confirm the session is live (beyond the filled cast button icon). Users expect some "casting to [device name]" confirmation. | LOW–MEDIUM | A small status chip or toast ("Überträgt auf: Wohnzimmer TV") shown under or near the cast button after session start. Use `CastSession.getCastDevice().friendlyName`. Not required to be persistent — a brief toast on connect + the filled cast button icon is sufficient. |
+| **Receiver stays alive during a paused match** | Auto-pause is a v1.0 feature (configurable leg-count pause with countdown). During pause the match is not being actively scored. The default CAF idle timeout (~5 min for non-media apps in some configurations) would kill the receiver — sending the TV back to the Chromecast home screen mid-break. | MEDIUM | Set `disableIdleTimeout: true` in `CastReceiverOptions`. This is explicitly documented as correct for non-media apps (scoreboards, dashboards). The darts receiver has no "media playback" lifecycle; idle timeout is meaningless for it. Without this, a 5-minute auto-pause break kills the session. |
+| **Reconnection after transient network drop** | Home Wi-Fi drops briefly (router reboot, range edge). Users expect Cast to recover without manually reconnecting. | LOW | CAF handles this automatically at the session level — a session enters "suspended" state on connectivity loss and returns to "connected" when restored. No code required; just do not interfere with the SDK's reconnection logic. |
 
-### Differentiators (Competitive Advantage)
+### Differentiators (Valuable but Not Expected)
 
-Not strictly required, but align with the Core Value ("scored quickly and accurately by touch, with a large readable live display for everyone in the room") and the social home-play setting. These are where a home app can feel *delightful* rather than utilitarian.
+Features that make the Cast integration noticeably better than a bare-minimum implementation for a private home context.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Caller voice ("One hundred and EIGHTY!", score + checkout calls) | The single most-loved feature of Russ Bray Scorer; turns scoring into an event. Perfect fit for a room full of spectators | MEDIUM | Web Speech API (`SpeechSynthesis`) gets you German number calls offline-ish with zero assets (ref: open-source klemenstraeger/darts-scorer). Pre-recorded clips sound far better (the "180" hype) but add asset weight and a recording effort. Recommend: WebSpeech for v1, optional recorded "180"/"Game shot" clips later. German-language calls fit the German UI. |
-| Sound effects + live achievement celebration overlay | Reinforces 180s, high checkouts, new personal records; already committed for records — extend to 180/171/high-finish moments | LOW–MEDIUM | Pairs with caller voice. Committed scope already has live record overlays; sound is the cheap multiplier. |
-| Training / practice modes | Big reason hobby players open the app between matches. DartCounter ships ~8; gives the app standalone value beyond match nights | MEDIUM–HIGH (per game) | Each mode is a self-contained mini-engine sharing the board input + stats persistence. Build incrementally. Recommended set & rules below. |
-| → **Around the Clock** (1→20→bull, hit to advance; doubles variant) | Best beginner drill, trivial rules, board-coverage practice | LOW | No math, no bust. Easiest training mode to ship first. |
-| → **Cricket** (15–20 + bull, close & score) | Most popular non-X01 game; many couples/groups want it as an alternative match | MEDIUM | Marks (open/closed) UI + points. Could be a 2nd "match" type, not just solo training. |
-| → **Bob's 27** (doubles ladder D1→bull, start 27, lose the double's value on a miss, out at ≤0) | Premier doubles-practice drill; directly improves checkout %, which the app already tracks | LOW–MEDIUM | Pure scoring loop with a penalty rule. |
-| → **Shanghai** (single/double/triple of round's number; instant win on S+D+T) | Fun, fast, social group game | LOW–MEDIUM | 7 (or 20) rounds, highest score or instant Shanghai win. |
-| → **121 / checkout training** (practice finishing from set targets) | Targeted finishing practice; complements checkout suggestions | LOW–MEDIUM | Variants exist; simplest: present a target (e.g. 121), N darts to check out, advance on success. |
-| → **Doubles / singles / score training** | Focused skill drills with progress tracking over time | LOW | Thin wrappers over board input + a target + stats. |
-| Deep stat dashboard: score distribution chart, doubles hit-rate, darts-per-leg, win rate, head-to-head | Long-term progression is a key retention hook; the data is already being captured | MEDIUM | Charts over stored history. Visualizing improvement is what DartConnect/MyDartTraining win on. Build once persistence + core stats exist. |
-| Per-player handicap / start-score offset | Lets a strong player and a beginner have a fair, fun home match — high value in a mixed-skill household | LOW–MEDIUM | E.g. different start scores per player, or a "head start". Pure config + engine tweak. |
-| Guest players (play without creating a profile) | Friends visiting shouldn't force profile creation; lowers friction for casual nights | LOW | "Guest" slot whose stats are discarded (or optionally merged later). Pairs with profiles. |
-| Data export / import / backup (JSON file) | All data is on-device with no server; users will fear losing years of stats on a browser cache wipe | LOW–MEDIUM | Export/import a JSON file via the browser download/file-picker. Critical insurance for an offline-only app. Strongly recommended despite "differentiator" label — borderline table-stakes given no backend. |
-| German darts terminology in calls/UI ("Ausbullen", "Ton", "Bull's eye", "Rest") | Authentic feel for the German-speaking target users; differentiator vs English-first apps | LOW | Fits committed German UI; just extend to call phrases & stat labels. |
-| Configurable input speed aids (drag-to-modifier, auto-advance after 3 darts) | Score Darts' hold-and-drag to single/double/treble speeds touch entry dramatically | MEDIUM | Quality-of-life for the touch-first goal. Auto-finalize visit after 3 darts / on win / on bust. |
+| **Receiver idle screen (logo + "Warte auf Spielstart…")** | Between matches, the TV shows something intentional rather than a frozen last-score or blank. Follows the Google design guideline: receiver idle state shows app logo and a message; rotates content every 30–60 s to prevent burn-in. | LOW–MEDIUM | When the sender sends an "idle" or "match-ended" state, the receiver transitions to an idle screen: the Neverman logo, "Kein aktives Spiel" or "Warte auf nächste Runde", maybe last-match summary. This is the differentiator between feeling "finished" vs feeling "abandoned." |
+| **Late-join hydration (receiver opened after match starts)** | If the Chromecast app is reloaded or a second Cast device connects mid-match, the receiver gets the current full state immediately without needing to restart the match. | MEDIUM | Sender must always send a full state snapshot as the first message to a newly connected receiver (on `SENDER_CONNECTED` event at the receiver). This mirrors what the existing BroadcastChannel hydration already does for the PC spectator window — same pattern, different transport. |
+| **Session resume after sender page refresh** | If the tablet reloads `/match` (browser refresh, PWA restart), the Cast session should auto-resume rather than requiring the user to re-cast. | LOW–MEDIUM | Set `autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED` in `CastContext` initialization. With this policy, on page reload the SDK automatically reconnects to the existing running session without user interaction. On reconnect, the sender sends a fresh snapshot to sync. |
+| **Receiver shows player-count-aware layout** | The existing `/display` already adapts to 1–4 players. Confirming that the Cast receiver uses the same adaptive layout (inherited from `/display`) ensures 2-player matches look as good as 4-player matches on the TV. | LOW | No new work if `/display` is reused as-is. Explicitly verify that the layout adapts at 1920×1080 (standard TV resolution), not just at PC monitor resolutions. |
+| **Smooth state transitions on score update** | Per-throw deltas arrive frequently. A score that "snaps" immediately is fine; a brief CSS transition (fade or slide) on the score field makes the display feel polished and live. | LOW | CSS `transition: color 0.2s ease` on the remaining-score element. Cheap, high perceived quality. Consistent with the Google receiver guideline for "cinematic transitions between states." |
+| **Receiver overscan-safe layout** | Older TVs (and even some modern ones with incorrect display settings) crop ~5–10% at the edges. Content near the edge will be clipped. | LOW | The Google receiver guideline mandates a 10% margin from all edges for safe content. The existing `/display` layout should be reviewed to ensure no critical elements (player names, score remaining) sit in the outermost 10% of the viewport. |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Things that look attractive but conflict with the stated scope, the no-backend/offline constraint, or the home-hobby focus. Several are already correctly in PROJECT.md "Out of Scope"; restated here with the *why* for the requirements author.
+Features that seem useful but are wrong for this private, single-Chromecast home context.
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Camera / auto dart detection (autodarts/Scolia) | "The cool apps do it automatically" | Needs cameras, calibration, heavy CV; explicitly out of scope; manual touch input is the entire design premise | Fast, reliable touch input + per-visit numeric entry. |
-| Online multiplayer / cross-device live sync | "Play friends remotely / use phone as remote scorer" | Requires a backend/server; PROJECT.md mandates GitHub Pages static + on-device only; sync is a huge correctness/complexity sink | One device runs the match; spectator window is a 2nd window on the *same* PC. |
-| Cloud accounts / login / leaderboards | "Save stats across devices, compete globally" | No backend allowed; auth + privacy + sync burden for a home app of ≤4 known people | Local profiles + JSON export/import for moving data between devices manually. |
-| Computer/bot opponent (avg 20–120) | DartCounter has it; "practice solo vs AI" | For a steel-dart app you still throw real darts and enter them — a bot can't share the physical board meaningfully; adds a simulation engine for little real-play value | Solo training modes (Bob's 27, ATC, checkout drills) give solo value without a fake opponent. |
-| Exhaustive game-mode library (Killer, Halve-It, Tactics, Gotcha, Mickey Mouse, Golf, Baseball, etc.) | "More games = more value" | Each mode is its own engine, stats, German strings, edge cases; long tail is rarely played; dilutes polish | Ship X01 + the 5–6 highest-value training modes listed above; add more only on real demand. |
-| In-app purchases / subscription / ads | Monetization norm in the category (DartCounter, Russ Bray Pro) | This is a personal/home app on GitHub Pages; monetization adds SDKs, privacy concerns, and friction for zero benefit | Free, no accounts, no tracking. |
-| Tournament / bracket management (n01 tournament system) | n01 is famous for it | Multi-match orchestration, seeding, scheduling — far beyond a ≤4-player living-room match | A simple match is the unit; run several matches manually if needed. |
-| Multi-language i18n framework | "Support English too" | German is the explicit single target; an i18n layer is premature abstraction (violates simplicity) | Hard-code German now; revisit only if a real second-language user appears. |
-| Real-time everything / animated board physics | "Make it flashy" | Animation/physics cost battery, distract from fast scoring, and risk performance on tablets | Crisp, high-contrast, large-typography UI; reserve motion for the celebration overlay. |
+| **Mini controller (persistent cast bar)** | The official Google Cast design checklist says a web sender must show a mini controller when navigating away from the content page. | For this app the scoring page `/match` IS the content page; there are no "other pages" the user navigates to during a match. The mini controller is designed for media apps where the user browses a catalog while music plays in the background. Implementing it adds code, layout complexity, and a persistent UI bar that occludes the dartboard on a tablet. | The filled Cast button icon + the session-start toast are sufficient. Note this explicitly in code: the design checklist mini-controller requirement is N/A for a single-page scoring app where `/match` is always foreground. |
+| **Multiple senders (two phones casting simultaneously)** | Cast supports it; a second household member might want to cast from their phone. | This is a private home scoreboard: one tablet controls scoring authority. A second sender joining could send conflicting state or trigger unintended session management. The complexity is real (sender-disconnect logic, authority model) and the use case does not exist in a household with one scoring device. | Ignore. With `autoJoinPolicy: ORIGIN_SCOPED`, a second device on the same Wi-Fi could theoretically auto-join the existing session and listen, but only the original scoring tablet sends state updates. That is acceptable and requires no active mitigation. |
+| **Expanded controller (full-screen cast control overlay)** | The Google Design Checklist requires an "expanded controller" for media Cast apps. | Expanded controller is for media playback (play/pause/seek/volume). The darts receiver has no playback controls — the tablet is the input device and the TV is display-only. An expanded controller with darts-context "controls" is meaningless; the tablet's full-screen `/match` IS the controller. | Not applicable. Document explicitly that the expanded controller requirement is N/A for a non-media, non-playback receiver. |
+| **Hardware volume control integration** | Sender checklist includes volume slider synced to receiver. | The TV's volume is irrelevant to a visual-only scoreboard. Audio (the caller voice) plays from the tablet (`/match`), not from the Chromecast receiver. A volume slider in the Cast context would control the Chromecast's audio output, which is silent. | Omit volume integration. Caller + SFX audio stays on the tablet as established in v1.0. |
+| **Screen-mirroring / Tab Cast** | "Just mirror the tablet screen to the TV instead of building a receiver." | Screen-mirroring sends pixels and the tablet display is optimized for touch scoring, not TV viewing. The typography is too small for 3 m viewing distance. The existing `/display` layout with its large-typography TV design is the right solution. Also, tab cast uses a different Cast session type and has performance/latency characteristics unsuitable for a live scoreboard. | Custom Web Receiver loading `/display` — already the plan. |
+| **Cloud relay for state sync** | "What if Cast isn't available / Chromecast is offline?" | Adds a backend, which is explicitly out of scope. The existing BroadcastChannel path already handles the PC second-window case. The Cast path is additive and optional — if the Chromecast is unavailable, the user falls back to the PC window. | Cast is additive. No fallback beyond what already exists. |
+| **Receiver published to Cast console (public listing)** | "Easier setup — anyone can cast to it." | Public listing exposes the app on the Cast developer console, requires Google review/approval, and makes the receiver available to unknown devices. For a private home app, the user registers their own Chromecast serial number to use an unpublished receiver. This is the explicit project decision and requires only a one-time $5 Cast developer registration. | Unpublished receiver with serial-number device registration — already the project decision. |
+| **Introductory overlay ("Cast Introduction")** | The Cast Design Checklist requires showing a first-run overlay that circles the cast button and explains it. | This is designed for public consumer apps where most users have never seen a cast button. For a private home app built and operated by one developer-user, a first-run tutorial is noise. | Skip. The requirement is for apps distributed to general users who may not know what the Cast button does. |
+
+---
 
 ## Feature Dependencies
 
 ```
-Game engine (X01: scores, legs, sets, bust, in/out rules)
-    └──requires──> Reversible state model (event log / undoable reducer)
-                       └──enables──> Undo / correct last entry
-                       └──enables──> "win leg twice" bug avoidance
+Cast sender session (CastContext + CastSession)
+    └──requires──> App ID from unpublished receiver registration
+    └──requires──> `<google-cast-launcher>` web component in /match toolbar
+    └──enables──>  Device picker (SDK-managed)
+    └──enables──>  Session lifecycle events (SESSION_STARTED, SESSION_ENDED, SESSION_RESUMED)
 
-Per-dart board input ──enables──> Checkout/double-attempt tracking
-                                       └──requires──> Checkout %  &  doubles hit-rate stats
-Per-visit numeric input ──(alone)──> CANNOT compute checkout % (no per-dart granularity)
-        └── conflict/gap: must add a "darts at double / finished?" prompt to recover the stat
+Session started
+    └──requires──> Sender sends full state snapshot immediately
+                       └──enables──> Receiver hydration (late-join safe)
+                       └──enables──> Receiver transitions from "loading" to "active scoreboard"
 
-Persistent profiles ──requires──> Match history ──requires──> Long-term stats
-                                                                   └──enables──> Stat dashboard / charts
-                                                                   └──enables──> Achievements / personal records
-Profiles ──enhances──> Guest players (guest = profile-less slot)
+Per-throw scoring event (existing game engine, /match)
+    └──triggers──> State delta message over custom channel
+                       └──updates──> Receiver display (same data as BroadcastChannel delta, different transport)
 
-Core stats (avg, first-9, 180/140/100 counts, highest score/checkout)
-    └──feeds──> Achievement detection (new record → live overlay + sound)
-    └──feeds──> Caller voice triggers ("180", "Game shot")
+disableIdleTimeout: true (receiver option)
+    └──prevents──> CAF killing the receiver during auto-pause breaks or between-match idle
 
-Caller voice ──enhances──> Sound effects / celebration overlay (same trigger points)
+autoJoinPolicy: ORIGIN_SCOPED (sender option)
+    └──enables──> Session resume after tablet page refresh (no re-cast needed)
 
-Training modes (ATC, Cricket, Bob's 27, Shanghai, 121, doubles/singles)
-    └──reuse──> Board input + stats persistence (build engine first, modes are thin)
+Receiver screen states
+    Loading screen (spinner + logo)
+        └──transitions to──> Active scoreboard (on first snapshot received)
+    Active scoreboard
+        └──transitions to──> Idle screen (on "match ended" / no sender / explicit idle signal)
+    Idle screen
+        └──transitions to──> Active scoreboard (on new match start / snapshot received)
 
-JSON export/import ──requires──> Persistent data store (defines the schema to serialize)
+Existing /display layout
+    └──reused as──> Cast receiver content (verify 1920×1080 fit + overscan margins)
 
-Wake lock, dark mode, German UI ──independent──> (no deps; do early, cheap)
+Existing BroadcastChannel sync
+    └──coexists──> Cast custom channel (both emit from same game-engine state; sender decides which transports to use)
 ```
 
 ### Dependency Notes
 
-- **Undo requires a reversible state model:** Decide this at architecture time. A naive "subtract the last number" undo is the source of the documented "win a leg twice" bug. Model game state as an ordered list of visits/throws and recompute, or use an undoable reducer.
-- **Checkout % requires per-dart (or a double-prompt) granularity:** Pure per-visit total entry cannot know how many darts were aimed at a double. Either rely on per-dart board input on finishing visits, or prompt "darts at double? finished?" Plan this into the input flow, not after.
-- **Stat dashboard requires history + core stats first:** Charts are cheap once the data model exists; do not build charting before persistence + the core stat computations are stable.
-- **Training modes reuse the engine, not duplicate it:** Build the board-input + stats-persistence layer so each training game is a small rules module on top. This keeps the long tail cheap (and makes the "more games" anti-feature pressure manageable).
-- **Export/import defines the storage schema:** Designing serialization early forces a clean, versioned on-device data model — valuable insurance given there is no backend.
+- **App ID must exist before any Cast code runs:** The `receiverApplicationId` is set at `CastContext` init time. Use a build-time env var (`PUBLIC_CAST_APP_ID`) so the ID is injected at build; the receiver's URL (GitHub Pages `/display`) is registered in the Cast developer console and tied to the serial-number-registered Chromecast.
+- **Snapshot is always the first message:** The sender must send a full state snapshot on `SENDER_CONNECTED` at the receiver (or on `SESSION_STARTED` at the sender). Never assume the receiver has prior state. This mirrors the BroadcastChannel hydration pattern already built for the PC spectator window.
+- **`disableIdleTimeout` must be set before `context.start()`:** Custom namespaces must also be declared in `CastReceiverOptions` before start; they cannot be added after the framework initializes.
+- **`/display` reuse reduces receiver build scope:** The receiver is the existing `/display` SvelteKit route, bootstrapped with the CAF receiver SDK script. The only additions are: a loading overlay, an idle overlay, and the custom-channel listener that writes incoming state into the existing Svelte store.
+
+---
 
 ## MVP Definition
 
-### Launch With (v1)
+### Launch With (v1.1 — Cast MVP)
 
-Minimum to validate "score a full X01 match quickly, accurately, and watchably." (Committed-scope items marked ✓committed.)
+The minimum to achieve "score a match on the tablet, watch live on the Chromecast TV."
 
-- [ ] X01 301/401/501, single/double out, legs & sets, ≤4 players ✓committed — the core loop
-- [ ] Reversible game state + **Undo last entry** — without it, live scoring fails
-- [ ] **Bust handling** (auto-revert visit) — correctness; legs are unplayable otherwise
-- [ ] Touch board input ✓committed **+ per-visit numeric keypad** — fast entry is the Core Value
-- [ ] Checkout suggestions (next 1–3 darts) ✓committed
-- [ ] **Checkout/double-attempt tracking** — needed for the headline finishing stat
-- [ ] Core stats: 3-dart avg, first-9 avg, checkout %, 180/140/100 counts, highest score/checkout, best/worst leg ✓(extends committed stats)
-- [ ] Bull-off result entry ✓committed
-- [ ] Spectator display (score, legs/sets, names, leg & match avg) ✓committed
-- [ ] Auto-pause with countdown ✓committed
-- [ ] Profiles, match history, long-term stats, achievements + live overlay ✓committed
-- [ ] **Screen wake lock** — cheap, prevents a glaring annoyance
-- [ ] PWA + offline + dark mode + German UI ✓committed
+- [ ] **Cast button** (`<google-cast-launcher>`) in `/match` toolbar — all three states (available / connecting / connected)
+- [ ] **CastContext initialization** with the registered unpublished `receiverApplicationId` and `autoJoinPolicy: ORIGIN_SCOPED`
+- [ ] **Session-start handler** — sender sends full state snapshot immediately on session start
+- [ ] **Per-throw delta sender** — each throw event also posts a delta over the custom Cast channel (alongside existing BroadcastChannel post)
+- [ ] **Custom Web Receiver** — `/display` with CAF receiver SDK, `disableIdleTimeout: true`, custom-channel listener hydrating Svelte store
+- [ ] **Receiver loading screen** — app logo + spinner, shown until first snapshot arrives
+- [ ] **Receiver idle screen** — app logo + "Kein aktives Spiel" message, shown when no sender is connected or match is over
+- [ ] **Session-end handler** — sender clears cast status indicator on `SESSION_ENDED`; receiver transitions to idle screen on sender disconnect
+- [ ] **"Überträgt auf: [Gerätename]" status toast** on session start in `/match`
+- [ ] **Overscan-safe receiver layout** — verify `/display` has 10% edge margins at 1920×1080
 
-### Add After Validation (v1.x)
+### Add After Validation (v1.1.x)
 
-Add once the match loop is proven in real use.
-
-- [ ] **Caller voice** (Web Speech, German) — biggest delight multiplier; trigger when match loop + achievement events are stable
-- [ ] **Sound effects** tied to 180/high-checkout/record events — once celebration overlay exists
-- [ ] **JSON export / import / backup** — once the data schema has settled (do not delay too long; it's data insurance)
-- [ ] **Guest players** — when friction with visiting friends is observed
-- [ ] **Training modes, in value order:** Around the Clock → Bob's 27 → Cricket → Shanghai → 121/checkout drill → doubles/singles
-- [ ] **Stat dashboard / charts** (score distribution, doubles hit-rate, darts-per-leg, win rate, H2H) — once enough history accumulates to be interesting
+- [ ] **Smooth score-update transitions** — CSS fade on remaining-score field (low effort, high polish)
+- [ ] **Session resume toast** ("Verbindung wiederhergestellt") on `SESSION_RESUMED` — informs user after a network drop recovery
 
 ### Future Consideration (v2+)
 
-- [ ] **Handicaps / per-player start offsets** — defer until mixed-skill imbalance is actually felt
-- [ ] **Recorded high-quality caller clips** (vs synthesized) — polish after WebSpeech proves the concept
-- [ ] **Cricket as a full standalone match type** (not just training) — if the group plays it often
-- [ ] **Drag-to-modifier / advanced touch speed aids** — optimize input after baseline UX is validated
+- [ ] **Idle-screen match-summary** — show last match result on the idle screen (requires passing summary data)
+- [ ] **Receiver UI theme customization** — different color schemes for different match moods (very low priority, home-use only)
+
+---
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Undo last entry (reversible state) | HIGH | MEDIUM | P1 |
-| Bust handling | HIGH | MEDIUM | P1 |
-| Per-visit numeric input | HIGH | LOW | P1 |
-| Checkout/double-attempt tracking | HIGH | MEDIUM | P1 |
-| Core stats (avg/first-9/checkout%/180s/highs/best leg) | HIGH | MEDIUM | P1 |
-| Screen wake lock | HIGH | LOW | P1 |
-| Caller voice (German, Web Speech) | HIGH | MEDIUM | P2 |
-| Sound effects + celebration audio | MEDIUM | LOW | P2 |
-| JSON export/import/backup | HIGH | MEDIUM | P2 |
-| Guest players | MEDIUM | LOW | P2 |
-| Training: Around the Clock | MEDIUM | LOW | P2 |
-| Training: Bob's 27 | MEDIUM | LOW–MED | P2 |
-| Training: Cricket | MEDIUM | MEDIUM | P2 |
-| Training: Shanghai / 121 / doubles drills | MEDIUM | LOW–MED | P3 |
-| Stat dashboard / charts | MEDIUM | MEDIUM | P2/P3 |
-| Handicaps / start offsets | MEDIUM | LOW–MED | P3 |
-| Recorded caller clips | MEDIUM | MEDIUM | P3 |
-| Camera detection / online sync / bot / IAP | (out of scope) | HIGH | NO |
+| Cast button (`<google-cast-launcher>`) in /match | HIGH | LOW | P1 |
+| CastContext init + App ID wiring | HIGH | LOW | P1 |
+| Snapshot on session start (sender) | HIGH | LOW | P1 |
+| Per-throw delta over Cast channel (sender) | HIGH | LOW | P1 |
+| Custom receiver with CAF SDK + channel listener | HIGH | MEDIUM | P1 |
+| `disableIdleTimeout: true` on receiver | HIGH | LOW | P1 (prevents session death during auto-pause) |
+| Receiver loading screen | MEDIUM | LOW | P1 |
+| Receiver idle screen | MEDIUM | LOW | P1 |
+| Session-end / disconnect handling | HIGH | LOW | P1 |
+| Status toast ("Überträgt auf…") | MEDIUM | LOW | P1 |
+| Overscan margin verification on /display | MEDIUM | LOW | P1 |
+| `autoJoinPolicy: ORIGIN_SCOPED` (session resume) | HIGH | LOW | P1 (one-line config, prevents frustrating re-cast on refresh) |
+| CSS transition on score update | LOW | LOW | P2 |
+| Session-resume toast | LOW | LOW | P2 |
+| Idle-screen match summary | LOW | MEDIUM | P3 |
+| Mini controller | N/A | MEDIUM | SKIP |
+| Expanded controller | N/A | MEDIUM | SKIP |
+| Multiple-sender authority model | N/A | HIGH | SKIP |
+| Cast Introduction overlay | N/A | LOW | SKIP |
+| Volume control integration | N/A | LOW | SKIP |
 
-## Competitor Feature Analysis
+---
 
-| Feature | DartCounter | n01 | Russ Bray Scorer | Score Darts | Our Approach |
-|---------|-------------|-----|------------------|-------------|--------------|
-| X01 + sets/legs + in/out | Yes | Yes (tournament-grade) | Yes | Yes | Committed; offline, ≤4 players |
-| Per-dart + per-visit input | Both | Both | Both | Both (+ drag-to-modifier, voice) | Both: board (per-dart) + numeric (per-visit) |
-| Undo / bust handling | Yes | Yes (return to prev leg) | Yes (has the win-twice bug) | Yes (clear docs) | Yes — reversible state, avoid win-twice bug |
-| Caller voice / "180" | MasterCaller Ray Martin | No (scoring focus) | Russ Bray (signature feature) | Voice + caller | Web Speech (German) v1.x, recorded clips later |
-| Training modes | ~8 (Cricket, ATC, Bob's 27, Shanghai, 121, doubles/singles/score) | Scoring-focused | Match-focused | X01 + Cricket | ATC, Bob's 27, Cricket, Shanghai, 121, drills — incremental |
-| Stats depth | avg, first-9, checkout%, highs, best/worst leg | dart avg, winning avg, score stats | match stats | various + missed-double tracking | Full core stats + dashboard; all on-device |
-| Computer/bot opponent | Yes (20–120) | Yes (12 levels) | — | — | NO — real darts, manual entry; solo = training modes |
-| Online / accounts / IAP | Yes (subscription) | Tournament system | Pro paid tier | Plus tier | NO — free, offline, no backend, JSON export instead |
-| Spectator/big display | — | — | — | — | Yes (our differentiator: 27" @ 3 m readable) |
+## Receiver Screen State Reference
+
+The CAF receiver for a non-media scoreboard has three meaningful screen states. These must be implemented:
+
+| State | Trigger | What TV Shows | Duration |
+|-------|---------|---------------|----------|
+| **Loading** | Receiver app bootstrapping (before CAF framework ready) | Neverman logo + animated spinner, dark background | Seconds (until framework init + first message) |
+| **Active** | Full state snapshot received from sender | Live `/display` scoreboard: player scores, legs/sets, averages — identical to the existing spectator view | As long as match is running and sender is connected |
+| **Idle** | No sender connected, or "match ended" signal received | Neverman logo + "Kein aktives Spiel" text, optionally last-match player names | Until next session / next match; rotate to prevent burn-in if idle for more than a few minutes |
+
+Note: The Google CAF design guideline specifies that the idle state should rotate content every 30–60 seconds and disconnect after 5 minutes of complete inactivity. With `disableIdleTimeout: true`, the receiver stays alive; but if there is no sender connected for an extended period (e.g. Chromecast was cast to by accident with no match running), the idle screen rotation prevents screen burn. The receiver app itself does not need to self-terminate — when the last sender disconnects, the Chromecast OS will eventually reclaim it after a long timeout.
+
+---
 
 ## Sources
 
-- DartCounter (Target) — modes, stats, callers, players: https://play.google.com/store/apps/details?id=com.dartcounter.mobile (HIGH)
-- Darts Counter: Scoreboard (Flame Apps) — checkout suggestions, undo, tablet layout: https://play.google.com/store/apps/details?id=de.flame.dartcounter (HIGH)
-- n01 (nakka) — scoring focus, stats, tournament system: https://nakka.com/soft/n01/index_eng.html , https://en.n01darts.com/ (HIGH)
-- Russ Bray Darts Scorer Pro — caller voice, name calls, undo "win twice" bug: https://apps.apple.com/us/app/russ-bray-darts-scorer-pro/id1269100714 (HIGH)
-- Score Darts X01 Help — bust handling, undo + missed doubles, input modes, auto-finalize: https://www.scoredarts.com/x01help/ (HIGH)
-- DARTS Scorekeeper 2026 — configurable caller voice, per-visit input, keyboard input: https://apps.apple.com/us/app/darts-scorekeeper-2026/id1504732492 (MEDIUM)
-- klemenstraeger/darts-scorer — Web Speech API announcer, checkout phrases: https://github.com/klemenstraeger/darts-scorer/issues/3 (MEDIUM)
-- Training game rules (Cricket, ATC, Shanghai, Bob's 27, 121): https://beskardarts.com/games/ , https://dartsplanet.tv/bobs-27-darts-practice-game/ , https://dartsy.org/blog/dart-practice-games-to-play-alone (HIGH for rules)
-- Stat definitions (first-9 avg, checkout %, 180/140/100 distribution, doubles): https://www.skysports.com/darts/news/12288/13271474/ , https://darts501.com/Scorer.html (HIGH)
+- [Google Cast UX Guidelines](https://developers.google.com/cast/docs/ux_guidelines) — sender/receiver model, button placement, receiver UI zones — MEDIUM (official)
+- [Google Cast Design Checklist — Cast Button](https://developers.google.com/cast/docs/design_checklist/cast-button) — button states, introduction overlay, position — MEDIUM (official)
+- [Google Cast Design Checklist — Sender App](https://developers.google.com/cast/docs/design_checklist/sender) — mini controller, expanded controller, volume, stop casting, what is N/A for web senders — MEDIUM (official)
+- [Google Cast Design Checklist — Non-Touch Receiver](https://developers.google.com/cast/docs/design_checklist/receiver) — receiver screen states (idle, loading, playing, paused), idle timeout guidelines — MEDIUM (official)
+- [Integrate Cast SDK into Your Web Sender App](https://developers.google.com/cast/docs/web_sender/integrate) — `<google-cast-launcher>`, `CastContext.setOptions`, `autoJoinPolicy`, session state events, custom channel API — MEDIUM (official)
+- [Add Core Features to Your Custom Web Receiver](https://developers.google.com/cast/docs/web_receiver/core_features) — `addCustomMessageListener`, `SENDER_DISCONNECTED`, late-join, `disableIdleTimeout`, `CastReceiverOptions` — MEDIUM (official)
+- [CastReceiverOptions reference](https://developers.google.com/cast/docs/reference/web_receiver/cast.framework.CastReceiverOptions) — `disableIdleTimeout`, `maxInactivity`, `customNamespaces` — MEDIUM (official)
+- [Cast Overview — multiple senders](https://developers.google.com/cast/docs/overview) — multi-sender session semantics — MEDIUM (official)
+- Web search synthesis (2026-06-18): `disableIdleTimeout` for non-media apps, `autoJoinPolicy` reconnect behavior, custom channel scoreboard pattern, idle timeout confirmation (~5 min) — LOW–MEDIUM (cross-checked)
 
 ---
-*Feature research for: darts scoring app (steel darts, offline, touch, home/hobby)*
-*Researched: 2026-06-10*
+
+*Feature research for: Google Cast integration — private home darts-scoring PWA (v1.1)*
+*Researched: 2026-06-18*

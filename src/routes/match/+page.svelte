@@ -20,6 +20,8 @@
 	import RecordOverlay from '../../ui/overlays/RecordOverlay.svelte';
 	import PauseOverlay from '../../ui/overlays/PauseOverlay.svelte';
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
+	import ResumeToast from '../../ui/cast/ResumeToast.svelte';
+	import { castSenderManager } from '../../lib/cast-sender.svelte.js';
 	import type { DartScore } from '../../engine/types.js';
 
 	// ── Audio prefs — enabled flags + volumes are $state so the in-match audio bar updates live ──
@@ -49,6 +51,14 @@
 			if (firstPlayer) {
 				announceGameStart(firstPlayer.name, base, callerVolume);
 			}
+		}
+
+		// SETUP-02 / D-13: init Cast sender only when VITE_CAST_APP_ID is present.
+		// Absent App ID → no init → Cast row stays hidden via {#if castAvailable}.
+		const appId = import.meta.env.VITE_CAST_APP_ID;
+		if (appId) {
+			castSenderManager.init(appId);
+			matchStore.setCastManager(castSenderManager);
 		}
 	});
 
@@ -364,6 +374,9 @@
 />
 
 <SpectatorChooser />
+
+<!-- CAST-06: SESSION_RESUMED resume toast — auto-dismisses after 3500ms. -->
+<ResumeToast />
 
 <a href="{base}/" class="back-btn" aria-label="Zurück zur Startseite">✕</a>
 

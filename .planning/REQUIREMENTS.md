@@ -10,11 +10,11 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 ### CAST — Sender (Tablet `/match`)
 
 - [ ] **CAST-01**: User can start casting the live display to a Chromecast from `/match` via the official Cast button
-- [ ] **CAST-02**: The Cast button reflects connection state (verfügbar / verbindet / verbunden)
+- [x] **CAST-02**: The Cast button reflects connection state (verfügbar / verbindet / verbunden)
 - [ ] **CAST-03**: User sees which device is being cast to ("Überträgt auf: <Gerät>") and can stop casting from `/match`
-- [ ] **CAST-04**: On a browser without Cast support (non-Chrome), `/match` works normally with the Cast control hidden/disabled (graceful degradation)
-- [ ] **CAST-05**: After a tablet page reload during an active cast, the session auto-rejoins without re-selecting the device
-- [ ] **CAST-06**: User sees a brief "Verbindung wiederhergestellt" hint when a Cast session resumes *(polish)*
+- [x] **CAST-04**: On a browser without Cast support (non-Chrome), `/match` works normally with the Cast control hidden/disabled (graceful degradation)
+- [x] **CAST-05**: After a tablet page reload during an active cast, the session auto-rejoins without re-selecting the device
+- [x] **CAST-06**: User sees a brief "Verbindung wiederhergestellt" hint when a Cast session resumes *(polish)*
 
 ### RECV — Receiver (Chromecast)
 
@@ -73,11 +73,11 @@ Which phase covers which requirement. Filled during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CAST-01 | Phase 7 | Pending |
-| CAST-02 | Phase 7 | Pending |
+| CAST-02 | Phase 7 | Complete |
 | CAST-03 | Phase 7 | Pending |
-| CAST-04 | Phase 7 | Pending |
-| CAST-05 | Phase 7 | Pending |
-| CAST-06 | Phase 7 | Pending |
+| CAST-04 | Phase 7 | Complete |
+| CAST-05 | Phase 7 | Complete |
+| CAST-06 | Phase 7 | Complete |
 | RECV-01 | Phase 7 | Pending |
 | RECV-02 | Phase 7 | Pending |
 | RECV-03 | Phase 7 | Pending |

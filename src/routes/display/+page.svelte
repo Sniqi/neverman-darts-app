@@ -136,8 +136,8 @@
 
 	// ── Fullscreen state (D-15 PC toggle, D-14 tablet exit) ──────────────────
 	// isFullscreen tracks document.fullscreenElement state.
-	// Guard document access — the route has ssr:false but fullscreen API must
-	// only be called in browser context inside $effect / click handlers.
+	// Guard document access — ssr=true for this route (Chromecast prerender, D-04), so
+	// all DOM/fullscreen API calls must be inside $effect / click handlers (browser-only).
 	let isFullscreen = $state(false);
 	// Latches true once fullscreen has been entered at least once this page-load (WR-01):
 	// after a fullscreen round-trip the big amber prompt must not re-appear over the live

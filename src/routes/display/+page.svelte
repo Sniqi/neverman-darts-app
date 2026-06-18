@@ -302,6 +302,11 @@
 	.display-root {
 		display: flex;
 		flex-direction: column;
+		/* 100vh fallback FIRST: the Chromecast CAF receiver runs an older Chromium without
+		   `dvh` support (added in Chrome 108). An unsupported unit invalidates the whole
+		   declaration → the element collapsed to auto height (~20% of the TV, bottom clipped).
+		   Modern browsers (tablet/PC) override with 100dvh on the next line. (UAT 07, 3rd pass) */
+		height: 100vh;
 		height: 100dvh;
 		width: 100%;
 		background: radial-gradient(
@@ -313,11 +318,9 @@
 		overflow: hidden;
 	}
 
-	/* D-11: TV overscan safe margin for Chromecast receiver (UI-SPEC §2, 96px = 10% of 960px half-width).
-	   Applied only when isReceiver is true — PC/tablet display paths are visually unchanged. */
-	.display-root.cast-receiver {
-		padding: 96px;
-	}
+	/* D-11: TV overscan safe margin removed per on-device UAT (07, 3rd pass) — the 96px border
+	   wasted too much of the screen and most modern TVs/Chromecast output no overscan. If a
+	   specific TV crops the edges, re-add a small symmetric inset here, e.g. `padding: 2.5vh 2.5vw`. */
 
 	.panels-grid {
 		flex: 1 1 0;

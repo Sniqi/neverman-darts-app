@@ -33,7 +33,7 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 
 ### SETUP — Deployment & registration
 
-- [ ] **SETUP-01**: The receiver is served at a stable HTTPS URL on GitHub Pages, correct under the repo subpath, and is not intercepted or broken by the PWA service worker
+- [x] **SETUP-01**: The receiver is served at a stable HTTPS URL on GitHub Pages, correct under the repo subpath, and is not intercepted or broken by the PWA service worker
 - [ ] **SETUP-02**: The Cast App ID is supplied at build time (no hard-coded App ID committed in source)
 - [ ] **SETUP-03**: A written setup guide documents the one-time Cast Console registration (unpublished receiver, register own Chromecast by serial, 15-min propagation + reboot)
 
@@ -87,11 +87,12 @@ Which phase covers which requirement. Filled during roadmap creation.
 | SYNC-02 | Phase 7 | Pending |
 | SYNC-03 | Phase 7 | Pending |
 | SYNC-04 | Phase 7 | Pending |
-| SETUP-01 | Phase 7 | Pending |
+| SETUP-01 | Phase 7 | Complete |
 | SETUP-02 | Phase 7 | Pending |
 | SETUP-03 | Phase 7 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 18 total
 - Mapped to phases: 18/18 (Phase 7)
 - Unmapped: 0

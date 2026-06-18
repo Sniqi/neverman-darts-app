@@ -4,16 +4,16 @@ milestone: v1.1
 milestone_name: Chromecast-Integration
 current_phase: 7
 current_phase_name: Chromecast Integration
-status: roadmapped
-stopped_at: Phase 7 UI-SPEC approved
-last_updated: "2026-06-18T18:21:19.214Z"
+status: executing
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-06-18T19:14:50.444Z"
 last_activity: 2026-06-18
-last_activity_desc: Roadmap for v1.1 created (Phase 7)
+last_activity_desc: Phase 7 execution started
 progress:
   total_phases: 1
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 6
+  completed_plans: 1
   percent: 0
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-06-18)
 
 ## Current Position
 
-Phase: 7 — Chromecast Integration
-Plan: —
-Status: Roadmap defined; awaiting discuss → plan → execute
-Last activity: 2026-06-18 — Roadmap for v1.1 created (Phase 7)
+Phase: 7 (Chromecast Integration) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-06-18 — Phase 7 execution started
 
 ```
 [Phase 7 ░░░░░░░░░░░░░░░░░░░░] 0%
@@ -84,6 +84,7 @@ Last activity: 2026-06-18 — Roadmap for v1.1 created (Phase 7)
 | Phase 04 P05 | 8min | 3 tasks | 10 files |
 | Phase 05-audio-auto-pause P01 | 7min | 2 tasks | 5 files |
 | Phase 05-audio-auto-pause P03 | 6min | 3 tasks | 8 files |
+| Phase 07 P01 | 6 | 6 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,9 @@ Recent decisions affecting current work:
 - [Phase ?]: BASE_PATH derived from github.event.repository.name so workflow stays correct if repo is renamed
 - [v1.1 roadmap]: Single phase (Phase 7) chosen for all Cast work — App ID is needed before E2E; splitting phases creates a verification cliff with no meaningful boundary
 - [v1.1 roadmap]: 3 open design decisions deferred to /gsd-discuss-phase — receiver entry point, message payload schema, App ID env strategy
+- [Phase ?]: trailingSlash='always' on display route forces build/display/index.html (D-04)
+- [Phase ?]: CAST_NS scoped to single export in sync-constants.ts — prevents silent namespace mismatch (D-05)
+- [Phase ?]: Receiver @types isolated to tsconfig.receiver.json — receiver cast.* globals must not leak into main tsconfig
 
 ### Quick Tasks Completed
 
@@ -161,9 +165,9 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-18T18:21:19.208Z
-Stopped at: Phase 7 UI-SPEC approved
-Resume file: .planning/phases/07-chromecast-integration/07-UI-SPEC.md
+Last session: 2026-06-18T19:14:50.438Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: None
 
 ## Operator Next Steps
 

@@ -53,10 +53,10 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.0-R
 
   - Cast Developer Console registration ($5 one-time, Chromecast serial registered, receiver URL registered, 15-min propagation + reboot) must be complete before any real-device testing is possible. SETUP-03 includes a written guide for this step.
 
-**Plans**: 6 plans
+**Plans**: 1/6 plans executed
 **Wave 1**
 
-- [ ] 07-01-PLAN.md — D-04 build gate: prerender /display, SW denylist, CAST_NS, @types install + isolation, Wave 0 scaffolds
+- [x] 07-01-PLAN.md — D-04 build gate: prerender /display, SW denylist, CAST_NS, @types install + isolation, Wave 0 scaffolds
 - [ ] 07-06-PLAN.md — RECV-05 score flash, VITE_CAST_APP_ID deploy wiring, SETUP-03 registration guide
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -84,4 +84,4 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.0-R
 | 4. Statistics & Achievements | v1.0 | 5/5 | Complete | 2026-06-12 |
 | 5. Audio & Auto-Pause | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
-| 7. Chromecast Integration | v1.1 | 0/6 | Not started | - |
+| 7. Chromecast Integration | v1.1 | 1/6 | In Progress|  |

@@ -37,6 +37,10 @@ jobs:
       - name: Build
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
+          # Cast Application ID injected from a repo VARIABLE (not a secret) — the App ID
+          # ships in the client bundle and is not sensitive (D-09/SETUP-02).
+          # Set via: Settings → Secrets and variables → Actions → Variables → VITE_CAST_APP_ID
+          VITE_CAST_APP_ID: ${{ vars.VITE_CAST_APP_ID }}
         run: npm run build
 
       - name: Upload artifact

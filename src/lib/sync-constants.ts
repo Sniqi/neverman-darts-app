@@ -28,3 +28,11 @@ export const LS_SNAPSHOT = 'neverman-match-snapshot';
  *  This keeps the channel count stable while allowing DisplayStore to route
  *  pause state without passing it through isValidMatchState (RESEARCH Pitfall 3). */
 export const MSG_PAUSE_TICK = 'pause-tick';
+
+/** Cast Application Framework namespace for sender/receiver message routing.
+ *  The `urn:x-cast:` prefix is required by the Cast SDK — any deviation silently
+ *  drops all Cast messages without an error (07-RESEARCH.md Pitfall 5).
+ *  Both cast-sender.svelte.ts and cast-receiver.ts import this constant; the string
+ *  literal `urn:x-cast:dev.neverman.match` must NOT appear anywhere else in src/
+ *  so a namespace mismatch cannot occur silently (D-05). */
+export const CAST_NS = 'urn:x-cast:dev.neverman.match';

@@ -292,25 +292,19 @@ describe('DisplayStore.receiveSnapshot', () => {
 		expect(store.state).toEqual(stateBefore);
 	});
 
-	it('leaves state unchanged on a non-object invalid payload (T-07-IV)', () => {
+	it('leaves state unchanged on a malformed non-null payload (T-07-IV)', () => {
 		const store = new DisplayStore();
+		// Establish a known-good state first.
 		store.receiveSnapshot(sampleCastState);
 		const stateBefore = store.state;
 
-		store.receiveSnapshot(null as unknown as CastDisplayState);
-		// null is the RECV-03 path — but we test it explicitly below;
-		// this test passes null as a typed arg only to confirm it is handled
-		// (the RECV-03 null path resets to idle, so state becomes null)
-		// — re-scope: test a truly malformed non-null value instead
-		store.receiveSnapshot(sampleCastState); // restore valid
-		// receiveSnapshot pads to MatchState (CR-01) � compare transmitted fields only
-		expect(store.state).toEqual(expect.objectContaining({
-			config: sampleCastState.config,
-			activePlayerIndex: sampleCastState.activePlayerIndex,
-			phase: sampleCastState.phase,
-			legStarterIndex: 0,
-			eventLog: [],
-		}));
+		// A non-null but structurally malformed payload (wrong shape, no players/config)
+		// must be rejected by isValidCastState before it can reach this.state.
+		const malformed = { not: 'a cast state' } as unknown as CastDisplayState;
+		store.receiveSnapshot(malformed);
+
+		// State is unchanged — the guard rejected the malformed payload.
+		expect(store.state).toEqual(stateBefore);
 	});
 
 	it('sets state to null and clears pause on null (RECV-03 idle on disconnect)', () => {

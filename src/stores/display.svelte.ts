@@ -119,8 +119,21 @@ export class DisplayStore {
 		// T-07-IV: validate before applying (same discipline as isValidMatchState in connect())
 		if (!isValidCastState(msg)) return;
 
-		// SYNC-01: apply the full snapshot
-		this.state = msg as unknown as MatchState;
+		// SYNC-01: pad fields that MatchState requires but CastDisplayState omits (CR-01).
+		// CastDisplayState intentionally omits isGuest, legCompleted, legStarterIndex, and
+		// eventLog — these are not transmitted over the wire (D-05/D-07 payload trim).
+		// Safe defaults ensure any /display component reading those fields gets a defined value.
+		const state: MatchState = {
+			...msg,
+			players: msg.players.map(p => ({
+				...p,
+				isGuest: false,    // Cast receiver has no guest concept
+				legCompleted: [],  // Not transmitted; safe default
+			})),
+			legStarterIndex: 0, // Not transmitted; safe default
+			eventLog: [],       // Not transmitted; safe default
+		};
+		this.state = state;
 		// SYNC-03: drive the receiver's local pause countdown from the snapshot
 		this.pauseActive = msg.pauseActive;
 		this.pauseRemainingSeconds = msg.pauseRemainingSeconds;

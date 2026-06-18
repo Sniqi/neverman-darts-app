@@ -9,6 +9,8 @@
 
 import type { MatchState } from '../engine/types.js';
 import { BC_CHANNEL, LS_SNAPSHOT, MSG_PAUSE_TICK } from '../lib/sync-constants.js';
+import { isValidCastState } from '../lib/cast-types.js';
+import type { CastDisplayState } from '../lib/cast-types.js';
 
 // Aliases for backward-compat with the names used throughout this file
 const CHANNEL_NAME = BC_CHANNEL;
@@ -94,6 +96,34 @@ export class DisplayStore {
 			this.channel?.close();
 			this.channel = null;
 		};
+	}
+
+	/**
+	 * Receiver ingress: apply a Cast snapshot to display state (SYNC-01, SYNC-03).
+	 *
+	 * - null → return to idle screen and clear pause (RECV-03: sender disconnected).
+	 * - invalid payload → silently ignored (T-07-IV: malicious/malformed same-LAN sender).
+	 * - valid CastDisplayState → update state + pause fields.
+	 *
+	 * This is a NEW additive ingress alongside connect(). The existing BroadcastChannel
+	 * handler in connect() is NOT modified (SYNC-04 guard).
+	 */
+	receiveSnapshot(msg: CastDisplayState | null): void {
+		if (msg === null) {
+			// RECV-03: sender disconnected — return to idle screen
+			this.state = null;
+			this.pauseActive = false;
+			this.pauseRemainingSeconds = 0;
+			return;
+		}
+		// T-07-IV: validate before applying (same discipline as isValidMatchState in connect())
+		if (!isValidCastState(msg)) return;
+
+		// SYNC-01: apply the full snapshot
+		this.state = msg as unknown as MatchState;
+		// SYNC-03: drive the receiver's local pause countdown from the snapshot
+		this.pauseActive = msg.pauseActive;
+		this.pauseRemainingSeconds = msg.pauseRemainingSeconds;
 	}
 }
 

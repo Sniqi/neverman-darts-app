@@ -55,6 +55,12 @@ export default defineConfig({
 				// prerendered/** omitted — pure SPA, no prerendered pages (Anti-Pattern)
 				globPatterns: ['client/**/*.{js,css,ico,png,svg,webp,webmanifest,mp3}'],
 				navigateFallback: base + '/404.html',
+				// D-03/D-04: Exclude /display from SW navigation fallback so the Chromecast
+				// receiver fetches the prerendered build/display/index.html directly, not the
+				// SPA 404.html shell. Without this denylist entry the SW intercepts the
+				// receiver URL and returns the SPA shell, which the Cast SDK cannot parse
+				// (Pitfall 7 — navigateFallback must not intercept prerendered routes).
+				navigateFallbackDenylist: [/\/display(\/|$)/],
 			},
 			devOptions: {
 				enabled: false,

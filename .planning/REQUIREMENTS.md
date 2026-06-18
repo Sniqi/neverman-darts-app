@@ -22,7 +22,7 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 - [ ] **RECV-02**: Before the first state arrives, the receiver shows a loading screen
 - [ ] **RECV-03**: When no match is active or the sender disconnects, the receiver shows an idle screen ("Kein aktives Spiel")
 - [ ] **RECV-04**: The receiver stays connected through long pauses (idle timeout disabled — survives auto-pause breaks)
-- [ ] **RECV-05**: The remaining-score field animates smoothly on update *(polish)*
+- [x] **RECV-05**: The remaining-score field animates smoothly on update *(polish)*
 
 ### SYNC — State sync over Cast
 
@@ -34,8 +34,8 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 ### SETUP — Deployment & registration
 
 - [x] **SETUP-01**: The receiver is served at a stable HTTPS URL on GitHub Pages, correct under the repo subpath, and is not intercepted or broken by the PWA service worker
-- [ ] **SETUP-02**: The Cast App ID is supplied at build time (no hard-coded App ID committed in source)
-- [ ] **SETUP-03**: A written setup guide documents the one-time Cast Console registration (unpublished receiver, register own Chromecast by serial, 15-min propagation + reboot)
+- [x] **SETUP-02**: The Cast App ID is supplied at build time (no hard-coded App ID committed in source)
+- [x] **SETUP-03**: A written setup guide documents the one-time Cast Console registration (unpublished receiver, register own Chromecast by serial, 15-min propagation + reboot)
 
 ## v2 Requirements
 
@@ -82,14 +82,14 @@ Which phase covers which requirement. Filled during roadmap creation.
 | RECV-02 | Phase 7 | Pending |
 | RECV-03 | Phase 7 | Pending |
 | RECV-04 | Phase 7 | Pending |
-| RECV-05 | Phase 7 | Pending |
+| RECV-05 | Phase 7 | Complete |
 | SYNC-01 | Phase 7 | Pending |
 | SYNC-02 | Phase 7 | Pending |
 | SYNC-03 | Phase 7 | Pending |
 | SYNC-04 | Phase 7 | Pending |
 | SETUP-01 | Phase 7 | Complete |
-| SETUP-02 | Phase 7 | Pending |
-| SETUP-03 | Phase 7 | Pending |
+| SETUP-02 | Phase 7 | Complete |
+| SETUP-03 | Phase 7 | Complete |
 
 **Coverage:**
 

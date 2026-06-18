@@ -5,10 +5,10 @@ milestone_name: Chromecast-Integration
 current_phase: 7
 current_phase_name: Chromecast Integration
 status: verifying
-stopped_at: Phase 7 executed (6/6 plans) — on-device UAT pending; gated on Cast Console registration
-last_updated: "2026-06-18T20:53:05.986Z"
-last_activity: 2026-06-18
-last_activity_desc: Phase 7 execution started
+stopped_at: Phase 7 UAT 2nd pass — CAST-01 connection PASS; fixed RECV-01 snapshot-discriminant blocker + receiver fullscreen-control cosmetic bug; pending redeploy + on-device retest
+last_updated: "2026-06-18T22:24:25.000Z"
+last_activity: 2026-06-19
+last_activity_desc: Phase 7 UAT fixes — Cast receiver renders match; receiver-only fullscreen controls hidden
 progress:
   total_phases: 1
   completed_phases: 1
@@ -143,6 +143,8 @@ Recent decisions affecting current work:
 - [Phase ?]: CastReceiverOptions plain object: avoids constructor mock, valid per CAF API
 - [Phase ?]: SENDER_DISCONNECTED confirmed as 'senderdisconnected' via @types/chromecast-caf-receiver
 - [Phase ?]: setCastManager() injection: route calls store method — avoids circular import, keeps MatchStore unit-testable with a fake manager
+- [Phase 07 UAT-fix]: Cast snapshots MUST be tagged `{ type: 'snapshot', ...payload }` (CastSnapshotMessage) — the receiver routes only `data.type === 'snapshot'`; sending the bare CastDisplayState left the TV on "Warten auf Match". Guarded by cast-contract.test.ts (sender→receiver integration test) — the isolated unit tests missed it (3f028f2)
+- [Phase 07 UAT-fix]: /display fullscreen prompt + toggle gated on !isReceiver — useless on a non-interactive Cast TV
 
 ### Quick Tasks Completed
 
@@ -174,12 +176,12 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-18T20:53:05.980Z
-Stopped at: Phase 7 executed (6/6 plans) — on-device UAT pending; gated on Cast Console registration
+Last session: 2026-06-18T22:24:25.000Z
+Stopped at: Phase 7 UAT 2nd pass — Cast connection works; two on-device bugs fixed (commit 3f028f2); awaiting redeploy + on-device retest of the 5 UAT items
 Resume file: .planning/phases/07-chromecast-integration/07-UAT.md
 
 ## Operator Next Steps
 
-- Run `/gsd-discuss-phase 7` to resolve the 3 open design decisions before planning
-- Confirm Cast Developer Console registration status (or schedule it)
-- Then `/gsd-plan-phase 7` to break Phase 7 into plans
+- Redeploy to GitHub Pages so the fix is live on the receiver URL (push to master, or `gh workflow run "Deploy to GitHub Pages"`)
+- Re-run the 5 device-gated UAT items on the Chromecast in one pass (Tests 1–5 in 07-UAT.md): receiver should now render the live scoreboard and update per throw, no Vollbild button on the TV
+- When all 5 pass → `/gsd-verify-work 7` to close the UAT, then `/gsd-complete-milestone v1.1`

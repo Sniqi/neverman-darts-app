@@ -15,6 +15,8 @@
 // ever calling context.start() on the real Cast SDK (which would throw outside
 // a Cast device environment).
 
+import type { ReceiverCallbacks } from '../lib/cast-receiver.js';
+
 let _mockReceiverContext = false;
 
 /** Set whether the mock should report a Cast receiver context.
@@ -34,7 +36,7 @@ export function isCastReceiverContext(): boolean {
  *  The real bridge (created in Plan 04) calls context.start() on init;
  *  this stub lets tests import cast-receiver.ts without triggering SDK calls. */
 export class CastReceiverBridge {
-	static init(): void {
+	static init(_callbacks: ReceiverCallbacks): void {
 		// no-op in test environment — prevents context.start() outside Cast device
 	}
 }

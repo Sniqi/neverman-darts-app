@@ -9,9 +9,9 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 
 ### CAST — Sender (Tablet `/match`)
 
-- [ ] **CAST-01**: User can start casting the live display to a Chromecast from `/match` via the official Cast button
+- [x] **CAST-01**: User can start casting the live display to a Chromecast from `/match` via the official Cast button
 - [x] **CAST-02**: The Cast button reflects connection state (verfügbar / verbindet / verbunden)
-- [ ] **CAST-03**: User sees which device is being cast to ("Überträgt auf: <Gerät>") and can stop casting from `/match`
+- [x] **CAST-03**: User sees which device is being cast to ("Überträgt auf: <Gerät>") and can stop casting from `/match`
 - [x] **CAST-04**: On a browser without Cast support (non-Chrome), `/match` works normally with the Cast control hidden/disabled (graceful degradation)
 - [x] **CAST-05**: After a tablet page reload during an active cast, the session auto-rejoins without re-selecting the device
 - [x] **CAST-06**: User sees a brief "Verbindung wiederhergestellt" hint when a Cast session resumes *(polish)*
@@ -29,7 +29,7 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 - [x] **SYNC-01**: On connect (including late join / reconnect), the receiver hydrates the full current match state
 - [x] **SYNC-02**: Every dart/visit updates the Chromecast scoreboard live
 - [x] **SYNC-03**: The auto-pause countdown stays in sync on the Chromecast display
-- [ ] **SYNC-04**: The existing PC second-window (BroadcastChannel) and tablet fullscreen spectator paths keep working unchanged (Cast is additive)
+- [x] **SYNC-04**: The existing PC second-window (BroadcastChannel) and tablet fullscreen spectator paths keep working unchanged (Cast is additive)
 
 ### SETUP — Deployment & registration
 
@@ -72,9 +72,9 @@ Which phase covers which requirement. Filled during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAST-01 | Phase 7 | Pending |
+| CAST-01 | Phase 7 | Complete |
 | CAST-02 | Phase 7 | Complete |
-| CAST-03 | Phase 7 | Pending |
+| CAST-03 | Phase 7 | Complete |
 | CAST-04 | Phase 7 | Complete |
 | CAST-05 | Phase 7 | Complete |
 | CAST-06 | Phase 7 | Complete |
@@ -86,7 +86,7 @@ Which phase covers which requirement. Filled during roadmap creation.
 | SYNC-01 | Phase 7 | Complete |
 | SYNC-02 | Phase 7 | Complete |
 | SYNC-03 | Phase 7 | Complete |
-| SYNC-04 | Phase 7 | Pending |
+| SYNC-04 | Phase 7 | Complete |
 | SETUP-01 | Phase 7 | Complete |
 | SETUP-02 | Phase 7 | Complete |
 | SETUP-03 | Phase 7 | Complete |

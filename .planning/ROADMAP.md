@@ -23,7 +23,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.0-R
 
 ### v1.1 Chromecast-Integration
 
-- [ ] **Phase 7: Chromecast Integration** - Wire the tablet as a Cast sender and `/display` as a Custom Web Receiver so the live scoreboard appears on a Chromecast-connected TV without disrupting existing spectator paths
+- [x] **Phase 7: Chromecast Integration** - Wire the tablet as a Cast sender and `/display` as a Custom Web Receiver so the live scoreboard appears on a Chromecast-connected TV without disrupting existing spectator paths (completed 2026-06-18)
 
 ## Phase Details
 
@@ -53,7 +53,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.0-R
 
   - Cast Developer Console registration ($5 one-time, Chromecast serial registered, receiver URL registered, 15-min propagation + reboot) must be complete before any real-device testing is possible. SETUP-03 includes a written guide for this step.
 
-**Plans**: 5/6 plans executed
+**Plans**: 6/6 plans complete
 **Wave 1**
 
 - [x] 07-01-PLAN.md — D-04 build gate: prerender /display, SW denylist, CAST_NS, @types install + isolation, Wave 0 scaffolds
@@ -70,7 +70,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.0-R
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 07-05-PLAN.md — Sender wiring: #publishToCast, /match init, SpectatorChooser Cast row, ResumeToast
+- [x] 07-05-PLAN.md — Sender wiring: #publishToCast, /match init, SpectatorChooser Cast row, ResumeToast
 
 **UI hint**: yes
 
@@ -84,4 +84,4 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.0-R
 | 4. Statistics & Achievements | v1.0 | 5/5 | Complete | 2026-06-12 |
 | 5. Audio & Auto-Pause | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
-| 7. Chromecast Integration | v1.1 | 5/6 | In Progress|  |
+| 7. Chromecast Integration | v1.1 | 6/6 | Complete   | 2026-06-18 |

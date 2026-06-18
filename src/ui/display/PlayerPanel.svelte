@@ -103,8 +103,29 @@
 		prevVisitCount = count;
 	});
 
+	// RECV-05: remaining-score update flash — draws the eye across the room when the
+	// score changes. Color-only (no transform) so layout is unaffected (SYNC-04 safe).
+	let showUpdating = $state(false);
+	let updatingTimer: ReturnType<typeof setTimeout> | null = null;
+	// null until first effect run — no flash on initial render.
+	let prevRemaining: number | null = null;
+
+	$effect(() => {
+		const r = liveRemaining;
+		if (prevRemaining !== null && r !== prevRemaining) {
+			showUpdating = true;
+			if (updatingTimer !== null) clearTimeout(updatingTimer);
+			updatingTimer = setTimeout(() => {
+				showUpdating = false;
+				updatingTimer = null;
+			}, 300);
+		}
+		prevRemaining = r;
+	});
+
 	onDestroy(() => {
 		if (bustTimer !== null) clearTimeout(bustTimer);
+		if (updatingTimer !== null) clearTimeout(updatingTimer);
 	});
 </script>
 
@@ -120,6 +141,7 @@
 			<div class="player-name">{player.name}</div>
 			<div
 				class="remaining-score"
+				class:updating={showUpdating}
 				role="status"
 				aria-live="polite"
 			>{liveRemaining}</div>
@@ -305,6 +327,12 @@
 		color: var(--text, #f0f0f0);
 		text-align: right;
 		pointer-events: none;
+		transition: color 300ms ease-out;
+	}
+
+	/* RECV-05: momentary white flash when score updates — draws the eye across the room */
+	.remaining-score.updating {
+		color: #ffffff;
 	}
 
 	.player-panel.active .remaining-score {

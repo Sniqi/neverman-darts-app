@@ -106,14 +106,16 @@ export class CastSenderManager {
 			event.sessionState === SessionState.SESSION_STARTED ||
 			event.sessionState === SessionState.SESSION_RESUMED
 		) {
-			this.activeSession = ctx.getCurrentSession();
+			// WR-03: cache the session once — a second getCurrentSession() call may return
+			// null if the SDK fires SESSION_ENDED between the two calls (CAF v3 edge case),
+			// which would set resumeDeviceName=null while activeSession is correctly set.
+			const session = ctx.getCurrentSession();
+			this.activeSession = session;
 
 			if (event.sessionState === SessionState.SESSION_RESUMED) {
 				// CAST-06: raise one-shot resume signal carrying device name for toast body
 				// "Überträgt weiter auf: <Gerät>".
-				const deviceName =
-					ctx.getCurrentSession()?.getCastDevice().friendlyName ?? null;
-				this.resumeDeviceName = deviceName;
+				this.resumeDeviceName = session?.getCastDevice().friendlyName ?? null;
 			}
 		} else if (event.sessionState === SessionState.SESSION_ENDED) {
 			this.activeSession = null;

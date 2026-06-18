@@ -99,7 +99,7 @@ describe('isCastReceiverContext', () => {
 // ── CastReceiverBridge.init ────────────────────────────────────────────────
 
 describe('CastReceiverBridge.init', () => {
-	it('calls addCustomMessageListener(CAST_NS, ...) BEFORE start()', async () => {
+	it('calls addCustomMessageListener(CAST_NS, ...) AND addEventListener(SENDER_DISCONNECTED, ...) BEFORE start()', async () => {
 		const ctx = makeMockContext();
 		const callOrder: string[] = [];
 
@@ -111,6 +111,10 @@ describe('CastReceiverBridge.init', () => {
 					.mock.calls.push([ns, handler]);
 			}
 		);
+		ctx.addEventListener.mockImplementation((eventType: string) => {
+			// WR-01: track SENDER_DISCONNECTED registration ordering (RECV-03 half of CAF v3)
+			callOrder.push('addEventListener:' + eventType);
+		});
 		ctx.start.mockImplementation(() => {
 			callOrder.push('start');
 		});
@@ -130,6 +134,11 @@ describe('CastReceiverBridge.init', () => {
 		const startIdx = callOrder.indexOf('start');
 		expect(addIdx).toBeGreaterThanOrEqual(0);
 		expect(startIdx).toBeGreaterThan(addIdx);
+
+		// WR-01: also verify addEventListener(SENDER_DISCONNECTED) is registered BEFORE start()
+		const disconnectIdx = callOrder.indexOf('addEventListener:senderdisconnected');
+		expect(disconnectIdx).toBeGreaterThanOrEqual(0);
+		expect(disconnectIdx).toBeLessThan(startIdx);
 	});
 
 	it('passes disableIdleTimeout=true and maxInactivity=3600 to start()', async () => {

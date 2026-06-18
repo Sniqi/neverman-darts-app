@@ -246,7 +246,24 @@ describe('DisplayStore.receiveSnapshot', () => {
 	it('sets state to the payload on a valid CastDisplayState (SYNC-01)', () => {
 		const store = new DisplayStore();
 		store.receiveSnapshot(sampleCastState);
-		expect(store.state).toEqual(sampleCastState);
+		// receiveSnapshot pads CastDisplayState to MatchState (CR-01): isGuest, legCompleted,
+		// legStarterIndex, eventLog are added with safe defaults. Verify transmitted fields
+		// are preserved and padded fields are defined.
+		expect(store.state).toEqual(expect.objectContaining({
+			config: sampleCastState.config,
+			activePlayerIndex: sampleCastState.activePlayerIndex,
+			currentVisit: sampleCastState.currentVisit,
+			phase: sampleCastState.phase,
+			legStartVisitIndex: sampleCastState.legStartVisitIndex,
+			legStarterIndex: 0,
+			eventLog: [],
+		}));
+		expect(store.state?.players[0]).toEqual(expect.objectContaining({
+			id: 'p1',
+			name: 'Alice',
+			isGuest: false,
+			legCompleted: [],
+		}));
 	});
 
 	it('sets pauseActive and pauseRemainingSeconds from the payload (SYNC-03)', () => {
@@ -286,7 +303,14 @@ describe('DisplayStore.receiveSnapshot', () => {
 		// (the RECV-03 null path resets to idle, so state becomes null)
 		// â€” re-scope: test a truly malformed non-null value instead
 		store.receiveSnapshot(sampleCastState); // restore valid
-		expect(store.state).toEqual(sampleCastState);
+		// receiveSnapshot pads to MatchState (CR-01) — compare transmitted fields only
+		expect(store.state).toEqual(expect.objectContaining({
+			config: sampleCastState.config,
+			activePlayerIndex: sampleCastState.activePlayerIndex,
+			phase: sampleCastState.phase,
+			legStarterIndex: 0,
+			eventLog: [],
+		}));
 	});
 
 	it('sets state to null and clears pause on null (RECV-03 idle on disconnect)', () => {

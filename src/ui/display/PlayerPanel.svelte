@@ -538,4 +538,29 @@
 		margin: 0.15em 0;
 		background: var(--line-strong, rgba(255, 255, 255, 0.14));
 	}
+
+	/* Fallback for engines WITHOUT container-query support — notably the Chromecast
+	   receiver's older Chromium (no `cqw`/`container-type`; also no `dvh`). There, every
+	   `clamp(min, Ncqw, max)` above is invalid and the font collapses to ~16px, so the
+	   players are unreadable on the TV (UAT 07, 3rd pass). Re-derive each size from the
+	   column width, which (with the overscan padding removed) is ~100vw / player-count —
+	   so `Ncqw` ≈ `calc(Nvw / player-count)`. Modern browsers (CQ-capable) skip this block
+	   entirely and keep the cqw rules untouched. */
+	@supports not (container-type: inline-size) {
+		.player-panel {
+			padding: clamp(8px, calc(2vw / var(--player-count, 2)), 24px)
+				clamp(8px, calc(2vw / var(--player-count, 2)), 18px);
+			gap: clamp(4px, calc(1.2vw / var(--player-count, 2)), 12px);
+		}
+		.player-name    { font-size: clamp(1.6rem, calc(11vw  / var(--player-count, 2)), 8.5rem); }
+		.remaining-score { font-size: clamp(3rem,  calc(23vw  / var(--player-count, 2)), 16rem); }
+		.ls-chip        { font-size: clamp(1.1rem, calc(6.5vw / var(--player-count, 2)), 4.4rem); }
+		.bust-label     { font-size: clamp(1.5rem, calc(17vw  / var(--player-count, 2)), 6rem); }
+		.dart-pill      { font-size: clamp(1rem,   calc(5vw   / var(--player-count, 2)), 3.2rem); }
+		.h-total        { font-size: clamp(1.2rem, calc(6.7vw / var(--player-count, 2)), 4.5rem); }
+		.h-remaining    { font-size: clamp(1rem,   calc(5.4vw / var(--player-count, 2)), 3.6rem); }
+		.checkout-route { font-size: clamp(1rem,   calc(5.5vw / var(--player-count, 2)), 3rem); }
+		.stats-line     { font-size: clamp(1rem,   calc(5.8vw / var(--player-count, 2)), 3.8rem); }
+		.history-row.bust-row .h-total { font-size: clamp(1rem, calc(4.8vw / var(--player-count, 2)), 3.2rem); }
+	}
 </style>

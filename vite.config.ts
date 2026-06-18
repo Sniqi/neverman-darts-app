@@ -19,7 +19,11 @@ export default defineConfig({
 		sveltekit(),
 		// Guard: exclude SvelteKitPWA in Vitest so virtual modules don't break tests
 		!process.env.VITEST && SvelteKitPWA({
-			registerType: 'prompt',
+			// autoUpdate: the SW self-activates (skipWaiting + clientsClaim) and the page
+			// reloads to the new build with no user prompt. Critical for the Chromecast
+			// receiver, which has no one to click a "new version" toast — it now picks up
+			// redeploys on the next cast instead of needing a power-cycle. (UAT 07, 3rd pass)
+			registerType: 'autoUpdate',
 			scope: base + '/',
 			base: base + '/',
 			kit: {

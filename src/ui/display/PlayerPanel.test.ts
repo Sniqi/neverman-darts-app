@@ -14,7 +14,7 @@
 //   9. BUST label shown when active player's last visit is a bust (D-08)
 
 import { render } from 'vitest-browser-svelte';
-import { expect, test } from 'vitest';
+import { expect, test, describe } from 'vitest';
 import PlayerPanel from './PlayerPanel.svelte';
 import type { PlayerState, MatchConfig } from '../../engine/types.js';
 
@@ -259,4 +259,76 @@ test('active player with last visit bust=true shows BUST label', async () => {
 		currentVisit: [],
 	});
 	expect(screen.container.textContent).toContain('BUST');
+});
+
+// --- RECV-05: remaining-score update flash ---
+
+import { flushSync } from 'svelte';
+
+describe('RECV-05 remaining-score update flash', () => {
+	const playerBase: PlayerState = {
+		id: 'p7',
+		name: 'Grace',
+		isGuest: false,
+		remaining: 501,
+		legsWon: 0,
+		setsWon: 0,
+		visits: [],
+	};
+
+	test('no .updating class on initial render', async () => {
+		const screen = render(PlayerPanel, {
+			player: playerBase,
+			isActive: false,
+			config: config501Double,
+			legStartIndex: 0,
+		});
+		const el = screen.container.querySelector('.remaining-score');
+		expect(el).toBeTruthy();
+		expect(el?.classList.contains('updating')).toBe(false);
+	});
+
+	test('.updating class applied immediately when liveRemaining changes', async () => {
+		const screen = render(PlayerPanel, {
+			player: playerBase,
+			isActive: false,
+			config: config501Double,
+			legStartIndex: 0,
+		});
+
+		// Rerender with a new remaining value (simulates a score change)
+		screen.rerender({
+			player: { ...playerBase, remaining: 321 },
+			isActive: false,
+			config: config501Double,
+			legStartIndex: 0,
+		});
+		flushSync();
+
+		const el = screen.container.querySelector('.remaining-score');
+		expect(el?.classList.contains('updating')).toBe(true);
+	});
+
+	test('.updating class removed after 300ms', async () => {
+		const screen = render(PlayerPanel, {
+			player: playerBase,
+			isActive: false,
+			config: config501Double,
+			legStartIndex: 0,
+		});
+
+		screen.rerender({
+			player: { ...playerBase, remaining: 321 },
+			isActive: false,
+			config: config501Double,
+			legStartIndex: 0,
+		});
+		flushSync();
+
+		// Wait for the 300ms timer to fire
+		await new Promise((resolve) => setTimeout(resolve, 400));
+
+		const el = screen.container.querySelector('.remaining-score');
+		expect(el?.classList.contains('updating')).toBe(false);
+	});
 });

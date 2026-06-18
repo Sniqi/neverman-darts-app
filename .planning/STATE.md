@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Chromecast-Integration
-status: planning
-last_updated: "2026-06-17T23:17:55.969Z"
-last_activity: 2026-06-17
+status: roadmapped
+last_updated: "2026-06-18T00:00:00.000Z"
+last_activity: 2026-06-18
 progress:
-  total_phases: 0
+  total_phases: 1
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,41 +17,42 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-10)
+See: .planning/PROJECT.md (updated 2026-06-18)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 6 — PWA & Deployment
+**Current focus:** Phase 7 — Chromecast Integration
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 7 — Chromecast Integration
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-17 — Milestone v1.1 started
+Status: Roadmap defined; awaiting discuss → plan → execute
+Last activity: 2026-06-18 — Roadmap for v1.1 created (Phase 7)
+
+```
+[Phase 7 ░░░░░░░░░░░░░░░░░░░░] 0%
+```
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (v1.0 reference):**
 
 - Total plans completed: 33
-- Average duration: —
-- Total execution time: 0 hours
+- Average duration: ~6 min/plan
+- Total execution time: estimated ~3.5 hours
 
-**By Phase:**
+**By Phase (v1.0):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 13 | - | - |
 | 02 | 6 | - | - |
-| 3 | 3 | - | - |
+| 03 | 3 | - | - |
 | 04 | 5 | - | - |
-| 5 | 3 | - | - |
-| 6 | 3 | - | - |
+| 05 | 3 | - | - |
+| 06 | 3 | - | - |
 
-**Recent Trend:**
-
-- Last 5 plans: —
-- Trend: —
+**v1.1 Plans:** TBD (after phase planning)
 
 *Updated after each plan completion*
 | Phase 01 P01 | 14 min | 4 tasks | 19 files |
@@ -123,6 +124,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Checkout hint uses getSuggestion(player.remaining + total, outRule) — pre-visit remaining recovered post-dispatch (A3)
 - [Phase ?]: Pause state on MatchStore class not reducer; legCompleted.length for leg counting; type-discriminated pause-tick on BC_CHANNEL
 - [Phase ?]: BASE_PATH derived from github.event.repository.name so workflow stays correct if repo is renamed
+- [v1.1 roadmap]: Single phase (Phase 7) chosen for all Cast work — App ID is needed before E2E; splitting phases creates a verification cliff with no meaningful boundary
+- [v1.1 roadmap]: 3 open design decisions deferred to /gsd-discuss-phase — receiver entry point, message payload schema, App ID env strategy
 
 ### Quick Tasks Completed
 
@@ -133,25 +136,33 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- Resolve 3 open design decisions in /gsd-discuss-phase before Phase 7 planning:
+  1. Receiver entry point (static/receiver.html vs. /display route reuse)
+  2. Cast message payload schema (full MatchState vs. trimmed CastDisplayState)
+  3. App ID env strategy (single VITE_CAST_APP_ID vs. dev/prod split)
+- Complete Cast Developer Console registration (non-code prerequisite — gates all E2E testing for Phase 7)
 
 ### Blockers/Concerns
 
-- Phase 3 planning: Dexie event-sourced schema is non-trivial; a focused research pass is recommended before planning Phase 3
-- Phase 5 (Audio): Web Speech API German voice quality depends on OS TTS voice; design a silent/text-only fallback from the start
+- Cast Developer Console registration ($5, Chromecast serial, 15-min propagation) must be completed before any real-device E2E testing is possible — plan the phase schedule so registration happens before or in parallel with sender code, not after
+- Android Chrome backgrounding behavior during Cast session: CastSenderManager session lifecycle when the tablet screen locks needs a dedicated UAT step (MEDIUM confidence from research)
+- Receiver SDK inertness on normal browsers: verify no errors or observable side effects when /display loads the receiver SDK in Chrome desktop without calling start() — LOW confidence from docs alone
 
 ## Deferred Items
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| RECV polish | RECV-06: Idle-screen match summary (last result shown between games) | v2 | 2026-06-18 |
+| RECV polish | RECV-07: Receiver UI theme customization | v2 | 2026-06-18 |
 
 ## Session Continuity
 
-Last session: 2026-06-13T00:37:32.172Z
-Stopped at: Completed 05-audio-auto-pause/05-03-PLAN.md
+Last session: 2026-06-18
+Stopped at: v1.1 roadmap defined (Phase 7)
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Run `/gsd-discuss-phase 7` to resolve the 3 open design decisions before planning
+- Confirm Cast Developer Console registration status (or schedule it)
+- Then `/gsd-plan-phase 7` to break Phase 7 into plans

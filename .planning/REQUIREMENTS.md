@@ -72,13 +72,30 @@ Which phase covers which requirement. Filled during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (filled by roadmapper) | | |
+| CAST-01 | Phase 7 | Pending |
+| CAST-02 | Phase 7 | Pending |
+| CAST-03 | Phase 7 | Pending |
+| CAST-04 | Phase 7 | Pending |
+| CAST-05 | Phase 7 | Pending |
+| CAST-06 | Phase 7 | Pending |
+| RECV-01 | Phase 7 | Pending |
+| RECV-02 | Phase 7 | Pending |
+| RECV-03 | Phase 7 | Pending |
+| RECV-04 | Phase 7 | Pending |
+| RECV-05 | Phase 7 | Pending |
+| SYNC-01 | Phase 7 | Pending |
+| SYNC-02 | Phase 7 | Pending |
+| SYNC-03 | Phase 7 | Pending |
+| SYNC-04 | Phase 7 | Pending |
+| SETUP-01 | Phase 7 | Pending |
+| SETUP-02 | Phase 7 | Pending |
+| SETUP-03 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 18 total
-- Mapped to phases: TBD (roadmap)
-- Unmapped: TBD
+- Mapped to phases: 18/18 (Phase 7)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-06-18*
-*Last updated: 2026-06-18 after initial definition (milestone v1.1)*
+*Last updated: 2026-06-18 — traceability filled after roadmap creation*

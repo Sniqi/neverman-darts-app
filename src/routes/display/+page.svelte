@@ -6,8 +6,10 @@
 	// Audio lives in /match — this window is a passive subscriber with no audio.
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { displayStore } from '../../stores/display.svelte.js';
 	import { BC_RECORD_CHANNEL } from '../../lib/sync-constants.js';
+	import { isCastReceiverContext, CastReceiverBridge } from '../../lib/cast-receiver.js';
 	import MatchHeader from '../../ui/display/MatchHeader.svelte';
 	import PlayerPanel from '../../ui/display/PlayerPanel.svelte';
 	import IdleScreen from '../../ui/display/IdleScreen.svelte';
@@ -15,6 +17,20 @@
 	import MatchWinDisplay from '../../ui/display/MatchWinDisplay.svelte';
 	import RecordOverlay from '../../ui/overlays/RecordOverlay.svelte';
 	import PauseOverlay from '../../ui/overlays/PauseOverlay.svelte';
+
+	// Cast receiver context flag — true only on a real Chromecast device (D-02).
+	let isReceiver = $state(false);
+
+	// One-time onMount: init the receiver bridge if running on a Chromecast.
+	// onMount is correct here (not $effect) — this is a one-time side-effect with
+	// no reactive dependencies. Matches the onMount pattern used in /match.
+	onMount(() => {
+		if (!isCastReceiverContext()) return;
+		isReceiver = true;
+		CastReceiverBridge.init({
+			onSnapshot: (msg) => displayStore.receiveSnapshot(msg),
+		});
+	});
 
 	// Connect the display store and subscribe to live updates.
 	// $effect returns the cleanup function which closes the BroadcastChannel.
@@ -174,12 +190,20 @@
 	}
 </script>
 
+<svelte:head>
+	<!-- CAF Custom Web Receiver SDK (D-02, RECV-01).
+	     Loaded in <svelte:head> so it is inert during SSR and on normal browsers.
+	     The SDK sets window.cast.framework.CastReceiverContext only inside a real
+	     Chromecast runtime; isCastReceiverContext() gates all receiver-specific code. -->
+	<script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+</svelte:head>
+
 {#if matchState === null || matchState.phase === 'setup'}
 	<IdleScreen />
 {:else}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="display-root" onclick={handleDisplayTap}>
+	<div class="display-root" class:cast-receiver={isReceiver} onclick={handleDisplayTap}>
 		<MatchHeader config={matchState.config} {currentLeg} />
 		<div
 			class="panels-grid"
@@ -283,6 +307,12 @@
 			#0b0c10 100%
 		);
 		overflow: hidden;
+	}
+
+	/* D-11: TV overscan safe margin for Chromecast receiver (UI-SPEC §2, 96px = 10% of 960px half-width).
+	   Applied only when isReceiver is true — PC/tablet display paths are visually unchanged. */
+	.display-root.cast-receiver {
+		padding: 96px;
 	}
 
 	.panels-grid {

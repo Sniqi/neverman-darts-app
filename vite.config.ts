@@ -97,6 +97,9 @@ export default defineConfig({
 					include: ['src/ui/**/*.test.ts'],
 					// Redirect PWA virtual modules to mocks so browser-mode tests never
 					// need the real SvelteKitPWA plugin (Pitfall 5 / RESEARCH Pattern 7).
+					// Also redirect cast-receiver to its mock so browser-mode component
+					// tests can force isCastReceiverContext() true via setMockReceiverContext()
+					// without needing a real Chromecast SDK (D-10 dev workflow).
 					alias: {
 						'virtual:pwa-register/svelte': resolve(
 							import.meta.dirname,
@@ -105,6 +108,10 @@ export default defineConfig({
 						'virtual:pwa-info': resolve(
 							import.meta.dirname,
 							'src/test-mocks/pwa-info-mock.ts'
+						),
+						'../../lib/cast-receiver.js': resolve(
+							import.meta.dirname,
+							'src/test-mocks/cast-receiver-mock.ts'
 						)
 					}
 				}

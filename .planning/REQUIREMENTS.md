@@ -26,9 +26,9 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 
 ### SYNC — State sync over Cast
 
-- [ ] **SYNC-01**: On connect (including late join / reconnect), the receiver hydrates the full current match state
-- [ ] **SYNC-02**: Every dart/visit updates the Chromecast scoreboard live
-- [ ] **SYNC-03**: The auto-pause countdown stays in sync on the Chromecast display
+- [x] **SYNC-01**: On connect (including late join / reconnect), the receiver hydrates the full current match state
+- [x] **SYNC-02**: Every dart/visit updates the Chromecast scoreboard live
+- [x] **SYNC-03**: The auto-pause countdown stays in sync on the Chromecast display
 - [ ] **SYNC-04**: The existing PC second-window (BroadcastChannel) and tablet fullscreen spectator paths keep working unchanged (Cast is additive)
 
 ### SETUP — Deployment & registration
@@ -83,9 +83,9 @@ Which phase covers which requirement. Filled during roadmap creation.
 | RECV-03 | Phase 7 | Pending |
 | RECV-04 | Phase 7 | Pending |
 | RECV-05 | Phase 7 | Complete |
-| SYNC-01 | Phase 7 | Pending |
-| SYNC-02 | Phase 7 | Pending |
-| SYNC-03 | Phase 7 | Pending |
+| SYNC-01 | Phase 7 | Complete |
+| SYNC-02 | Phase 7 | Complete |
+| SYNC-03 | Phase 7 | Complete |
 | SYNC-04 | Phase 7 | Pending |
 | SETUP-01 | Phase 7 | Complete |
 | SETUP-02 | Phase 7 | Complete |

@@ -257,7 +257,9 @@
 
 <!-- Layer 3: fullscreen controls (z-index 30) — outside the conditional so always rendered -->
 
-<!-- PC fullscreen toggle (D-15): small icon button top-right, always visible on /display -->
+<!-- PC fullscreen toggle (D-15): small icon button top-right on /display.
+     Hidden on a Cast receiver (isReceiver) — the TV is already fullscreen and has no pointer. -->
+{#if !isReceiver}
 <button
 	class="fullscreen-toggle"
 	aria-label={isFullscreen ? 'Vollbild beenden' : 'Vollbild aktivieren'}
@@ -275,13 +277,15 @@
 		</svg>
 	{/if}
 </button>
+{/if}
 
 <!-- Tablet fullscreen prompt (D-14, DISP-02): shown when not fullscreen AND either idle/setup
      OR the tablet-fullscreen intent flag is set (?fullscreen=1, only set by SpectatorChooser's
      goToDisplayFullscreen — PC second window has no flag and is never affected). The intent
      case is also gated on !hasEnteredFullscreen (WR-01) so the prompt does not re-appear over
-     the live scoreboard after a mid-match fullscreen exit; the top-right toggle re-enters. -->
-{#if !isFullscreen && (matchState === null || matchState.phase === 'setup' || (tabletFullscreenIntent && !hasEnteredFullscreen))}
+     the live scoreboard after a mid-match fullscreen exit; the top-right toggle re-enters.
+     Suppressed entirely on a Cast receiver (isReceiver) — useless on a non-interactive TV. -->
+{#if !isReceiver && !isFullscreen && (matchState === null || matchState.phase === 'setup' || (tabletFullscreenIntent && !hasEnteredFullscreen))}
 	<button class="fullscreen-prompt" onclick={activateFullscreen}>
 		Vollbild aktivieren
 	</button>

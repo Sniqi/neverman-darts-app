@@ -278,7 +278,7 @@ describe('CastSenderManager', () => {
 		expect(() => manager.sendSnapshot(payload)).not.toThrow();
 	});
 
-	it('sendSnapshot: calls session.sendMessage(CAST_NS, payload) with an active session', async () => {
+	it('sendSnapshot: calls session.sendMessage(CAST_NS, {type:"snapshot", ...payload}) with an active session', async () => {
 		const { CastSenderManager } = await import('./cast-sender.svelte.js');
 		const manager = new CastSenderManager();
 		manager.init('app-id');
@@ -293,8 +293,9 @@ describe('CastSenderManager', () => {
 		} as unknown as CastDisplayState;
 		manager.sendSnapshot(payload);
 
+		// Must carry the `type: 'snapshot'` discriminant the receiver requires (cast-receiver.ts).
 		expect(mockSession.sendMessage).toHaveBeenCalledOnce();
-		expect(mockSession.sendMessage).toHaveBeenCalledWith(CAST_NS, payload);
+		expect(mockSession.sendMessage).toHaveBeenCalledWith(CAST_NS, { type: 'snapshot', ...payload });
 	});
 
 	it('sendSnapshot: swallows errors from session.sendMessage (non-fatal contract)', async () => {

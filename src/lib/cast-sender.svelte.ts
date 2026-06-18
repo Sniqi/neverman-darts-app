@@ -13,7 +13,7 @@
 // construction is safe at module-load time (SSR-safe, unit-test-safe).
 
 import { CAST_NS } from './sync-constants.js';
-import type { CastDisplayState } from './cast-types.js';
+import type { CastDisplayState, CastSnapshotMessage } from './cast-types.js';
 
 /** URL of the Cast Sender SDK script. ?loadCastFramework=1 is REQUIRED (Pitfall 3). */
 const CAST_SDK_URL =
@@ -145,7 +145,11 @@ export class CastSenderManager {
 	sendSnapshot(payload: CastDisplayState): void {
 		if (!this.activeSession) return;
 		try {
-			this.activeSession.sendMessage(CAST_NS, payload);
+			// Tag with the `type: 'snapshot'` discriminant the receiver requires
+			// (cast-receiver.ts routes only `data.type === 'snapshot'`). Without it
+			// every message is silently dropped and the TV stays on "Warten auf Match".
+			const message: CastSnapshotMessage = { type: 'snapshot', ...payload };
+			this.activeSession.sendMessage(CAST_NS, message);
 		} catch {
 			// Non-fatal — match play continues uninterrupted
 		}

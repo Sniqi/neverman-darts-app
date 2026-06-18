@@ -72,10 +72,19 @@ status: all_fixed
 
 ## Skipped Issues
 
-None — all in-scope findings were fixed.
+None — all 6 iteration-1 in-scope findings were fixed.
 
 ---
 
-_Fixed: 2026-06-18T22:15:00Z_
-_Fixer: Claude (gsd-code-fixer)_
-_Iteration: 1_
+## Iteration 2 (re-review outcome)
+
+The auto re-review confirmed both criticals (CR-01, CR-02) fixed and sound, with no SYNC-04 / namespace regression. Two new lower-severity items surfaced:
+
+- **IN-01 (Info) — FIXED** (`commit 1aea94d`): The test "leaves state unchanged on a non-object invalid payload" was mislabeled and actually exercised valid ingress (valid → null → valid). Rewritten to pass a genuinely malformed non-null payload (`{ not: 'a cast state' }`) and assert `isValidCastState` rejects it, leaving state unchanged. Strengthens T-07-IV coverage. 15/15 display-store tests pass.
+- **WR-01 (Warning) — ACCEPTED, not fixed.** `ResumeToast.svelte`'s `$effect` reads `resumeDeviceName` then clears it via `consumeResumeSignal()`, causing one extra no-op effect run per resume (terminated by the `name !== null` guard — safe today). The reviewer's suggested `untrack()` wrap targets *reads*; the re-run here is triggered by a *write* to a signal the effect reads, so `untrack` around the write would be a no-op. A genuine fix requires a version-counter refactor of `CastSenderManager` (read name untracked, depend on a monotonic counter). Deferred as optional polish: disproportionate for a safe structural nicety on resume UI that is not E2E-testable without the physical Chromecast. Tracked for v2 alongside other receiver polish.
+
+---
+
+_Fixed: 2026-06-18T22:15:00Z (iter 1), 2026-06-18T22:23:00Z (iter 2)_
+_Fixer: Claude (gsd-code-fixer iter 1; orchestrator inline iter 2)_
+_Iterations: 2 — final: 0 Critical, 0 unaccepted Warning (1 accepted), 0 open Info_

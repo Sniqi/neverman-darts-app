@@ -3,11 +3,21 @@
 	// Monitor/cast icon in the scoring view toolbar that opens a chooser menu.
 	// D-12: monitor icon always reachable mid-match.
 	// D-13: chooser with two options — PC second window (DISP-01) and tablet fullscreen (DISP-02).
+	//        Cast row added as third option, gated on castSenderManager.castAvailable (CAST-04).
 	// T-02-06: win.opener is nulled manually after open (no reverse tabnabbing).
 	// T-02-07: popup-blocked null-check; no crash on denied fullscreen.
 	// T-02-04: player names / copy rendered via {interpolation} only — no {@html}.
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
+	import { castSenderManager } from '../../lib/cast-sender.svelte.js';
+
+	function requestCastSession() {
+		try {
+			cast.framework.CastContext.getInstance().requestSession();
+		} catch {
+			// Cast SDK not yet loaded or unavailable — no-op
+		}
+	}
 
 	let open = $state(false);
 	let popupBlocked = $state(false);
@@ -157,6 +167,46 @@
 			</svg>
 			Anzeige hier im Vollbild
 		</button>
+
+		{#if castSenderManager.castAvailable}
+			<!-- Cast row (CAST-01/CAST-02/CAST-03/CAST-04 — D-12/D-13) -->
+			<!-- google-cast-launcher is a custom element registered by the Cast SDK at runtime. -->
+			<!-- Hidden visually; row click calls requestSession() directly (UI-SPEC §1). -->
+			<!-- svelte-ignore unknown_element -->
+			<google-cast-launcher style="display:none" aria-hidden="true"></google-cast-launcher>
+			<button class="chooser-action-btn" onclick={requestCastSession}>
+				<!-- Cast icon: screen with wifi waves (Chromecast shape) -->
+				<svg
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+					class="action-icon"
+				>
+					<!-- Screen outline -->
+					<rect x="2" y="4" width="20" height="14" rx="2" />
+					<!-- Wifi waves from bottom-left corner (cast shape) -->
+					<path d="M2 18v2" />
+					<path d="M2 15a5 5 0 0 1 5 5" />
+					<path d="M2 11a9 9 0 0 1 9 9" />
+				</svg>
+				Auf Chromecast übertragen
+			</button>
+
+			{#if castSenderManager.activeSession !== null}
+				<!-- "Überträgt auf: <Gerät>" connected status line (CAST-02/CAST-03) -->
+				<p class="cast-connected-line">
+					<span class="cast-dot">●</span>
+					<span class="cast-label">Überträgt auf:</span>
+					<span class="cast-device">{castSenderManager.activeSession.getCastDevice().friendlyName}</span>
+				</p>
+			{/if}
+		{/if}
 	</div>
 {/if}
 
@@ -280,5 +330,31 @@
 	.warn-icon {
 		flex-shrink: 0;
 		color: #e8a020;
+	}
+
+	/* Cast connected status line — shown below the Cast row when a session is active */
+	.cast-connected-line {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 1.4;
+		margin: 0;
+		padding: 4px 16px;
+	}
+
+	.cast-dot {
+		font-size: 10px;
+		color: var(--accent, #e8a020);
+		flex-shrink: 0;
+	}
+
+	.cast-label {
+		color: rgba(240, 240, 240, 0.6);
+	}
+
+	.cast-device {
+		color: var(--accent, #e8a020);
 	}
 </style>

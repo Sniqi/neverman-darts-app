@@ -22,16 +22,17 @@
 	}
 
 	// Watch the one-shot resume signal from the sender manager (CAST-06).
-	// When resumeDeviceName becomes non-null: capture the name, show the toast,
-	// consume the signal (reset to null), and start the 3500ms auto-dismiss timer.
+	// Reading resumeDeviceName creates the reactive dependency that re-runs this
+	// effect when it changes. consumeResumeSignal() is the single safe consumption
+	// point — avoids direct $state field writes from an external component (WR-04).
 	$effect(() => {
 		const name = castSenderManager.resumeDeviceName;
 		if (name !== null) {
 			clearTimer();
 			deviceName = name;
 			visible = true;
-			// Consume the one-shot signal so it does not re-trigger
-			castSenderManager.resumeDeviceName = null;
+			// Consume via the encapsulated method (atomic read+clear, not a direct field write)
+			castSenderManager.consumeResumeSignal();
 			dismissTimer = setTimeout(() => {
 				visible = false;
 				dismissTimer = null;

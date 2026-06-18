@@ -769,6 +769,161 @@ describe('MatchStore', () => {
 		});
 	});
 
+	// ── Cast publish (#publishToCast — SYNC-02 / SYNC-04) ────────────────────
+	//
+	// Verifies the THIRD additive publish block in dispatch():
+	//   - Calls mgr.sendSnapshot with toDisplayState projection when session is active.
+	//   - Is a no-op when no manager set or when activeSession is null.
+	//   - Swallows sendSnapshot throws (non-fatal/additive contract).
+	//   - Runs AFTER the BroadcastChannel + localStorage blocks (ordering).
+	// Existing BroadcastChannel + localStorage tests above must still pass unchanged.
+
+	describe('#publishToCast (SYNC-02 / SYNC-04)', () => {
+		let bcMessages: unknown[] = [];
+		let lsStore: Record<string, string> = {};
+
+		beforeEach(() => {
+			bcMessages = [];
+			lsStore = {};
+			// Stub BroadcastChannel to capture match-state posts
+			const MockBC = class {
+				name: string;
+				constructor(name: string) { this.name = name; }
+				postMessage(data: unknown) { if (this.name === 'neverman-match') bcMessages.push(data); }
+				close() {}
+			};
+			vi.stubGlobal('BroadcastChannel', MockBC);
+			vi.stubGlobal('localStorage', {
+				getItem: (k: string) => lsStore[k] ?? null,
+				setItem: (k: string, v: string) => { lsStore[k] = v; },
+				removeItem: (k: string) => { delete lsStore[k]; },
+			});
+		});
+
+		/** Build a fake CastSenderManager with a controllable activeSession. */
+		function makeFakeManager(sessionActive: boolean) {
+			return {
+				activeSession: sessionActive ? {} as cast.framework.CastSession : null,
+				sendSnapshot: vi.fn(),
+			};
+		}
+
+		it('calls sendSnapshot once with toDisplayState projection when session is active', () => {
+			const mgr = makeFakeManager(true);
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+			store.setCastManager(mgr);
+
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+
+			expect(mgr.sendSnapshot).toHaveBeenCalledTimes(1);
+			const arg = mgr.sendSnapshot.mock.calls[0][0] as { activePlayerIndex: number };
+			expect(typeof arg).toBe('object');
+			expect(typeof arg.activePlayerIndex).toBe('number');
+		});
+
+		it('does NOT call sendSnapshot when no manager is set (SYNC-04 — no cast, exact previous behavior)', () => {
+			// No setCastManager call — ensure dispatch does not throw and does not try to publish
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+			// No exception should occur; BroadcastChannel + localStorage still work
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+			expect(bcMessages.length).toBeGreaterThan(0); // BC still fires
+			expect(lsStore['neverman-match-snapshot']).toBeDefined(); // LS still fires
+		});
+
+		it('does NOT call sendSnapshot when activeSession is null (inactive session)', () => {
+			const mgr = makeFakeManager(false); // activeSession: null
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+			store.setCastManager(mgr);
+
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+
+			expect(mgr.sendSnapshot).not.toHaveBeenCalled();
+		});
+
+		it('swallows a throw inside sendSnapshot — dispatch completes and state is correct', () => {
+			const mgr = makeFakeManager(true);
+			mgr.sendSnapshot.mockImplementationOnce(() => { throw new Error('Cast error'); });
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+			store.setCastManager(mgr);
+
+			// Should not throw; state must remain correct
+			expect(() => store.dispatch({ type: 'NUMPAD_VISIT', total: 180 })).not.toThrow();
+			expect(store.state.players[0].remaining).toBe(321);
+		});
+
+		it('BroadcastChannel and localStorage blocks are unchanged after setCastManager (SYNC-04)', () => {
+			const mgr = makeFakeManager(true);
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+			store.setCastManager(mgr);
+
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+
+			// Both existing transports still fired
+			expect(bcMessages.length).toBeGreaterThan(0);
+			expect(lsStore['neverman-match-snapshot']).toBeDefined();
+		});
+
+		it('Cast publish runs AFTER existing BroadcastChannel + localStorage blocks (ordering)', () => {
+			const callOrder: string[] = [];
+			const MockBC2 = class {
+				name: string;
+				constructor(name: string) { this.name = name; }
+				postMessage() { callOrder.push('bc'); }
+				close() {}
+			};
+			vi.stubGlobal('BroadcastChannel', MockBC2);
+			vi.stubGlobal('localStorage', {
+				getItem: () => null,
+				setItem: () => { callOrder.push('ls'); },
+				removeItem: () => {},
+			});
+
+			const mgr = {
+				activeSession: {} as cast.framework.CastSession,
+				sendSnapshot: vi.fn(() => { callOrder.push('cast'); }),
+			};
+			store.dispatch({
+				type: 'START_MATCH',
+				config: config501Double,
+				players: [player1],
+				order: ['p1'],
+			});
+			store.setCastManager(mgr);
+			// Reset after START_MATCH (we only care about NUMPAD_VISIT ordering)
+			callOrder.length = 0;
+
+			store.dispatch({ type: 'NUMPAD_VISIT', total: 180 });
+
+			expect(callOrder.indexOf('bc')).toBeLessThan(callOrder.indexOf('cast'));
+			expect(callOrder.indexOf('ls')).toBeLessThan(callOrder.indexOf('cast'));
+		});
+	});
+
 	describe('mid-visit remaining (CR-06 / ENG-07)', () => {
 		beforeEach(() => {
 			store.dispatch({

@@ -30,6 +30,8 @@ import { BC_CHANNEL, BC_RECORD_CHANNEL, LS_SNAPSHOT, MSG_PAUSE_TICK } from '../l
 import { loadAudioPrefs } from '../lib/audio-prefs.js';
 import { computeLifetimeStats, type LifetimeStats } from '../db/stats.js';
 import { matchAverageCrossLeg } from '../engine/averages.js';
+import { toDisplayState } from '../lib/cast-types.js';
+import type { CastSenderManager } from '../lib/cast-sender.svelte.js';
 
 /**
  * A single record item detected during a dispatch.
@@ -118,6 +120,10 @@ export class MatchStore {
 		} catch {
 			// Silently ignore — localStorage may be unavailable in private mode or quota exceeded
 		}
+
+		// Cast publish — THIRD additive block (SYNC-02 / SYNC-04).
+		// Runs after BC + LS blocks; no-op when no session active.
+		this.#publishToCast();
 
 		// Phase 4: detect records after publish, before match-complete persist.
 		// Compares against per-player baselines (lifetime best at match start, then
@@ -446,6 +452,46 @@ export class MatchStore {
 
 	/** Monotonic counter for record-event payloads (WR-05). */
 	#recordSeq = 0;
+
+	// ── Cast publish (SYNC-02 / SYNC-04) ─────────────────────────────────────
+	// The THIRD publish block — additive, after BroadcastChannel and localStorage.
+	// Injected via setCastManager() from the /match onMount once the Cast SDK
+	// initialises. Null until then — dispatch behaves exactly as before (SYNC-04).
+
+	/** The active CastSenderManager, or null when not initialised (no Cast session). */
+	#castManager: CastSenderManager | null = null;
+
+	/**
+	 * Inject the CastSenderManager from the /match route after Cast SDK init.
+	 * Called once from onMount when VITE_CAST_APP_ID is present (SETUP-02).
+	 */
+	setCastManager(mgr: CastSenderManager): void {
+		this.#castManager = mgr;
+	}
+
+	/**
+	 * Publish the trimmed Cast snapshot to the active Chromecast session (SYNC-02).
+	 * Guard: no-op when #castManager is null or activeSession is null.
+	 * Non-fatal: throws inside sendSnapshot are swallowed so dispatch always
+	 * completes (additive/non-fatal contract — mirrors BC/LS blocks above).
+	 * Called immediately after the localStorage block in dispatch() (SYNC-04).
+	 */
+	#publishToCast(): void {
+		if (!this.#castManager?.activeSession) return;
+		try {
+			const payload = toDisplayState(this.state, this.pauseActive, this.pauseRemainingSeconds);
+			// DEV-only size guard: warn if snapshot exceeds the Cast 64 KB limit.
+			if (import.meta.env.DEV) {
+				const bytes = new TextEncoder().encode(JSON.stringify(payload)).byteLength;
+				if (bytes > 32768) {
+					console.warn(`[Cast] snapshot size ${bytes} bytes exceeds 32 KB soft limit`);
+				}
+			}
+			this.#castManager.sendSnapshot(payload);
+		} catch {
+			// Non-fatal — match play continues uninterrupted
+		}
+	}
 
 	/**
 	 * Persist a completed match to IndexedDB and clear the resume slot.

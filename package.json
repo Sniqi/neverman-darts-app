@@ -22,6 +22,8 @@
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.10",
+    "@types/chromecast-caf-receiver": "^6.0.26",
+    "@types/chromecast-caf-sender": "^1.0.11",
     "@types/node": "^22.19.20",
     "@vite-pwa/assets-generator": "^1.0.2",
     "@vite-pwa/sveltekit": "^1.1.0",

@@ -1,0 +1,10 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"types": ["chromecast-caf-receiver"]
+	},
+	"include": [
+		"src/lib/cast-receiver.ts",
+		"src/lib/cast-types.ts"
+	]
+}

@@ -18,10 +18,10 @@ Requirements for the v1.1 milestone (Chromecast integration). Each maps to a roa
 
 ### RECV — Receiver (Chromecast)
 
-- [ ] **RECV-01**: The Chromecast runs `/display` as a standalone Custom Web Receiver showing the live scoreboard (not screen-mirroring)
-- [ ] **RECV-02**: Before the first state arrives, the receiver shows a loading screen
-- [ ] **RECV-03**: When no match is active or the sender disconnects, the receiver shows an idle screen ("Kein aktives Spiel")
-- [ ] **RECV-04**: The receiver stays connected through long pauses (idle timeout disabled — survives auto-pause breaks)
+- [x] **RECV-01**: The Chromecast runs `/display` as a standalone Custom Web Receiver showing the live scoreboard (not screen-mirroring)
+- [x] **RECV-02**: Before the first state arrives, the receiver shows a loading screen
+- [x] **RECV-03**: When no match is active or the sender disconnects, the receiver shows an idle screen ("Kein aktives Spiel")
+- [x] **RECV-04**: The receiver stays connected through long pauses (idle timeout disabled — survives auto-pause breaks)
 - [x] **RECV-05**: The remaining-score field animates smoothly on update *(polish)*
 
 ### SYNC — State sync over Cast
@@ -78,10 +78,10 @@ Which phase covers which requirement. Filled during roadmap creation.
 | CAST-04 | Phase 7 | Complete |
 | CAST-05 | Phase 7 | Complete |
 | CAST-06 | Phase 7 | Complete |
-| RECV-01 | Phase 7 | Pending |
-| RECV-02 | Phase 7 | Pending |
-| RECV-03 | Phase 7 | Pending |
-| RECV-04 | Phase 7 | Pending |
+| RECV-01 | Phase 7 | Complete |
+| RECV-02 | Phase 7 | Complete |
+| RECV-03 | Phase 7 | Complete |
+| RECV-04 | Phase 7 | Complete |
 | RECV-05 | Phase 7 | Complete |
 | SYNC-01 | Phase 7 | Complete |
 | SYNC-02 | Phase 7 | Complete |

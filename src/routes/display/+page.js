@@ -14,3 +14,10 @@
 
 export const prerender = true;
 export const ssr = true;
+// trailingSlash='always' makes adapter-static emit build/display/index.html
+// (a directory index) rather than build/display.html (a flat file).
+// The Chromecast Cast SDK loads the receiver URL as-registered; GitHub Pages
+// serves directory indexes correctly when the URL ends with /display/.
+// Without this, adapter-static defaults to 'never' and produces display.html,
+// which causes the navigateFallbackDenylist regex to miss the /display/ form.
+export const trailingSlash = 'always';

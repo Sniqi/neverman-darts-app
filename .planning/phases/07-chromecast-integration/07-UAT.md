@@ -1,21 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 07-chromecast-integration
 source: [07-VERIFICATION.md]
 started: 2026-06-18T22:25:00Z
-updated: 2026-06-19T10:00:00Z
+updated: 2026-06-19T12:00:00Z
 ---
 
 ## Current Test
 
-number: 4
-name: Live per-throw sync to TV (SYNC live)
-expected: |
-  Test 1 PASSED — Cast connects and both the TV and the PC second window render the scoreboard.
-  Now verify live sync: every dart thrown on /match updates the TV scoreboard in real time, and no
-  PC/tablet-only "Vollbild" button appears on the TV. (Remaining: Test 2 device-name + stop-casting,
-  Test 3 auto-rejoin on /match reload, Test 5 long-pause survival.)
-awaiting: user response (on-device, match casting live)
+[testing complete — all 5 tests passed on-device (2026-06-19, 3rd pass)]
 
 <!--
 POST-FIX RETEST PASS (3rd pass) — fixes from commit 3f028f2 are LIVE on GitHub Pages
@@ -48,26 +41,35 @@ note: |
 
 ### 2. Device name shown + stop casting (CAST-03)
 expected: While connected, /match shows "Überträgt auf: Wohnzimmer Ultra"; tapping the launcher opens the native Cast dialog and "Stop casting" ends the session; the TV returns to idle.
-result: [pending]
+result: pass
+note: Confirmed on-device 2026-06-19 (user: "1,2,4 pass").
 
 ### 3. Auto-rejoin after tablet reload (CAST-05)
 expected: With an active Cast session, reloading /match auto-rejoins the existing session (ORIGIN_SCOPED) without re-selecting the device; the TV scoreboard keeps showing the current match; the "Verbindung wiederhergestellt" toast appears.
-result: [pending]
+result: pass
+note: |
+  Initially FAILED — reloading /match started a blank match (resume was only wired through the home
+  page's ResumePrompt). Fixed (892ea2d, user-approved design change): /match onMount now restores the
+  saved in-progress match via loadUnfinishedMatch(), and a new effect re-pushes the snapshot on the
+  Cast disconnected→connected edge so the TV re-syncs on ORIGIN_SCOPED auto-rejoin. User confirmed
+  "funktioniert" 2026-06-19.
 
 ### 4. Live per-throw sync to TV (SYNC live)
 expected: Every dart thrown on the tablet updates the TV scoreboard in real time; the auto-pause countdown appears and stays in sync on the TV during break intervals. No PC/tablet-only "Vollbild" button appears on the TV.
-result: [pending]
+result: pass
+note: Confirmed on-device 2026-06-19 (user: "1,2,4 pass") — live per-throw sync works; no Vollbild button on the TV (isReceiver gating).
 
 ### 5. Session survives a long pause (RECV-04)
 expected: Leave the session idle through a 6+ minute auto-pause break; the receiver stays up on the TV (disableIdleTimeout / maxInactivity=3600) and resumes updating when scoring continues.
-result: [pending]
+result: pass
+note: User confirmed already tested on-device, passes (2026-06-19). Backed by the receiver's disableIdleTimeout:true + maxInactivity:3600 (cast-receiver.ts).
 
 ## Summary
 
 total: 5
-passed: 1
+passed: 5
 issues: 0
-pending: 4
+pending: 0
 skipped: 0
 blocked: 0
 

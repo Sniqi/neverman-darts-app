@@ -9,6 +9,7 @@
 	import { loadAudioPrefs, saveAudioPref } from '../../lib/audio-prefs.js';
 	import { initVoices, announceVisit, announceGameStart, announceNoScore } from '../../lib/audio-caller.js';
 	import { playSfx } from '../../lib/audio-sfx.js';
+	import { loadUnfinishedMatch } from '../../lib/storage.js';
 	import { base } from '$app/paths';
 	import { getSuggestion } from '../../engine/checkout.js';
 	import ScorePanel from '../../ui/input/ScorePanel.svelte';
@@ -36,6 +37,16 @@
 	// Load lifetime stats for profile players once at match start so #detectRecords
 	// has a comparison baseline. Guard: only load when players are present.
 	onMount(() => {
+		// CAST-05 / reload-safety: a full page reload re-creates the store empty. If an unfinished
+		// match is persisted (LS_SNAPSHOT), restore it so reloading /match — or recovering from a
+		// crash — keeps the match, and the Cast session re-syncs via the effect below, instead of
+		// starting blank. Guarded on an empty store so a new match navigated in from Setup (which
+		// already set the store) is never clobbered.
+		if (matchStore.state.players.length === 0) {
+			const saved = loadUnfinishedMatch();
+			if (saved) matchStore.restore(saved);
+		}
+
 		if (matchStore.state.players.length > 0) {
 			matchStore.loadRecords(matchStore.state);
 		}
@@ -60,6 +71,19 @@
 			castSenderManager.init(appId);
 			matchStore.setCastManager(castSenderManager);
 		}
+	});
+
+	// CAST-05: when a Cast session (re)connects, push the current snapshot once so the receiver
+	// shows the match immediately. Covers auto-rejoin after a /match reload (ORIGIN_SCOPED) and
+	// connecting mid-match — neither sends anything otherwise until the next dart. Tracked with a
+	// plain prev-flag so it fires only on the disconnected→connected edge, not on every dispatch.
+	let _prevCastConnected = false;
+	$effect(() => {
+		const connected = castSenderManager.activeSession !== null;
+		if (connected && !_prevCastConnected && matchStore.state.players.length > 0) {
+			matchStore.publishSnapshot();
+		}
+		_prevCastConnected = connected;
 	});
 
 	// ── Music: game win / set win / pause (AUD-03) ───────────────────────────

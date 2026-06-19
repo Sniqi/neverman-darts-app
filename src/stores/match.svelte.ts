@@ -561,6 +561,16 @@ export class MatchStore {
 		this.state = state;
 	}
 
+	/**
+	 * Publish the current match state to the Cast receiver on demand (CAST-05).
+	 * Used when a Cast session (re)connects — auto-rejoin after a /match reload, or connecting
+	 * mid-match — so the receiver shows the current match immediately instead of waiting for the
+	 * next dispatch. No-op when no Cast session is active (delegates to the same guarded path).
+	 */
+	publishSnapshot(): void {
+		this.#publishToCast();
+	}
+
 	get isMatchComplete(): boolean {
 		return this.state.phase === 'match-complete';
 	}

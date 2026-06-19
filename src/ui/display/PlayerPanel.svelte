@@ -563,4 +563,15 @@
 		.stats-line     { font-size: clamp(1rem,   calc(5.8vw / var(--player-count, 2)), 3.8rem); }
 		.history-row.bust-row .h-total { font-size: clamp(1rem, calc(4.8vw / var(--player-count, 2)), 3.2rem); }
 	}
+
+	/* The Chromecast's Chrome 90 also lacks `subgrid` (Chrome 117+). The history rows normally
+	   inherit the section's `1fr auto auto` tracks via `grid-template-columns: subgrid`; without
+	   it that declaration is invalid and the row loses its columns (darts | total | remaining
+	   collapse). Re-declare the tracks explicitly on the fallback — columns align within each row
+	   (cross-row track-sharing is lost, which is acceptable on old engines). (UAT 07, 3rd pass) */
+	@supports not (grid-template-columns: subgrid) {
+		.history-row {
+			grid-template-columns: 1fr auto auto;
+		}
+	}
 </style>

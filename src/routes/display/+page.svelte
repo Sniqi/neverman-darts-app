@@ -80,31 +80,6 @@
 	// Use matchState to avoid naming conflict with the $state rune.
 	let matchState = $derived(displayStore.state);
 
-	// ── TEMP DEBUG (UAT 07, 3rd pass) — prints receiver capabilities + computed layout
-	//    on-screen so we can diagnose the empty-panels bug without a remote debugger.
-	//    REMOVE after diagnosis. ──────────────────────────────────────────────────
-	let dbg = $state('debug: collecting…');
-	$effect(() => {
-		const _trigger = matchState; // re-run whenever state changes
-		requestAnimationFrame(() => {
-			const ch = (s: string) => {
-				const e = document.querySelector(s) as HTMLElement | null;
-				return e ? e.clientHeight : -1;
-			};
-			const fs = (s: string) => {
-				const e = document.querySelector(s) as HTMLElement | null;
-				return e ? getComputedStyle(e).fontSize : 'n/a';
-			};
-			dbg = [
-				`isReceiver=${isReceiver} players=${matchState?.players?.length ?? 'null'} phase=${matchState?.phase ?? 'null'}`,
-				`CQ=${CSS.supports('container-type: inline-size')} dvh=${CSS.supports('height: 100dvh')} win=${window.innerWidth}x${window.innerHeight}`,
-				`rootH=${ch('.display-root')} gridH=${ch('.panels-grid')} panelH=${ch('.player-panel')}`,
-				`scoreFont=${fs('.remaining-score')} nameFont=${fs('.player-name')}`,
-				navigator.userAgent.replace(/.*(Chrome\/[0-9.]+).*/, '$1'),
-			].join('\n');
-		});
-	});
-
 	// Current leg: sum of all players' legsWon + 1 (the leg currently in progress)
 	let currentLeg = $derived.by(() => {
 		if (!matchState || matchState.phase === 'setup') return 1;
@@ -223,9 +198,6 @@
 	<script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
 </svelte:head>
 
-<!-- TEMP DEBUG (UAT 07, 3rd pass) — on-screen receiver diagnostics. REMOVE after diagnosis. -->
-<pre style="position:fixed;top:0;left:0;z-index:99999;margin:0;background:rgba(0,0,0,0.85);color:#39ff14;font:bold 26px/1.35 monospace;padding:12px;white-space:pre-wrap;max-width:100vw;pointer-events:none;">{dbg}</pre>
-
 {#if matchState === null || matchState.phase === 'setup'}
 	<IdleScreen />
 {:else}
@@ -330,12 +302,13 @@
 	.display-root {
 		display: flex;
 		flex-direction: column;
-		/* 100vh fallback FIRST: the Chromecast CAF receiver runs an older Chromium without
-		   `dvh` support (added in Chrome 108). An unsupported unit invalidates the whole
-		   declaration → the element collapsed to auto height (~20% of the TV, bottom clipped).
-		   Modern browsers (tablet/PC) override with 100dvh on the next line. (UAT 07, 3rd pass) */
+		/* Base height for the Chromecast's Chrome 90 (no `dvh`, no container queries). This MUST be
+		   a single `height: 100vh` with the dvh upgrade in a SEPARATE @supports rule below. Writing
+		   `height:100vh; height:100dvh;` as two declarations does NOT survive the build: the CSS
+		   minifier dedupes same-property declarations and keeps only 100dvh, which Chrome 90 ignores
+		   → the element gets no height → the panels-grid collapses to 0 and only the header shows
+		   (rootH=77, gridH=0). (UAT 07, 3rd pass — confirmed via on-screen receiver debug) */
 		height: 100vh;
-		height: 100dvh;
 		width: 100%;
 		background: radial-gradient(
 			120% 90% at 50% 0%,
@@ -344,6 +317,15 @@
 			#0b0c10 100%
 		);
 		overflow: hidden;
+	}
+
+	/* Modern browsers (tablet/PC): upgrade to dynamic viewport height so the tablet's address
+	   bar is accounted for. Separate @supports rule so the minifier can't fold it into the base
+	   declaration above (see the note on .display-root height). */
+	@supports (height: 100dvh) {
+		.display-root {
+			height: 100dvh;
+		}
 	}
 
 	/* D-11: TV overscan safe margin removed per on-device UAT (07, 3rd pass) — the 96px border

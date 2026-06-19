@@ -8,14 +8,14 @@ updated: 2026-06-19T10:00:00Z
 
 ## Current Test
 
-number: 1
-name: Cast button connects + TV renders the live scoreboard (CAST-01 / RECV-01)
+number: 4
+name: Live per-throw sync to TV (SYNC live)
 expected: |
-  On /match (Chrome, same LAN as the registered Chromecast), the Cast control is visible; tapping
-  it lists "Wohnzimmer Ultra"; selecting it starts a session. The TV now shows the full live
-  scoreboard within seconds (NOT the "Warten auf Match" idle screen), and the tablet stays on the
-  scoring view showing "Überträgt auf: Wohnzimmer Ultra".
-awaiting: on-device diagnosis (NEW BLOCKER — receiver app fails to launch, see Gaps)
+  Test 1 PASSED — Cast connects and both the TV and the PC second window render the scoreboard.
+  Now verify live sync: every dart thrown on /match updates the TV scoreboard in real time, and no
+  PC/tablet-only "Vollbild" button appears on the TV. (Remaining: Test 2 device-name + stop-casting,
+  Test 3 auto-rejoin on /match reload, Test 5 long-pause survival.)
+awaiting: user response (on-device, match casting live)
 
 <!--
 POST-FIX RETEST PASS (3rd pass) — fixes from commit 3f028f2 are LIVE on GitHub Pages
@@ -31,18 +31,20 @@ All 5 tests reset to pending for a clean on-device pass. If all pass → /gsd-co
 
 ### 1. Cast button connects + TV renders the live scoreboard (CAST-01 / RECV-01)
 expected: On /match (Chrome, same LAN as the registered Chromecast), the Cast control is visible; tapping it lists "Wohnzimmer Ultra"; selecting it starts a session. The TV shows the full live scoreboard within seconds (not the "Warten auf Match" idle screen); the tablet stays on the scoring view showing "Überträgt auf: Wohnzimmer Ultra".
-result: issue
-reported: "Casting schlägt fehl. Cast-Dialog zeigt bei 'Wohnzimmer Ultra': 'Failed to cast. Please try again.' Der TV bleibt auf 'Warte auf Match…'. (3rd pass, nach Redeploy)"
-severity: blocker
+result: pass
 note: |
-  REGRESSION vs 2nd pass (where the session established and only the receiver-render failed).
-  Now the receiver app never LAUNCHES — "Failed to cast. Please try again." is the native CAF
-  error for a failed receiver launch, which is upstream of the type:'snapshot' fix. Deployed build
-  VERIFIED correct & current via live-bundle grep: App ID 9671DA41 inlined (1×), caf_receiver SDK
-  URL (1×), cast_sender loader (1×), snapshot discriminant (8×). So NOT a stale-build / empty-App-ID
-  regression. Cause is device-side receiver launch — most likely a stale cached receiver/SW on the
-  Chromecast (2nd pass also needed a full power-cycle). Next: reboot Chromecast → retry; if still
-  failing, remote-debug the receiver via Cast Developer Console to capture the launch error.
+  PASS (2026-06-19, 3rd pass). User confirmed: "Jetzt funktioniert sowohl TV als auch 2. bildschirm
+  /display." Took a chain of fixes, each diagnosed from ground truth:
+  - "Failed to cast" → the receiver app 404'd every chunk because relative asset paths (../_app)
+    resolved to the domain root on the no-trailing-slash /display URL. Fixed by kit.paths.relative=false
+    (absolute paths). (5b333e9)
+  - Receiver then booted but showed only the header over empty space. On-screen debug overlay on the
+    TV revealed Chrome 90 (no container queries, no dvh, no subgrid) at 1280x720, rootH=77/gridH=0.
+    The CSS minifier had stripped the `height:100vh` fallback (dedup of duplicate `height:` decls),
+    leaving only the unsupported 100dvh → height collapse. Fixed via @supports (height + cqw fonts +
+    subgrid), all verified to survive minification. (e61190c, 8d3fecc, 016eebb)
+  - Also: PWA registerType autoUpdate so the receiver self-updates on each cast (no reboot). (8d3fecc)
+  Both the Cast receiver and the PC second window now render the full scoreboard.
 
 ### 2. Device name shown + stop casting (CAST-03)
 expected: While connected, /match shows "Überträgt auf: Wohnzimmer Ultra"; tapping the launcher opens the native Cast dialog and "Stop casting" ends the session; the TV returns to idle.
@@ -63,8 +65,8 @@ result: [pending]
 ## Summary
 
 total: 5
-passed: 0
-issues: 1
+passed: 1
+issues: 0
 pending: 4
 skipped: 0
 blocked: 0

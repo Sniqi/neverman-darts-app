@@ -152,7 +152,7 @@
 {/snippet}
 
 <main class="setup-screen">
-	<button class="back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück zur Startseite">
+	<button class="btn btn--ghost back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück zur Startseite">
 		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 			stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 			<path d="M15 18l-6-6 6-6" />
@@ -332,7 +332,7 @@
 			<p class="validation-hint">Mindestens 1 Spieler erforderlich</p>
 		{/if}
 		<button
-			class="start-btn"
+			class="btn btn--cta"
 			onclick={handleStart}
 			disabled={!canStart}
 			aria-disabled={!canStart}
@@ -367,17 +367,10 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-xs);
-		background: none;
-		border: none;
-		color: var(--text-muted);
+		width: auto;
 		font-size: 15px;
-		cursor: pointer;
 		padding: 0;
 		margin-bottom: calc(-1 * var(--space-md));
-	}
-
-	.back-btn:active {
-		opacity: 0.7;
 	}
 
 	h1 {
@@ -473,11 +466,14 @@
 		justify-content: space-between;
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line);
+		box-shadow: var(--edge-highlight);
+		min-height: var(--row-h);
 	}
 
 	.stepper-label {
-		font-size: 16px;
+		font-size: var(--text-md);
 	}
 
 	.stepper {
@@ -487,17 +483,23 @@
 	}
 
 	.stepper-btn {
-		width: 44px;
-		height: 44px;
+		width: var(--hit-min);
+		height: var(--hit-min);
 		background: var(--surface-3);
 		color: var(--text);
 		border: none;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		font-size: 20px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		box-shadow: var(--edge-highlight);
+		transition: transform var(--dur-fast) var(--ease);
+	}
+
+	.stepper-btn:active:not(:disabled) {
+		transform: scale(var(--press-scale));
 	}
 
 	.stepper-btn:disabled {
@@ -506,14 +508,14 @@
 	}
 
 	.stepper-value {
-		font-size: 20px;
-		font-weight: 600;
+		font-size: var(--text-xl);
+		font-weight: 700;
 		min-width: 24px;
 		text-align: center;
 	}
 
 	.stepper-unit {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		color: var(--text-muted);
 		min-width: 48px;
 	}
@@ -525,36 +527,14 @@
 		justify-content: space-between;
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line);
+		box-shadow: var(--edge-highlight);
+		min-height: var(--row-h);
 	}
 
 	.toggle-label {
-		font-size: 16px;
-	}
-
-	input[type='checkbox'] {
-		width: 44px;
-		height: 24px;
-		cursor: pointer;
-	}
-
-	/* Start button */
-	.start-btn {
-		width: 100%;
-		background: var(--accent);
-		color: var(--on-accent);
-		border: none;
-		border-radius: var(--radius-sm);
-		padding: var(--space-sm) var(--space-md);
-		font-size: 18px;
-		font-weight: 600;
-		min-height: 56px;
-		cursor: pointer;
-	}
-
-	.start-btn:disabled {
-		opacity: 0.4;
-		cursor: default;
+		font-size: var(--text-md);
 	}
 
 	.validation-hint {

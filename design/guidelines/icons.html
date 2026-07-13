@@ -1,0 +1,19 @@
+<!-- @dsCard group="Brand" viewport="700x170" subtitle="Inline stroke SVGs + unicode glyphs, no icon library" name="Iconography" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{display:flex;align-items:center;padding:16px;gap:10px;font-family:var(--font-ui);}
+.sw{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
+.chip{height:64px;border-radius:8px;border:1px solid var(--line);}
+.lbl{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.val{font-size:12px;color:var(--text);}
+</style></head><body><div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+    <div style="display:flex;gap:24px;align-items:center;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span class="lbl">inline SVG: 24 viewBox, stroke currentColor, width 2, round caps</span>
+    </div>
+    <div style="display:flex;gap:24px;align-items:center;font-size:18px;">
+      <span>▼</span><span>⌫</span><span>×</span><span>›</span><span>✓</span><span style="color:var(--accent);font-size:10px;">●</span><span>—</span><span>Ø</span><span>✕</span><span>−</span><span>+</span>
+      <span class="lbl">unicode glyphs as icons — no emoji, ever</span>
+    </div>
+  </div></body></html>

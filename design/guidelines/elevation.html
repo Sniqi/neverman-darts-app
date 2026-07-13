@@ -1,0 +1,10 @@
+<!-- @dsCard group="Spacing" viewport="700x170" subtitle="Layered key + ambient shadows, amber glow" name="Shadows & Glow" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{display:flex;align-items:center;padding:16px;gap:10px;font-family:var(--font-ui);}
+.lbl{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.val{font-size:12px;color:var(--text);}
+</style></head><body><div style="display:flex;gap:20px;width:100%;">
+    <div style="flex:1;"><div style="height:72px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--radius-lg);box-shadow:var(--shadow-panel);"></div><div class="val" style="margin-top:8px;">--shadow-panel</div><div class="lbl">dialogs, spectator header</div></div>
+    <div style="flex:1;"><div style="height:72px;background:linear-gradient(180deg,var(--accent-bright) 0%,var(--accent) 45%,var(--accent-deep) 130%);border-radius:var(--radius-sm);box-shadow:var(--shadow-raise), inset 0 1px 0 rgba(255,255,255,.25);"></div><div class="val" style="margin-top:8px;">--shadow-raise</div><div class="lbl">accent CTAs + inner sheen</div></div>
+    <div style="flex:1;"><div style="height:72px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:999px;box-shadow:var(--glow-accent);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;font-family:var(--font-score);font-size:22px;">T20 T20 D20</div><div class="val" style="margin-top:8px;">--glow-accent</div><div class="lbl">checkout callout</div></div>
+  </div></body></html>

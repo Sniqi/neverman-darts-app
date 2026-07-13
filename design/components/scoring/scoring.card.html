@@ -1,0 +1,39 @@
+<!-- @dsCard group="Components" viewport="700x400" name="Scoring" subtitle="Dartboard, numpad, visit strip, score cards, dart pills" -->
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px;}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Dartboard, Numpad, VisitStrip, ScoreCard, DartPill } = window.NevermanDartsDesignSystem_61370c;
+function Demo() {
+  const [darts, setDarts] = React.useState([{segment:20,multiplier:3},{segment:5,multiplier:1}]);
+  return (
+    <div style={{display:'grid',gridTemplateColumns:'340px 1fr',gap:16,alignItems:'start'}}>
+      <div style={{width:340,height:340}}>
+        <Dartboard onDart={(d)=>setDarts(ds=>ds.length<3?[...ds,d]:[d])} />
+      </div>
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        <div style={{display:'flex',gap:8}}>
+          <ScoreCard name="Micha" remaining={120} legs={1} active checkout="T20 20 D20" />
+          <ScoreCard name="Gast 1" remaining={301} legs={0} />
+        </div>
+        <VisitStrip darts={darts} onUndo={()=>setDarts(ds=>ds.slice(0,-1))} />
+        <div style={{display:'flex',gap:6,alignItems:'center',padding:'4px 16px'}}>
+          <DartPill dart={{segment:20,multiplier:3}} />
+          <DartPill dart={{segment:16,multiplier:2}} />
+          <DartPill dart={{segment:5,multiplier:1}} />
+          <DartPill dart={{segment:25,multiplier:2}} />
+          <DartPill dart={{segment:0,multiplier:1}} />
+          <DartPill dart={{segment:19,multiplier:3}} bust />
+        </div>
+        <Numpad onConfirm={()=>{}} />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script></body></html>

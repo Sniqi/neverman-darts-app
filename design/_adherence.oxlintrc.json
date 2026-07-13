@@ -1,0 +1,373 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/core/**",
+              "components/display/**",
+              "components/history/**",
+              "components/scoring/**",
+              "ui_kits/darts-app/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Barlow|Barlow Semi Condensed))/i]",
+        "message": "Font not provided by the design system. Available: Barlow, Barlow Semi Condensed."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|children|chevron|disabled|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, children, chevron, disabled, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:menu|accent|cta|destructive|cancel)$/]",
+        "message": "<Button> variant must be one of 'menu' | 'accent' | 'cta' | 'destructive' | 'cancel'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute > JSXIdentifier[name!=/^(?:active|children|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<Chip> doesn't accept that prop. Declared props: active, children, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ConfirmDialog'] > JSXAttribute > JSXIdentifier[name!=/^(?:heading|body|ctaLabel|ctaStyle|backdropDismiss|onConfirm|onCancel|key|ref|className|style|children)$/]",
+        "message": "<ConfirmDialog> doesn't accept that prop. Declared props: heading, body, ctaLabel, ctaStyle, backdropDismiss, onConfirm, onCancel."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ConfirmDialog'] > JSXAttribute[name.name='ctaStyle'] > Literal[value!=/^(?:destructive|accent)$/]",
+        "message": "<ConfirmDialog> ctaStyle must be one of 'destructive' | 'accent'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Dartboard'] > JSXAttribute > JSXIdentifier[name!=/^(?:onDart|style|key|ref|className|style|children)$/]",
+        "message": "<Dartboard> doesn't accept that prop. Declared props: onDart, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DartScore'] > JSXAttribute > JSXIdentifier[name!=/^(?:segment|multiplier|key|ref|className|style|children)$/]",
+        "message": "<DartScore> doesn't accept that prop. Declared props: segment, multiplier."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HistoryRow'] > JSXAttribute > JSXIdentifier[name!=/^(?:date|winnerName|otherNames|result|format|onClick|key|ref|className|style|children)$/]",
+        "message": "<HistoryRow> doesn't accept that prop. Declared props: date, winnerName, otherNames, result, format, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MatchHeader'] > JSXAttribute > JSXIdentifier[name!=/^(?:startScore|outRule|setsEnabled|legsToWin|setsToWin|currentLeg|key|ref|className|style|children)$/]",
+        "message": "<MatchHeader> doesn't accept that prop. Declared props: startScore, outRule, setsEnabled, legsToWin, setsToWin, currentLeg."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MatchHeader'] > JSXAttribute[name.name='outRule'] > Literal[value!=/^(?:single|double)$/]",
+        "message": "<MatchHeader> outRule must be one of 'single' | 'double'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Numpad'] > JSXAttribute > JSXIdentifier[name!=/^(?:onConfirm|validate|key|ref|className|style|children)$/]",
+        "message": "<Numpad> doesn't accept that prop. Declared props: onConfirm, validate."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PanelVisit'] > JSXAttribute > JSXIdentifier[name!=/^(?:darts|total|scoreAfter|bust|live|key|ref|className|style|children)$/]",
+        "message": "<PanelVisit> doesn't accept that prop. Declared props: darts, total, scoreAfter, bust, live."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ScoreCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|remaining|legs|sets|active|checkout|key|ref|className|style|children)$/]",
+        "message": "<ScoreCard> doesn't accept that prop. Declared props: name, remaining, legs, sets, active, checkout."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SegmentedControl'] > JSXAttribute > JSXIdentifier[name!=/^(?:options|value|onChange|key|ref|className|style|children)$/]",
+        "message": "<SegmentedControl> doesn't accept that prop. Declared props: options, value, onChange."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|key|ref|className|style|children)$/]",
+        "message": "<StatCard> doesn't accept that prop. Declared props: label, value."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Stepper'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|min|max|unit|onChange|key|ref|className|style|children)$/]",
+        "message": "<Stepper> doesn't accept that prop. Declared props: label, value, min, max, unit, onChange."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ToggleRow'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|checked|onChange|key|ref|className|style|children)$/]",
+        "message": "<ToggleRow> doesn't accept that prop. Declared props: label, checked, onChange."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='VisitStrip'] > JSXAttribute > JSXIdentifier[name!=/^(?:darts|bust|onUndo|key|ref|className|style|children)$/]",
+        "message": "<VisitStrip> doesn't accept that prop. Declared props: darts, bust, onUndo."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Button": {
+        "replaces": []
+      },
+      "Chip": {
+        "replaces": []
+      },
+      "ConfirmDialog": {
+        "replaces": []
+      },
+      "Dartboard": {
+        "replaces": []
+      },
+      "DartScore": {
+        "replaces": []
+      },
+      "HistoryRow": {
+        "replaces": []
+      },
+      "MatchHeader": {
+        "replaces": []
+      },
+      "Numpad": {
+        "replaces": []
+      },
+      "PanelVisit": {
+        "replaces": []
+      },
+      "ScoreCard": {
+        "replaces": []
+      },
+      "SegmentedControl": {
+        "replaces": []
+      },
+      "StatCard": {
+        "replaces": []
+      },
+      "Stepper": {
+        "replaces": []
+      },
+      "ToggleRow": {
+        "replaces": []
+      },
+      "VisitStrip": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--accent",
+      "--accent-bright",
+      "--accent-deep",
+      "--accent-double",
+      "--accent-line",
+      "--accent-soft",
+      "--backdrop",
+      "--bg",
+      "--bg-deep",
+      "--blur-backdrop",
+      "--board-bg",
+      "--board-green",
+      "--board-red",
+      "--board-single",
+      "--board-stroke",
+      "--border-input",
+      "--control-h",
+      "--cta-bg",
+      "--cta-text",
+      "--destructive",
+      "--destructive-line",
+      "--destructive-soft",
+      "--display-body",
+      "--display-caption",
+      "--display-emph",
+      "--display-name",
+      "--display-score",
+      "--dur-base",
+      "--dur-fast",
+      "--dur-med",
+      "--dur-slow",
+      "--ease",
+      "--ease-spring",
+      "--edge-highlight",
+      "--focus-ring",
+      "--font-score",
+      "--font-ui",
+      "--glow-accent",
+      "--hit-min",
+      "--key-h",
+      "--leading-body",
+      "--leading-tight",
+      "--line",
+      "--line-strong",
+      "--on-accent",
+      "--positive",
+      "--positive-soft",
+      "--press-opacity",
+      "--press-scale",
+      "--radius-lg",
+      "--radius-md",
+      "--radius-pill",
+      "--radius-sm",
+      "--radius-xl",
+      "--radius-xs",
+      "--ring-focus",
+      "--row-h",
+      "--shadow-panel",
+      "--shadow-raise",
+      "--space-2xl",
+      "--space-3xl",
+      "--space-lg",
+      "--space-md",
+      "--space-sm",
+      "--space-xl",
+      "--space-xs",
+      "--surface",
+      "--surface-2",
+      "--surface-3",
+      "--surface-card",
+      "--surface-hint",
+      "--text",
+      "--text-2xl",
+      "--text-3xl",
+      "--text-base",
+      "--text-body",
+      "--text-faint",
+      "--text-lg",
+      "--text-md",
+      "--text-muted",
+      "--text-score-active",
+      "--text-score-inactive",
+      "--text-sm",
+      "--text-soft",
+      "--text-xl",
+      "--text-xs",
+      "--tracking-caps",
+      "--tracking-tight",
+      "--triple",
+      "--weight-bold",
+      "--weight-heavy",
+      "--weight-medium",
+      "--weight-regular",
+      "--weight-semibold"
+    ],
+    "tokenKinds": {
+      "--bg": "color",
+      "--bg-deep": "color",
+      "--surface": "color",
+      "--surface-2": "color",
+      "--surface-3": "color",
+      "--surface-hint": "color",
+      "--text": "font",
+      "--text-soft": "font",
+      "--text-muted": "font",
+      "--text-faint": "font",
+      "--accent": "color",
+      "--accent-bright": "color",
+      "--accent-deep": "color",
+      "--accent-soft": "color",
+      "--accent-line": "color",
+      "--on-accent": "color",
+      "--accent-double": "color",
+      "--destructive": "color",
+      "--destructive-soft": "color",
+      "--destructive-line": "color",
+      "--positive": "color",
+      "--positive-soft": "color",
+      "--triple": "color",
+      "--line": "color",
+      "--line-strong": "color",
+      "--border-input": "color",
+      "--focus-ring": "color",
+      "--board-single": "color",
+      "--board-red": "color",
+      "--board-green": "color",
+      "--board-stroke": "color",
+      "--board-bg": "color",
+      "--surface-card": "color",
+      "--text-body": "font",
+      "--cta-bg": "color",
+      "--cta-text": "font",
+      "--font-ui": "font",
+      "--font-score": "font",
+      "--text-xs": "font",
+      "--text-sm": "font",
+      "--text-base": "font",
+      "--text-md": "font",
+      "--text-lg": "font",
+      "--text-xl": "font",
+      "--text-2xl": "font",
+      "--text-3xl": "font",
+      "--text-score-inactive": "font",
+      "--text-score-active": "font",
+      "--weight-regular": "font",
+      "--weight-medium": "font",
+      "--weight-semibold": "font",
+      "--weight-bold": "font",
+      "--weight-heavy": "font",
+      "--leading-body": "font",
+      "--leading-tight": "font",
+      "--tracking-tight": "font",
+      "--tracking-caps": "font",
+      "--display-caption": "font",
+      "--display-body": "font",
+      "--display-emph": "font",
+      "--display-name": "font",
+      "--display-score": "font",
+      "--space-xs": "spacing",
+      "--space-sm": "spacing",
+      "--space-md": "spacing",
+      "--space-lg": "spacing",
+      "--space-xl": "spacing",
+      "--space-2xl": "spacing",
+      "--space-3xl": "spacing",
+      "--hit-min": "spacing",
+      "--control-h": "spacing",
+      "--row-h": "spacing",
+      "--key-h": "spacing",
+      "--radius-xs": "radius",
+      "--radius-sm": "radius",
+      "--radius-md": "radius",
+      "--radius-lg": "radius",
+      "--radius-xl": "radius",
+      "--radius-pill": "radius",
+      "--shadow-raise": "shadow",
+      "--shadow-panel": "shadow",
+      "--glow-accent": "color",
+      "--edge-highlight": "shadow",
+      "--ring-focus": "color",
+      "--backdrop": "color",
+      "--blur-backdrop": "spacing",
+      "--dur-fast": "other",
+      "--dur-base": "other",
+      "--dur-med": "other",
+      "--dur-slow": "other",
+      "--ease": "other",
+      "--ease-spring": "other",
+      "--press-scale": "other",
+      "--press-opacity": "other"
+    },
+    "fontFamilies": [
+      "Barlow",
+      "Barlow Semi Condensed"
+    ]
+  }
+}

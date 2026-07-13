@@ -1,0 +1,44 @@
+<!-- @dsCard group="Components" viewport="700x400" name="Core Controls" subtitle="Buttons, chips, steppers, toggles, stat tiles" -->
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px;}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard } = window.NevermanDartsDesignSystem_61370c;
+function Demo() {
+  const [score, setScore] = React.useState(301);
+  const [rule, setRule] = React.useState('Double Out');
+  const [legs, setLegs] = React.useState(2);
+  const [on, setOn] = React.useState(true);
+  return (
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        <Button variant="menu" chevron>Neues Spiel</Button>
+        <Button variant="cta">Spiel starten</Button>
+        <div style={{display:'flex',gap:8}}>
+          <Button variant="destructive">Verwerfen</Button>
+          <Button variant="cancel">Abbrechen</Button>
+        </div>
+        <Button variant="cta" disabled>Spiel starten</Button>
+      </div>
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        <div style={{display:'flex',gap:8}}>
+          {[301,401,501].map(s => <Chip key={s} active={s===score} onClick={()=>setScore(s)}>{s}</Chip>)}
+        </div>
+        <SegmentedControl options={['Single Out','Double Out']} value={rule} onChange={setRule} />
+        <Stepper label="Legs - First to" value={legs} onChange={setLegs} />
+        <ToggleRow label="Sets" checked={on} onChange={setOn} />
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+          <StatCard value="42.3" label="Ø 3 Darts" />
+          <StatCard value="67%" label="Checkout" />
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script></body></html>

@@ -1,0 +1,54 @@
+/* Neverman Darts — color tokens (2026 refresh).
+   Dark-only, blue-tinted charcoal ramp + one amber accent.
+   Tints/lines derive from base colors via color-mix(in oklab). */
+:root {
+	/* Base surfaces — elevation = lightness step on the same cool hue */
+	--bg: #0c0e14;
+	--bg-deep: #07080c;          /* dartboard miss zone / deepest layer */
+	--surface: #161a23;          /* cards, controls, rows */
+	--surface-2: #1d2330;        /* nested / raised elements */
+	--surface-3: #29303f;       /* pressed rows, highest layer */
+	--surface-hint: #1a1f2b;     /* info hint bubbles */
+
+	/* Text */
+	--text: #eef1f6;
+	--text-soft: #c4cad6;        /* secondary copy */
+	--text-muted: #8a92a6;       /* meta, hints, labels */
+	--text-faint: rgba(238, 241, 246, 0.38);
+
+	/* Accent (amber) */
+	--accent: #f0a424;
+	--accent-bright: #ffc44d;    /* hover / glow edges / link hover */
+	--accent-deep: #c07d0a;      /* gradient tail on accent fills */
+	--accent-soft: color-mix(in oklab, var(--accent) 13%, transparent);
+	--accent-line: color-mix(in oklab, var(--accent) 45%, transparent);
+	--on-accent: #191104;        /* text on accent fills */
+	--accent-double: #f6dfae;    /* double-segment pill text */
+
+	/* Semantic */
+	--destructive: #e5484d;
+	--destructive-soft: color-mix(in oklab, var(--destructive) 14%, transparent);
+	--destructive-line: color-mix(in oklab, var(--destructive) 40%, transparent);
+	--positive: #3dd68c;         /* leg/checkout won */
+	--positive-soft: color-mix(in oklab, var(--positive) 13%, transparent);
+	--triple: #ff7d75;           /* triple-dart float/flash color */
+
+	/* Hairlines & borders */
+	--line: rgba(235, 240, 255, 0.07);
+	--line-strong: rgba(235, 240, 255, 0.14);
+	--border-input: rgba(235, 240, 255, 0.16);  /* keys, chips, inputs */
+	--focus-ring: color-mix(in oklab, var(--accent) 65%, transparent);
+
+	/* Dartboard segment fills */
+	--board-single: #222835;
+	--board-red: #ab2430;
+	--board-green: #1d7a46;
+	--board-stroke: #39404f;
+	--board-bg: #0c0e14;
+
+	/* Semantic aliases */
+	--surface-card: var(--surface);
+	--text-body: var(--text);
+	--cta-bg: var(--accent);
+	--cta-text: var(--on-accent);
+}

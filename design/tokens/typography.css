@@ -1,0 +1,59 @@
+/* Neverman Darts — typography tokens (2026 refresh).
+   UI: Barlow (400/500/600/700). Scores & spectator display: Barlow Semi Condensed (600/700/800).
+   Fallback is system-ui so the PWA still works before fonts load. */
+:root {
+	--font-ui: "Barlow", system-ui, -apple-system, sans-serif;
+	--font-score: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif; /* @kind font */
+
+	/* App scale — sized for a 10" tablet at arm's length */
+	--text-xs: 13px;
+	--text-sm: 15px;
+	--text-base: 17px;   /* body default */
+	--text-md: 19px;
+	--text-lg: 22px;     /* section headings */
+	--text-xl: 26px;     /* page titles */
+	--text-2xl: 32px;    /* numpad digits / stat values */
+	--text-3xl: 40px;    /* numpad entry display */
+	--text-score-inactive: 44px;  /* uses --font-score */
+	--text-score-active: 96px;    /* active remaining score, --font-score */
+
+	--weight-regular: 400;
+	--weight-medium: 500;
+	--weight-semibold: 600;
+	--weight-bold: 700;
+	--weight-heavy: 800;  /* Barlow Semi Condensed only — giant scores */
+
+	--leading-body: 1.5;
+	--leading-tight: 1;
+	--tracking-tight: -0.02em;   /* giant numerals */
+	--tracking-caps: 0.08em;     /* uppercase labels (BUST, section eyebrows) */
+
+	/* Spectator display scale — 27" at 3 m. Sizes scale with player-column width
+	   (cqw); minimums keep everything legible from across the room.
+	   caption = Ø labels/meta · body = visit rows/chips · emph = totals/checkout · name · score */
+	--display-caption: clamp(1.75rem, 4cqw, 5rem); /* @kind font */
+	--display-body: clamp(2rem, 5cqw, 6.5rem); /* @kind font */
+	--display-emph: clamp(2.5rem, 6.5cqw, 8rem); /* @kind font */
+	--display-name: clamp(3rem, 10cqw, 12rem); /* @kind font */
+	--display-score: clamp(6rem, 27cqw, 26rem); /* @kind font */
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font-ui);
+	font-size: var(--text-base);
+	line-height: var(--leading-body);
+	-webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-bright); }
+
+::selection { background: var(--accent); color: var(--on-accent); }
+
+:focus-visible {
+	outline: 3px solid var(--focus-ring);
+	outline-offset: 2px;
+}

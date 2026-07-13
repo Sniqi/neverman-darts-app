@@ -1,0 +1,16 @@
+/* Neverman Darts — spacing scale (multiples of 4) */
+:root {
+	--space-xs: 4px;
+	--space-sm: 8px;
+	--space-md: 16px;
+	--space-lg: 24px;
+	--space-xl: 32px;
+	--space-2xl: 48px;
+	--space-3xl: 64px;
+
+	/* Touch targets — sized for a 10" tablet */
+	--hit-min: 48px;      /* steppers, icon buttons */
+	--control-h: 56px;    /* chips, segmented controls, dart slots */
+	--row-h: 64px;        /* menu buttons, list rows, start CTA */
+	--key-h: 76px;        /* numpad keys, confirm */
+}

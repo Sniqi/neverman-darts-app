@@ -1,0 +1,10 @@
+<!-- @dsCard group="Spacing" viewport="700x180" subtitle="Amber edge for active, scale for press" name="Active & Press States" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{display:flex;align-items:center;padding:16px;gap:10px;font-family:var(--font-ui);}
+.lbl{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+</style></head><body><div style="display:flex;gap:16px;width:100%;">
+    <div style="flex:1;background:linear-gradient(var(--accent-soft),var(--accent-soft)),var(--surface-2);border:1px solid var(--accent-line);box-shadow:inset 4px 0 0 var(--accent), var(--glow-accent);border-radius:var(--radius-md);padding:14px;"><div style="font-weight:600;">Aktiv</div><div class="lbl">tint + inset 4px edge + glow</div></div>
+    <div style="flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:14px;"><div style="font-weight:600;">Inaktiv</div><div class="lbl">hairline only</div></div>
+    <div style="flex:1;background:linear-gradient(180deg,var(--accent-bright) 0%,var(--accent) 45%,var(--accent-deep) 130%);transform:scale(.97);filter:brightness(1.1);border-radius:var(--radius-sm);padding:14px;color:var(--on-accent);"><div style="font-weight:600;">Gedrückt</div><div class="lbl" style="color:rgba(25,17,4,.7);">scale .97 + brightness 1.1</div></div>
+    <div style="flex:1;background:var(--surface-3);border:1px solid var(--border-input);border-radius:var(--radius-sm);padding:14px;transform:scale(.97);"><div style="font-weight:600;">Taste gedrückt</div><div class="lbl">surface-3 + scale .97</div></div>
+  </div></body></html>

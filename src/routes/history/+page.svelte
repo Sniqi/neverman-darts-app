@@ -14,7 +14,7 @@
 
 <div class="screen">
 	<header class="heading-bar">
-		<button class="back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück">
+		<button class="btn btn--ghost btn--icon back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück">
 			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M15 18l-6-6 6-6" />
@@ -59,21 +59,7 @@
 	}
 
 	.back-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 44px;
-		height: 44px;
-		background: transparent;
-		border: none;
-		color: var(--text);
-		cursor: pointer;
-		flex-shrink: 0;
 		margin-left: calc(-1 * var(--space-sm));
-	}
-
-	.back-btn:active {
-		opacity: 0.7;
 	}
 
 	.screen-title {

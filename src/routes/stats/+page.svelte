@@ -35,7 +35,7 @@
 <div class="screen">
 	<header class="heading-bar">
 		<button
-			class="back-btn"
+			class="btn btn--ghost btn--icon back-btn"
 			onclick={selectedProfileId !== null ? backToPicker : () => goto(`${base}/`)}
 			aria-label="Zurück"
 		>
@@ -61,7 +61,7 @@
 				<nav class="profile-list" aria-label="Profil auswählen">
 					{#each $profiles as profile (profile.id)}
 						<button
-							class="menu-btn"
+							class="btn btn--menu menu-btn"
 							aria-label="Statistik für {profile.name} anzeigen"
 							onclick={() => selectProfile(String(profile.id), profile.name)}
 						>
@@ -107,16 +107,6 @@
 	}
 
 	.back-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 44px;
-		height: 44px;
-		background: transparent;
-		border: none;
-		color: var(--text);
-		cursor: pointer;
-		flex-shrink: 0;
 		margin-left: calc(-1 * var(--space-sm));
 		outline: none;
 	}
@@ -124,10 +114,6 @@
 	.back-btn:focus-visible {
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
-	}
-
-	.back-btn:active {
-		opacity: 0.7;
 	}
 
 	.screen-title {
@@ -157,30 +143,12 @@
 	}
 
 	.menu-btn {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100%;
-		height: 56px;
-		padding: 0 var(--space-md);
-		background: var(--surface);
-		color: var(--text);
-		border: none;
-		border-radius: var(--radius-sm);
-		font-size: 16px;
-		font-weight: 400;
-		cursor: pointer;
-		text-align: left;
 		outline: none;
 	}
 
 	.menu-btn:focus-visible {
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
-	}
-
-	.menu-btn:active {
-		opacity: 0.85;
 	}
 
 	/* Empty state */

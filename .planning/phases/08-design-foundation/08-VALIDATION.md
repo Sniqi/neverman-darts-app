@@ -1,7 +1,7 @@
 ---
 phase: 8
 slug: design-foundation
-status: planned
+status: complete
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-07-13
@@ -38,24 +38,24 @@ created: 2026-07-13
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 08-01-T1 | 08-01 | 1 | FOUND-01, FOUND-03 | T-08-01-01 | colors.css/elevation.css have 0 `color-mix()` | grep-gate | `grep -c 'color-mix' src/styles/colors.css src/styles/elevation.css` | ✅ new files created by task | ⬜ pending |
-| 08-01-T2 | 08-01 | 1 | FOUND-03 | T-08-01-01 | app.css is a 4-import aggregator, no old tokens | build | `grep -c "@import" src/app.css` | ✅ new/rewritten | ⬜ pending |
-| 08-01-T3 | 08-01 | 1 | FOUND-04 | T-08-01-02 | reduced-motion collapses all animation/transition | e2e (new, Wave 0 gap) | `npx playwright test e2e/reduced-motion.spec.ts` | ❌ MISSING — created by this task | ⬜ pending |
-| 08-02-T0 | 08-02 | 2 | FOUND-02 | T-08-02-SC | pip package legitimacy approved before install | human-check | manual PyPI review + "approved" | n/a | ⬜ pending |
-| 08-02-T1 | 08-02 | 2 | FOUND-02 | T-08-02-02 | 7 fonts converted to WOFF2 (or documented TTF fallback) | asset-check | `ls -la src/styles/fonts/*.woff2 2>/dev/null \| wc -l` | ❌ MISSING — created by this task | ⬜ pending |
-| 08-02-T2 | 08-02 | 2 | FOUND-02 | T-08-02-03 | globPatterns + manifest colors updated | grep-gate + build | `grep -c "woff2" vite.config.ts && grep -c "0c0e14" vite.config.ts` | ✅ existing file modified | ⬜ pending |
-| 08-02-T3 | 08-02 | 2 | FOUND-02 | T-08-02-02 | fonts survive fully-offline reload | e2e (new, Wave 0 gap) | `npx playwright test e2e/offline-fonts.spec.ts` | ❌ MISSING — created by this task | ⬜ pending |
-| 08-03-T1 | 08-03 | 3 | FOUND-01, FOUND-03, FOUND-04 | T-08-03-01 | 0 hex/rgba in 5 input/dialog files | grep-gate + browser | per-file `grep -Ec '#[0-9a-fA-F]{3,6}\|rgba\(' <file>` loop | ✅ existing files modified | ⬜ pending |
-| 08-03-T2 | 08-03 | 3 | FOUND-01, FOUND-02, FOUND-03, FOUND-04 | T-08-03-01 | 0 hex/rgba in 5 files; shake=400ms / score-float=1.6s preserved | grep-gate | per-file grep loop | ✅ existing files modified | ⬜ pending |
-| 08-03-T3 | 08-03 | 3 | FOUND-01, FOUND-04 | T-08-03-01 | 0 hex/rgba in 5 files; zeroFlashFade retimed; PLAT-04 updated | grep-gate + browser | `npx vitest run --project=browser src/ui/pwa/ReloadPrompt.test.ts` | ✅ existing files modified | ⬜ pending |
-| 08-04-T1 | 08-04 | 3 | FOUND-01, FOUND-03, FOUND-04 | T-08-04-01 | 0 hex/rgba in 5 display/setup files | grep-gate | per-file grep loop | ✅ existing files modified | ⬜ pending |
-| 08-04-T2 | 08-04 | 3 | FOUND-01, FOUND-02, FOUND-04 | T-08-04-01 | 0 hex/rgba in 4 files; liveRowPulse=1.6s infinite preserved | grep-gate | per-file grep loop | ✅ existing files modified | ⬜ pending |
-| 08-04-T3 | 08-04 | 3 | FOUND-01, FOUND-03 | T-08-04-01 | 0 hex/rgba in 5 files; no logic change | grep-gate | per-file grep loop | ✅ existing files modified | ⬜ pending |
-| 08-05-T1 | 08-05 | 3 | FOUND-01, FOUND-02 | T-08-05-01 | 0 hex/rgba in 5 stats files; StatCard tabular-nums | grep-gate | per-file grep loop | ✅ existing files modified | ⬜ pending |
-| 08-05-T2 | 08-05 | 3 | FOUND-01, FOUND-03 | T-08-05-01 | 0 hex/rgba in 5 route pages; accent CTA text-on-fill fix | grep-gate | per-file grep loop | ✅ existing files modified | ⬜ pending |
-| 08-05-T3 | 08-05 | 3 | FOUND-01, FOUND-04 | T-08-05-01 | 0 hex/rgba in match/display shells; E2E flows intact | grep-gate + e2e | `npx playwright test e2e/full-match-flow.spec.ts e2e/spectator-sync.spec.ts` | ✅ existing files/tests | ⬜ pending |
-| 08-06-T1 | 08-06 | 4 | FOUND-01 | T-08-06-01 | Profile.color default + fixtures consistent | unit | `npx vitest run --project unit src/db/profiles.test.ts src/lib/backup.test.ts` | ✅ existing files modified | ⬜ pending |
-| 08-06-T2 | 08-06 | 4 | FOUND-01 | T-08-06-02 | durable regression lock; full suite green | unit + full suite | `npx vitest run --project unit src/lib/design-tokens.test.ts && npm test` | ❌ MISSING — created by this task | ⬜ pending |
+| 08-01-T1 | 08-01 | 1 | FOUND-01, FOUND-03 | T-08-01-01 | colors.css/elevation.css have 0 `color-mix()` | grep-gate | `grep -c 'color-mix' src/styles/colors.css src/styles/elevation.css` | ✅ new files created by task | ✅ green |
+| 08-01-T2 | 08-01 | 1 | FOUND-03 | T-08-01-01 | app.css is a 4-import aggregator, no old tokens | build | `grep -c "@import" src/app.css` | ✅ new/rewritten | ✅ green |
+| 08-01-T3 | 08-01 | 1 | FOUND-04 | T-08-01-02 | reduced-motion collapses all animation/transition | e2e (new, Wave 0 gap) | `npx playwright test e2e/reduced-motion.spec.ts` | ❌ MISSING — created by this task | ✅ green |
+| 08-02-T0 | 08-02 | 2 | FOUND-02 | T-08-02-SC | pip package legitimacy approved before install | human-check | manual PyPI review + "approved" | n/a | ✅ green |
+| 08-02-T1 | 08-02 | 2 | FOUND-02 | T-08-02-02 | 7 fonts converted to WOFF2 (or documented TTF fallback) | asset-check | `ls -la src/styles/fonts/*.woff2 2>/dev/null \| wc -l` | ❌ MISSING — created by this task | ✅ green |
+| 08-02-T2 | 08-02 | 2 | FOUND-02 | T-08-02-03 | globPatterns + manifest colors updated | grep-gate + build | `grep -c "woff2" vite.config.ts && grep -c "0c0e14" vite.config.ts` | ✅ existing file modified | ✅ green |
+| 08-02-T3 | 08-02 | 2 | FOUND-02 | T-08-02-02 | fonts survive fully-offline reload | e2e (new, Wave 0 gap) | `npx playwright test e2e/offline-fonts.spec.ts` | ❌ MISSING — created by this task | ✅ green |
+| 08-03-T1 | 08-03 | 3 | FOUND-01, FOUND-03, FOUND-04 | T-08-03-01 | 0 hex/rgba in 5 input/dialog files | grep-gate + browser | per-file `grep -Ec '#[0-9a-fA-F]{3,6}\|rgba\(' <file>` loop | ✅ existing files modified | ✅ green |
+| 08-03-T2 | 08-03 | 3 | FOUND-01, FOUND-02, FOUND-03, FOUND-04 | T-08-03-01 | 0 hex/rgba in 5 files; shake=400ms / score-float=1.6s preserved | grep-gate | per-file grep loop | ✅ existing files modified | ✅ green |
+| 08-03-T3 | 08-03 | 3 | FOUND-01, FOUND-04 | T-08-03-01 | 0 hex/rgba in 5 files; zeroFlashFade retimed; PLAT-04 updated | grep-gate + browser | `npx vitest run --project=browser src/ui/pwa/ReloadPrompt.test.ts` | ✅ existing files modified | ✅ green |
+| 08-04-T1 | 08-04 | 3 | FOUND-01, FOUND-03, FOUND-04 | T-08-04-01 | 0 hex/rgba in 5 display/setup files | grep-gate | per-file grep loop | ✅ existing files modified | ✅ green |
+| 08-04-T2 | 08-04 | 3 | FOUND-01, FOUND-02, FOUND-04 | T-08-04-01 | 0 hex/rgba in 4 files; liveRowPulse=1.6s infinite preserved | grep-gate | per-file grep loop | ✅ existing files modified | ✅ green |
+| 08-04-T3 | 08-04 | 3 | FOUND-01, FOUND-03 | T-08-04-01 | 0 hex/rgba in 5 files; no logic change | grep-gate | per-file grep loop | ✅ existing files modified | ✅ green |
+| 08-05-T1 | 08-05 | 3 | FOUND-01, FOUND-02 | T-08-05-01 | 0 hex/rgba in 5 stats files; StatCard tabular-nums | grep-gate | per-file grep loop | ✅ existing files modified | ✅ green |
+| 08-05-T2 | 08-05 | 3 | FOUND-01, FOUND-03 | T-08-05-01 | 0 hex/rgba in 5 route pages; accent CTA text-on-fill fix | grep-gate | per-file grep loop | ✅ existing files modified | ✅ green |
+| 08-05-T3 | 08-05 | 3 | FOUND-01, FOUND-04 | T-08-05-01 | 0 hex/rgba in match/display shells; E2E flows intact | grep-gate + e2e | `npx playwright test e2e/full-match-flow.spec.ts e2e/spectator-sync.spec.ts` | ✅ existing files/tests | ✅ green |
+| 08-06-T1 | 08-06 | 4 | FOUND-01 | T-08-06-01 | Profile.color default + fixtures consistent | unit | `npx vitest run --project unit src/db/profiles.test.ts src/lib/backup.test.ts` | ✅ existing files modified | ✅ green |
+| 08-06-T2 | 08-06 | 4 | FOUND-01 | T-08-06-02 | durable regression lock; full suite green | unit + full suite | `npx vitest run --project unit src/lib/design-tokens.test.ts && npm test` | ❌ MISSING — created by this task | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -90,4 +90,16 @@ Per RESEARCH.md's Validation Architecture, this phase had 4 coverage gaps at pla
 - [x] Feedback latency < 120s (grep gates and targeted vitest/playwright runs are all well under this)
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** planning complete — ready for `/gsd-execute-phase 8`
+**Approval:** approved 2026-07-14 (post-execution audit)
+
+---
+
+## Validation Audit 2026-07-14
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+All 18 mapped verifications ran green during execution and were independently re-run by the phase verifier (523/523 unit+browser, reduced-motion + offline-fonts E2E pass, grep gates 0 hits, motion exceptions confirmed). 08-02-T0 (pip legitimacy) approved with documented PyPI verification. The 6 pre-existing red E2E tests are tracked in deferred-items.md (predate Phase 8, not phase requirements).

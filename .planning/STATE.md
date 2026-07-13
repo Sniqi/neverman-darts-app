@@ -4,11 +4,11 @@ milestone: v1.2
 milestone_name: Restyling
 current_phase: 9
 current_phase_name: Core Components
-status: planning
-stopped_at: Phase 8 complete (verified), ready to plan Phase 9
-last_updated: "2026-07-14T00:15:00.000Z"
-last_activity: 2026-07-13
-last_activity_desc: Phase 08 complete, transitioned to Phase 9
+status: executing
+stopped_at: Phase 9 UI-SPEC approved
+last_updated: "2026-07-13T23:21:45.244Z"
+last_activity: 2026-07-14
+last_activity_desc: Phase 08 verified (8/8), transitioned to Phase 9
 progress:
   total_phases: 5
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 
 Phase: 9 — Core Components
 Plan: Not started
-Status: Ready to plan
+Status: Ready to execute
 Last activity: 2026-07-14 — Phase 08 verified (8/8), transitioned to Phase 9
 
 ## Performance Metrics
@@ -139,9 +139,9 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14
-Stopped at: Phase 8 complete, ready to plan Phase 9 (autonomous run --from 8 in progress)
-Resume file: None
+Last session: 2026-07-13T22:45:30.387Z
+Stopped at: Phase 9 UI-SPEC approved
+Resume file: .planning/phases/09-core-components/09-UI-SPEC.md
 
 ## Operator Next Steps
 

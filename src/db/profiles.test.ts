@@ -17,7 +17,7 @@ describe('profiles CRUD (PROF-01)', () => {
 		expect(all[0].id).toBe(id);
 		expect(all[0].name).toBe('alex');
 		expect(all[0].initial).toBe('A');
-		expect(all[0].color).toBe('#e8a020');
+		expect(all[0].color).toBe('#f0a424');
 		expect(all[0].createdAt).toBeTypeOf('number');
 	});
 

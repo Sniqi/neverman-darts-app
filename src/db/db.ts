@@ -8,7 +8,7 @@ export interface Profile {
 	// which keeps the id optional at insert time (++id auto-increment).
 	id: number; // auto-increment primary key
 	name: string;
-	color: string; // hex color for avatar, e.g. "#e8a020"
+	color: string; // hex color for avatar, e.g. "#f0a424"
 	initial: string; // first letter of name, uppercase
 	createdAt: number; // Date.now() at creation — used by Phase 4 stats
 }

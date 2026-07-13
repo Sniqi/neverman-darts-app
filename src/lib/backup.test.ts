@@ -22,7 +22,7 @@ describe('backup export/validate/import (PROF-03)', () => {
 			// Seed then export to get a valid NevermanDarts blob
 			await db.profiles.add({
 				name: 'TestPlayer',
-				color: '#e8a020',
+				color: '#f0a424',
 				initial: 'T',
 				createdAt: Date.now()
 			});
@@ -58,7 +58,7 @@ describe('backup export/validate/import (PROF-03)', () => {
 			// Seed row A into the DB
 			await db.profiles.add({
 				name: 'PlayerA',
-				color: '#e8a020',
+				color: '#f0a424',
 				initial: 'A',
 				createdAt: Date.now()
 			});
@@ -77,7 +77,7 @@ describe('backup export/validate/import (PROF-03)', () => {
 			await db.profiles.clear();
 			await db.profiles.add({
 				name: 'PlayerA',
-				color: '#e8a020',
+				color: '#f0a424',
 				initial: 'A',
 				createdAt: Date.now()
 			});

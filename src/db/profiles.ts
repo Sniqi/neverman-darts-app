@@ -17,7 +17,8 @@ export async function createProfile(name: string): Promise<number> {
 	if (!trimmed) throw new Error('Profile name cannot be empty');
 	const profile: Omit<Profile, 'id'> = {
 		name: trimmed,
-		color: '#e8a020',
+		// Default updated for DS consistency (FOUND-01); field is currently unused by any UI render path.
+		color: '#f0a424',
 		initial: trimmed[0].toUpperCase(),
 		createdAt: Date.now()
 	};

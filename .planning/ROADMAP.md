@@ -44,69 +44,96 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
 ## Phase Details
 
 ### Phase 8: Design Foundation
+
 **Goal**: The app's foundational visual language — color, typography, spacing/radii/elevation, and motion — matches the design system everywhere, replacing all provisional v1.0 styling.
 **Depends on**: Nothing (first phase of v1.2)
 **Requirements**: FOUND-01, FOUND-02, FOUND-03, FOUND-04
 **Success Criteria** (what must be TRUE):
+
   1. Every screen in the app (scoring app + spectator display) renders on the DS dark, blue-tinted charcoal palette with amber `#f0a424` accents — no old provisional colors remain anywhere.
   2. All UI text renders in Barlow and all score numerals render in Barlow Semi Condensed with tabular figures, and both load correctly while the PWA is fully offline.
   3. Spacing, corner radii, and elevation (hairlines, layered shadows, edge-highlights) across every surface follow the DS 4px/radius/elevation scales — no ad-hoc spacing or mismatched corners remain.
   4. Interactive transitions (button press, dialog open, invalid-input shake, score float) animate within the DS's 100–300ms motion spec, and stop moving entirely when "reduce motion" is enabled.
+
 **Plans**: 6 plans
 Plans:
+**Wave 1**
+
 - [ ] 08-01-PLAN.md — DS color/typography/spacing/elevation tokens + reduced-motion E2E proof
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 08-02-PLAN.md — Self-hosted WOFF2 fonts, PWA precache, offline-font E2E proof
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 08-03-PLAN.md — Sweep: scoring input, dialogs & overlays (15 files)
 - [ ] 08-04-PLAN.md — Sweep: display, setup & history (14 files)
 - [ ] 08-05-PLAN.md — Sweep: stats charts & route pages (12 files)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 08-06-PLAN.md — Profile.color default + durable no-provisional-colors regression test
+
 **UI hint**: yes
 
 ### Phase 9: Core Components
+
 **Goal**: Every shared UI primitive matches its DS component spec wherever it appears across the app.
 **Depends on**: Phase 8
 **Requirements**: COMP-01, COMP-02, COMP-03, COMP-04
 **Success Criteria** (what must be TRUE):
+
   1. Every button shows the correct DS variant (amber gradient CTA, secondary, ghost, or destructive), visibly presses with a scale-down, and is comfortably tappable (≥48px).
   2. Chips, segmented controls (e.g. Single/Double Out), steppers (e.g. leg/set counts), and toggle rows (e.g. audio/SFX switches) render at DS sizes with spring-animated switch thumbs.
   3. Every confirmation dialog opens with a blurred scrim and a scale-in animation, and shows stacked full-width buttons with an explicit destructive action plus "Abbrechen".
   4. Stat cards (e.g. on the stats dashboard) show large DS-sized values with the DS caption styling.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 10: Scoring Surface
+
 **Goal**: The touch-scoring screen (`/match`) visually matches the DS scoring specs while every existing scoring behavior stays unchanged.
 **Depends on**: Phase 8, Phase 9
 **Requirements**: SCOR-01, SCOR-02, SCOR-03, SCOR-04
 **Success Criteria** (what must be TRUE):
+
   1. The numpad shows DS-sized keys and digits with a visible pressed state and a ⌫ backspace key, and still enters scores correctly.
   2. The dartboard renders in DS board colors with an active-touch highlight, while polar hit detection, enlarged rings, and segment geometry keep working exactly as before.
   3. The visit strip shows pill-shaped dart notation (`T20`, `D16`, `Bull (50)`, `✕`) with the triple-flash color on triple hits.
   4. The score panel shows the active player in the large amber-edged treatment, inactive players smaller, checkout suggestions with an amber glow, and a red BUST flash — all matching current scoring behavior exactly.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 11: Spectator Display
+
 **Goal**: The spectator display (PC second window, tablet fullscreen, and Chromecast receiver) matches the DS display spec and is confirmed working on the real Chromecast device, with all sync and behavior unchanged.
 **Depends on**: Phase 8
 **Requirements**: DISP-01, DISP-02, DISP-03, DISP-04
 **Success Criteria** (what must be TRUE):
+
   1. Player panels scale their typography with the DS cqw clamps, the active player shows the amber edge + inner glow + tint, and inactive panels sit at 55% opacity.
   2. The match header and panel backgrounds show the DS dark gradients, an amber bloom under the header rule, and ● separators between stats.
   3. On the real Chromecast device (Chrome 90 @ 1280×720), the restyled display renders correctly with no layout breakage — every modern CSS feature used (container queries, dvh, subgrid) is confirmed to fall back correctly via `@supports`.
   4. BroadcastChannel/Cast sync, the idle screen, leg/set banners, the win overlay, and the pause countdown all still render and update exactly as before the restyle.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 12: Pages & Overlays
+
 **Goal**: Every remaining app page and every global overlay/toast matches the DS screens, completing the restyle across the whole app.
 **Depends on**: Phase 8, Phase 9
 **Requirements**: PAGE-01, PAGE-02, PAGE-03, PAGE-04
 **Success Criteria** (what must be TRUE):
+
   1. The start hub and match setup show the centered 520px column, DS list boxes, a collapsible "Profile verwalten" section, and terse German labels.
   2. Match history (list + detail) matches the DS HistoryRow layout and styling.
   3. The statistics dashboard shows DS typography/colors, with the existing bespoke SVG charts recolored to the DS palette (not rebuilt).
   4. The data/backup page and global overlays/toasts (PWA update toast, resume prompt, pause overlay, record celebrations) all match their DS specs.
+
 **Plans**: TBD
 **UI hint**: yes
 

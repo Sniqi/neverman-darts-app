@@ -2,9 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
-status: planning
-last_updated: "2026-07-13T18:30:55.241Z"
+current_phase: 8
+status: executing
+stopped_at: Phase 8 UI-SPEC approved
+last_updated: "2026-07-13T19:43:37.947Z"
 last_activity: 2026-07-13
+last_activity_desc: Roadmap created (Phases 8–12, v1.2 Restyling)
 progress:
   total_phases: 5
   completed_phases: 0
@@ -26,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 Phase: 8 (not started)
 Plan: —
-Status: Ready to plan
+Status: Ready to execute
 Last activity: 2026-07-13 — Roadmap created (Phases 8–12, v1.2 Restyling)
 
 ## Performance Metrics
@@ -113,9 +116,9 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-13
-Stopped at: Milestone v1.1 completed, archived, and tagged — next: define milestone v1.2 (Restyling)
-Resume file: —
+Last session: 2026-07-13T18:59:12.661Z
+Stopped at: Phase 8 UI-SPEC approved
+Resume file: .planning/phases/08-design-foundation/08-UI-SPEC.md
 
 ## Operator Next Steps
 

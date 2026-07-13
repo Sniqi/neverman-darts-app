@@ -67,8 +67,8 @@
 		width="100%"
 	>
 		<!-- Axes -->
-		<line x1={PAD_LEFT} y1={PAD_TOP} x2={PAD_LEFT} y2={PAD_TOP + PLOT_H} stroke="#444" stroke-width="1" />
-		<line x1={PAD_LEFT} y1={PAD_TOP + PLOT_H} x2={PAD_LEFT + PLOT_W} y2={PAD_TOP + PLOT_H} stroke="#444" stroke-width="1" />
+		<line x1={PAD_LEFT} y1={PAD_TOP} x2={PAD_LEFT} y2={PAD_TOP + PLOT_H} stroke="var(--line-strong)" stroke-width="1" />
+		<line x1={PAD_LEFT} y1={PAD_TOP + PLOT_H} x2={PAD_LEFT + PLOT_W} y2={PAD_TOP + PLOT_H} stroke="var(--line-strong)" stroke-width="1" />
 
 		{#if points.length >= 2}
 			<!-- Y-axis tick labels -->
@@ -78,14 +78,14 @@
 					y={tick.y + 4}
 					text-anchor="end"
 					font-size="11"
-					fill="#888"
+					fill="var(--text-muted)"
 				>{tick.val}</text>
 			{/each}
 			<!-- Data polyline -->
 			<polyline
 				points={svgPoints}
 				fill="none"
-				stroke="#e8a020"
+				stroke="var(--accent)"
 				stroke-width="2"
 				stroke-linejoin="round"
 			/>
@@ -95,7 +95,7 @@
 					cx={xCoord(i, points.length)}
 					cy={yCoord(v)}
 					r="3"
-					fill="#e8a020"
+					fill="var(--accent)"
 				/>
 			{/each}
 		{:else}
@@ -104,7 +104,7 @@
 				y={VIEW_H / 2}
 				text-anchor="middle"
 				font-size="14"
-				fill="#888"
+				fill="var(--text-muted)"
 			>Nicht genug Daten.</text>
 		{/if}
 	</svg>
@@ -112,15 +112,15 @@
 
 <style>
 	.chart-card {
-		background: #1e2027;
+		background: var(--surface);
 		border-radius: 8px;
-		padding: var(--space-md, 16px);
+		padding: var(--space-md);
 	}
 
 	.chart-title {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
-		margin: 0 0 var(--space-sm, 8px) 0;
+		color: var(--text-muted);
+		margin: 0 0 var(--space-sm) 0;
 	}
 </style>

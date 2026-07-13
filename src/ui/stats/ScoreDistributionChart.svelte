@@ -58,13 +58,13 @@
 			y1="0"
 			x2={BAR_X}
 			y2={viewBoxHeight}
-			stroke="#444"
+			stroke="var(--line-strong)"
 			stroke-width="1"
 		/>
 		{#each bands as band, i}
 			{@const barW = maxCount > 0 ? (band.count / maxCount) * BAR_WIDTH : 0}
 			{@const y = i * ROW_HEIGHT + 5}
-			{@const fill = i === highlightIdx ? '#e8a020' : '#444'}
+			{@const fill = i === highlightIdx ? 'var(--accent)' : 'var(--line-strong)'}
 			<!-- Bar -->
 			<rect
 				x={BAR_X + 2}
@@ -80,14 +80,14 @@
 				y={y + BAR_HEIGHT - 3}
 				text-anchor="end"
 				font-size="12"
-				fill="#888"
+				fill="var(--text-muted)"
 			>{band.label}</text>
 			<!-- Count label (right of bar) -->
 			<text
 				x={BAR_X + barW + 8}
 				y={y + BAR_HEIGHT - 3}
 				font-size="12"
-				fill="#f0f0f0"
+				fill="var(--text)"
 			>{band.count}</text>
 		{/each}
 	</svg>
@@ -95,15 +95,15 @@
 
 <style>
 	.chart-card {
-		background: #1e2027;
+		background: var(--surface);
 		border-radius: 8px;
-		padding: var(--space-md, 16px);
+		padding: var(--space-md);
 	}
 
 	.chart-title {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
-		margin: 0 0 var(--space-sm, 8px) 0;
+		color: var(--text-muted);
+		margin: 0 0 var(--space-sm) 0;
 	}
 </style>

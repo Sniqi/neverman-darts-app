@@ -71,14 +71,14 @@
 					y1={PAD_TOP + PLOT_H}
 					x2={viewW - PAD_RIGHT}
 					y2={PAD_TOP + PLOT_H}
-					stroke="#444"
+					stroke="var(--line-strong)"
 					stroke-width="1"
 				/>
 				{#each values as val, i}
 					{@const bh = barHeight(val)}
 					{@const bx = barX(i)}
 					{@const by = barY(val)}
-					{@const fill = i === bestIdx ? '#e8a020' : '#444'}
+					{@const fill = i === bestIdx ? 'var(--accent)' : 'var(--line-strong)'}
 					<!-- Bar -->
 					<rect
 						x={bx}
@@ -94,7 +94,7 @@
 						y={by - 3}
 						text-anchor="middle"
 						font-size="11"
-						fill="#f0f0f0"
+						fill="var(--text)"
 					>{val}</text>
 					<!-- Leg index below axis -->
 					<text
@@ -102,7 +102,7 @@
 						y={PAD_TOP + PLOT_H + 14}
 						text-anchor="middle"
 						font-size="11"
-						fill="#888"
+						fill="var(--text-muted)"
 					>{i + 1}</text>
 				{/each}
 			</svg>
@@ -112,16 +112,16 @@
 
 <style>
 	.chart-card {
-		background: #1e2027;
+		background: var(--surface);
 		border-radius: 8px;
-		padding: var(--space-md, 16px);
+		padding: var(--space-md);
 	}
 
 	.chart-title {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
-		margin: 0 0 var(--space-sm, 8px) 0;
+		color: var(--text-muted);
+		margin: 0 0 var(--space-sm) 0;
 	}
 
 	.chart-scroll {
@@ -131,9 +131,9 @@
 	.empty-text {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
+		color: var(--text-muted);
 		margin: 0;
 		text-align: center;
-		padding: var(--space-md, 16px) 0;
+		padding: var(--space-md) 0;
 	}
 </style>

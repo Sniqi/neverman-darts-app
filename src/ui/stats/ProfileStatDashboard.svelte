@@ -91,12 +91,12 @@
 
 <style>
 	.empty-state {
-		padding: var(--space-xl, 32px) var(--space-md, 16px);
+		padding: var(--space-xl) var(--space-md);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 		text-align: center;
 	}
 
@@ -104,14 +104,14 @@
 		font-size: 16px;
 		font-weight: 400;
 		margin: 0;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.empty-body {
 		font-size: 14px;
 		font-weight: 400;
 		margin: 0;
-		color: #888888;
+		color: var(--text-muted);
 	}
 
 	.dashboard {
@@ -120,25 +120,25 @@
 	}
 
 	.section {
-		padding: var(--space-md, 16px);
+		padding: var(--space-md);
 	}
 
 	.section-heading {
 		font-size: 20px;
 		font-weight: 600;
-		margin: 0 0 var(--space-md, 16px) 0;
-		color: #f0f0f0;
+		margin: 0 0 var(--space-md) 0;
+		color: var(--text);
 	}
 
 	.kpi-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.divider {
 		border: none;
-		border-top: 1px solid #2d2d2d;
+		border-top: 1px solid var(--surface-3);
 		margin: 0;
 	}
 </style>

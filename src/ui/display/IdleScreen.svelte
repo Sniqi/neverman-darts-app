@@ -15,11 +15,21 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		height: 100dvh;
+		/* Base height for the Chromecast's Chrome 90 (no `dvh`). This MUST be a single
+		   `height: 100vh` with the dvh upgrade in a SEPARATE @supports rule below — the CSS
+		   minifier dedupes same-property declarations, so `height:100vh; height:100dvh;`
+		   as two declarations does NOT survive the build (see display/+page.svelte). */
+		height: 100vh;
 		width: 100%;
 		background: var(--bg);
 		color: var(--text);
 		gap: var(--space-md);
+	}
+
+	@supports (height: 100dvh) {
+		.idle-screen {
+			height: 100dvh;
+		}
 	}
 
 	.app-name {

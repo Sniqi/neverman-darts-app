@@ -8,11 +8,20 @@ A touch-optimized darts scoring web app (PWA) for home play with steel darts. Pl
 
 A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
 
-## Current State
+## Current Milestone: v1.2 Restyling
 
-**Shipped:** v1.1 Chromecast-Integration (closed 2026-07-13; on-device UAT 5/5 passed 2026-06-19). The PWA is live at https://sniqi.github.io/neverman-darts-app with all v1.0 features plus Google Cast: `/match` acts as Cast sender, `/display` doubles as an unpublished Custom Web Receiver on the user's own Chromecast.
+**Goal:** Die gesamte App-UI auf den Ziel-Zustand des Design-Systems (`design/`) bringen — Barlow-Typografie, geschichtete dunkle Surfaces mit Amber-Akzent `#f0a424`, neue Radien/Elevation/Motion — auf beiden Surfaces (Scoring-App + Spectator-Display inkl. Cast-Receiver), ohne Funktionalität zu ändern.
 
-**Next:** planning milestone v1.2 (Restyling — adopt the Claude Design system in `design/` as the app's visual target state).
+**Target features:**
+- Design-Tokens app-weit übernommen (Farben, Spacing, Radien, Elevation, Typo-Skalen)
+- Barlow + Barlow Semi Condensed self-hosted (OFL), offline via PWA-Precache
+- Core-Komponenten nach DS-Spec (Buttons, Chips, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog)
+- Scoring-Surface nach DS-Spec (Numpad, Dartboard-Farben, VisitStrip, ScoreCards)
+- Display-Surface nach DS-Spec (cqw-Display-Skala, Active-Player-Treatment) — Chrome-90-sicher via `@supports` für den Cast-Receiver
+- Alle Seiten restyled (Hub, Setup, History, Stats, Daten/Backup) + Overlays/Toasts
+- Motion-System nach DS (100–300ms, reduced-motion-Collapse)
+
+**Prior state:** v1.1 shipped 2026-07-13 (Chromecast, UAT 5/5); PWA live at https://sniqi.github.io/neverman-darts-app — full history in `.planning/MILESTONES.md`.
 
 ## Requirements
 
@@ -30,7 +39,15 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 ### Active
 
-(None — v1.0 and v1.1 scope fully shipped and validated. Defined with the next milestone.)
+**Restyling (v1.2)** — pure visual adoption of the design system in `design/`; no functional changes, all existing tests stay green.
+
+- [ ] Foundation: DS color/spacing/radius/elevation tokens replace the provisional styling app-wide
+- [ ] Typography: Barlow (UI) + Barlow Semi Condensed (score numerals), self-hosted, offline-precached, tabular-nums on score surfaces
+- [ ] Core components restyled to DS specs (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog)
+- [ ] Scoring surface restyled (Numpad, Dartboard colors, VisitStrip, ScoreCard, active-score 96px treatment)
+- [ ] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver
+- [ ] All pages restyled (Hub, Setup, History, Stats, Daten/Backup) incl. overlays/toasts
+- [ ] Motion system per DS (100–300ms, standard/spring easing, `prefers-reduced-motion` collapse)
 
 ### Out of Scope
 

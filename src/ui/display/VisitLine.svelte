@@ -87,6 +87,8 @@
 
 	.visit-total {
 		font-weight: 600;
+		font-family: var(--font-score);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.visit-breakdown {

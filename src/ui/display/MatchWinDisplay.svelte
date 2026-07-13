@@ -151,5 +151,7 @@
 		font-size: clamp(1rem, 2vw, 2.5rem);
 		font-weight: 600;
 		color: var(--accent);
+		font-family: var(--font-score);
+		font-variant-numeric: tabular-nums;
 	}
 </style>

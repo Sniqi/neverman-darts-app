@@ -4,9 +4,9 @@ milestone: v1.2
 milestone_name: Restyling
 current_phase: 9
 current_phase_name: Core Components
-status: verifying
-stopped_at: Completed 08-05-PLAN.md
-last_updated: "2026-07-13T22:01:59.733Z"
+status: planning
+stopped_at: Phase 8 complete (verified), ready to plan Phase 9
+last_updated: "2026-07-14T00:15:00.000Z"
 last_activity: 2026-07-13
 last_activity_desc: Phase 08 complete, transitioned to Phase 9
 progress:
@@ -21,17 +21,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-13)
+See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 08 — Design Foundation
+**Current focus:** Phase 9 — Core Components
 
 ## Current Position
 
 Phase: 9 — Core Components
 Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-07-13 — Phase 08 complete, transitioned to Phase 9
+Status: Ready to plan
+Last activity: 2026-07-14 — Phase 08 verified (8/8), transitioned to Phase 9
 
 ## Performance Metrics
 
@@ -127,6 +127,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ### Blockers/Concerns
 
+- (Pre-existing, documented) 6 E2E tests red since before Phase 8 — spec drift vs June quick tasks (full-match-flow stepper, resume .overlay, spectator-sync score text). Attribution proof + handling rule in `.planning/phases/08-design-foundation/deferred-items.md`; evaluate E2E as "no NEW failures vs baseline" until repaired (recommend /gsd-debug or quick task before milestone audit).
 - (Carried, low priority) Android Chrome backgrounding during a Cast session: sender session lifecycle when the tablet screen locks was never explicitly UAT'd — no issues reported through 3 on-device UAT passes and real use; revisit only if disconnects are observed. (Screen wake lock on /match makes locking rare in practice.)
 
 ## Deferred Items
@@ -135,13 +136,14 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 |----------|------|--------|-------------|
 | RECV polish | RECV-06: Idle-screen match summary (last result shown between games) | v2 | 2026-06-18 |
 | RECV polish | RECV-07: Receiver UI theme customization | v2 | 2026-06-18 |
+| Test debt | 6 pre-existing red E2E tests (spec drift since 2026-06-14 quick tasks) — see 08 deferred-items.md | repair before milestone audit | 2026-07-14 |
 
 ## Session Continuity
 
-Last session: 2026-07-13T21:32:22.479Z
-Stopped at: Completed 08-05-PLAN.md
+Last session: 2026-07-14
+Stopped at: Phase 8 complete, ready to plan Phase 9 (autonomous run --from 8 in progress)
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Autonomous run active (/gsd-autonomous --from 8): Phase 9 discuss→plan→execute is next

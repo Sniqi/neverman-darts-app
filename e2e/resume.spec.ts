@@ -6,14 +6,16 @@
 //
 // Match is driven via numpad (not SVG segments) — headless hit-detection
 // caveat per STATE.md decision [Phase 01-04].
-// Overlay dismissed via page.evaluate DOM click — Playwright pointer click
-// intercepted by .panel-area in headless mode.
+// Visits commit immediately on "Bestätigen" — the correction-window overlay
+// was replaced by the dart-pill undo strip (commit 5be44aa, June quick tasks).
 
 import { test, expect } from 'playwright/test';
 
 const SNAPSHOT_KEY = 'neverman-match-snapshot';
 
-// Helper: enter a numpad visit total and dismiss the correction overlay
+// Helper: enter a numpad visit total. Visits commit immediately on "Bestätigen" —
+// the correction-window overlay was replaced by the dart-pill undo strip
+// (commit 5be44aa, June quick tasks) and no longer exists on /match.
 async function enterNumpadVisit(page: import('playwright').Page, total: number) {
 	const clearBtn = page.getByRole('button', { name: 'C', exact: true });
 	await clearBtn.click();
@@ -22,14 +24,6 @@ async function enterNumpadVisit(page: import('playwright').Page, total: number) 
 		await page.getByRole('button', { name: digit, exact: true }).click();
 	}
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
-
-	// Dismiss correction overlay via DOM click (Playwright pointer intercepted by panel-area)
-	const overlay = page.locator('.overlay');
-	await expect(overlay).toBeVisible();
-	await page.evaluate(() => {
-		(document.querySelector('.overlay') as HTMLElement)?.click();
-	});
-	await expect(overlay).not.toBeVisible();
 }
 
 test.describe('FLOW-03: crash-resume', () => {
@@ -42,6 +36,10 @@ test.describe('FLOW-03: crash-resume', () => {
 		await page.getByRole('button', { name: 'Spieler hinzufügen' }).click();
 		await page.getByRole('button', { name: 'Gast hinzufügen' }).click();
 		await expect(page.getByText('Gast 1')).toBeVisible();
+
+		// Setup default changed to 301 since June quick tasks (commit b9e4ef4) — select
+		// 501 explicitly so the 180 visit below produces the expected remaining (321).
+		await page.getByRole('button', { name: '501', exact: true }).click();
 
 		// Reduce legs to 1 so the match doesn't end after one leg win
 		// (but we won't finish — just enter a visit)
@@ -86,6 +84,10 @@ test.describe('FLOW-03: crash-resume', () => {
 
 		await page.getByRole('button', { name: 'Spieler hinzufügen' }).click();
 		await page.getByRole('button', { name: 'Gast hinzufügen' }).click();
+
+		// Setup default changed to 301 since June quick tasks (commit b9e4ef4) — select
+		// 501 explicitly so the 180 visit below produces a valid, non-finishing remaining.
+		await page.getByRole('button', { name: '501', exact: true }).click();
 
 		await page.getByRole('button', { name: 'Spiel starten' }).click();
 		await expect(page).toHaveURL(/\/bulloff/);

@@ -14,8 +14,20 @@ test('full X01 match happy path: setup → bull-off → match → leg win', asyn
 	await page.getByRole('button', { name: 'Gast hinzufügen' }).click();
 	await expect(page.getByText('Gast 1')).toBeVisible();
 
-	// Reduce legs to 1 so one leg win = match win
-	await page.getByRole('button', { name: 'Legs verringern' }).click();
+	// Setup defaults changed since June quick tasks (commit b9e4ef4): default mode is
+	// now 301/Single Out. This test exercises the 501 Double-Out checkout flow, so
+	// select it explicitly instead of relying on defaults.
+	await page.getByRole('button', { name: '501', exact: true }).click();
+	await page.getByRole('button', { name: 'Double Out' }).click();
+
+	// Same commit also flipped "Sets" on by default (setsEnabled=true, setsToWin=2),
+	// which would make legsToWin apply per-set (so a single leg win would only
+	// close the first set, not the match). Turn it off so legs apply to the whole
+	// match again, matching this test's original single-leg-match intent.
+	await page.getByRole('switch', { name: 'Sets' }).click();
+
+	// Default legs is now 2 (since quick task 260614-q02) with a minimum of 1 —
+	// reduce legs to 1 (one click) so one leg win = match win.
 	await page.getByRole('button', { name: 'Legs verringern' }).click();
 
 	// "Spiel starten" should now be enabled
@@ -37,7 +49,9 @@ test('full X01 match happy path: setup → bull-off → match → leg win', asyn
 	// Visit 3: 125                → remaining 16
 	// Visit 4: 16 (D8)            → remaining 0, leg won
 
-	async function enterNumpadVisit(total: number, opts: { assertOverlay?: boolean } = {}) {
+	// Visits commit immediately on "Bestätigen" — the correction-window overlay
+	// was replaced by the dart-pill undo strip (commit 5be44aa, June quick tasks).
+	async function enterNumpadVisit(total: number) {
 		// Clear any existing input first (exact match to avoid matching undo button aria-label)
 		const clearBtn = page.getByRole('button', { name: 'C', exact: true });
 		await clearBtn.click();
@@ -57,34 +71,16 @@ test('full X01 match happy path: setup → bull-off → match → leg win', asyn
 		}
 		// Confirm
 		await page.getByRole('button', { name: 'Bestätigen' }).click();
-
-		const overlay = page.locator('.overlay');
-
-		if (opts.assertOverlay) {
-			// Positively assert the correction window appears (regression guard for CR-03/CR-04)
-			await expect(overlay).toBeVisible();
-			// Dismiss via JS click on the overlay element: Playwright's pointer-based click
-			// is intercepted by .panel-area in headless mode, but a DOM click() dispatched
-			// via evaluate() reliably reaches the overlay and triggers handleOutsideClick.
-			await page.evaluate(() => {
-				(document.querySelector('.overlay') as HTMLElement)?.click();
-			});
-			// Assert overlay is removed from the DOM after dismissal
-			await expect(overlay).not.toBeVisible();
-		} else {
-			// For subsequent visits: assert and dismiss deterministically
-			await expect(overlay).toBeVisible();
-			await page.evaluate(() => {
-				(document.querySelector('.overlay') as HTMLElement)?.click();
-			});
-			await expect(overlay).not.toBeVisible();
-		}
 	}
 
-	// First visit: assert the correction-window lifecycle (regression guard for CR-03/CR-04)
-	await enterNumpadVisit(180, { assertOverlay: true });
+	// First visit: assert the remaining score updates immediately (regression guard
+	// for the visit-commit flow, replacing the old correction-window lifecycle guard).
 	await enterNumpadVisit(180);
+	await expect(page.getByText('321')).toBeVisible();
+	await enterNumpadVisit(180);
+	await expect(page.getByText('141')).toBeVisible();
 	await enterNumpadVisit(125);
+	await expect(page.getByText('16', { exact: true })).toBeVisible();
 
 	// Final visit: 16 (D8 finish, double-out)
 	const clearBtn = page.getByRole('button', { name: 'C', exact: true });

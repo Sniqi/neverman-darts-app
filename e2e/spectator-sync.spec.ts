@@ -46,6 +46,10 @@ async function setupAndStartMatch(page: import('playwright/test').Page) {
 	await page.getByRole('button', { name: 'Gast hinzufügen' }).click();
 	await expect(page.getByText('Gast 1')).toBeVisible();
 
+	// Setup default changed to 301 since June quick tasks (commit b9e4ef4) — select
+	// 501 explicitly so the assertions below ('501' start, '321' after a 180 visit) hold.
+	await page.getByRole('button', { name: '501', exact: true }).click();
+
 	// Start match (1 player, default legs)
 	await page.getByRole('button', { name: 'Spiel starten' }).click();
 	await expect(page).toHaveURL(/\/bulloff/);
@@ -74,8 +78,11 @@ test('DISP-05: display window shows updated remaining after dart entered on matc
 	await displayPage.goto('/display');
 
 	// The display must show the updated remaining score (321) from the snapshot
+	// exact: true avoids matching the history row's "→321" breadcrumb once a
+	// completed visit exists (PlayerPanel renders both the live remaining-score
+	// and a "→{scoreAfterVisit}" history entry for the same value).
 	await expect(
-		displayPage.getByText('321')
+		displayPage.getByText('321', { exact: true })
 	).toBeVisible({ timeout: 5000 });
 });
 
@@ -95,8 +102,11 @@ test('DISP-05: display re-hydrates current score after reload mid-match', async 
 	await displayPage.goto('/display');
 
 	// Display must show the current remaining (321) hydrated from localStorage snapshot
+	// exact: true avoids matching the history row's "→321" breadcrumb once a
+	// completed visit exists (PlayerPanel renders both the live remaining-score
+	// and a "→{scoreAfterVisit}" history entry for the same value).
 	await expect(
-		displayPage.getByText('321')
+		displayPage.getByText('321', { exact: true })
 	).toBeVisible({ timeout: 5000 });
 
 	// Enter another visit: 180 → remaining 141
@@ -106,7 +116,7 @@ test('DISP-05: display re-hydrates current score after reload mid-match', async 
 	// Reload the display page — must re-hydrate with 141
 	await displayPage.reload();
 	await expect(
-		displayPage.getByText('141')
+		displayPage.getByText('141', { exact: true })
 	).toBeVisible({ timeout: 5000 });
 });
 
@@ -137,7 +147,10 @@ test('DISP-05: open /display updates live on dart entry without reload', async (
 
 	// 5. Assert display shows 321 WITHOUT calling displayPage.reload()
 	//    This proves the live BroadcastChannel path is working
+	// exact: true avoids matching the history row's "→321" breadcrumb once a
+	// completed visit exists (PlayerPanel renders both the live remaining-score
+	// and a "→{scoreAfterVisit}" history entry for the same value).
 	await expect(
-		displayPage.getByText('321')
+		displayPage.getByText('321', { exact: true })
 	).toBeVisible({ timeout: 5000 });
 });

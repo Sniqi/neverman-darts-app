@@ -148,7 +148,7 @@ Plans:
 | 5. Audio & Auto-Pause | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
-| 8. Design Foundation | v1.2 | 6/6 | Complete   | 2026-07-13 |
+| 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
 | 9. Core Components | v1.2 | 0/TBD | Not started | - |
 | 10. Scoring Surface | v1.2 | 0/TBD | Not started | - |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |

@@ -36,18 +36,19 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - **Achievements: personal records celebrated live AND stored** — highest visit/checkout, best leg, best match average, 180s detected in real time, celebrated on input + spectator views, and persisted (recompute-from-history). Records celebrate once per genuine new best. *Validated in Phase 4 (human UAT 2026-06-12).*
 - **Audio caller + auto-pause** — Web Speech caller announces each non-bust visit (DE/EN) with a checkout-number hint; sound effects on 180/high-finish/record; independent toggles + a master volume slider (default 50%); auto-pause shows a synced countdown overlay on both views after a configurable number of legs, auto-resuming or via "Weiter". *Validated in Phase 5 (human UAT 2026-06-13).* Audio plays from the scoring window (`/match`) only — the spectator window is passive and browsers block its autoplay.
 - **PWA & deployment** — installable PWA (manifest + service worker via `@vite-pwa/sveltekit`, `registerType: 'prompt'`); full offline precache incl. SFX; subpath-correct build for GitHub Pages (`BASE_PATH=/neverman-darts-app`); German dark update toast ("Neue Version verfügbar"); GitHub Actions deploy workflow. *Config validated + accepted in Phase 6 (2026-06-13).* Live go-live (create repo, enable Pages, push) is the user's outward-facing step — workflow is committed and ready.
+- ✓ **Design foundation (v1.2)** — DS tokens app-wide (colors/spacing/radii/elevation as static Chrome-90-safe values), Barlow + Barlow Semi Condensed self-hosted as WOFF2 (offline-precached, tabular-nums on score surfaces), DS motion tokens with reduced-motion collapse, zero provisional colors (grep-gated by `src/lib/design-tokens.test.ts`) — v1.2 (Phase 8, verified 8/8 must-haves)
 
 ### Active
 
 **Restyling (v1.2)** — pure visual adoption of the design system in `design/`; no functional changes, all existing tests stay green.
 
-- [ ] Foundation: DS color/spacing/radius/elevation tokens replace the provisional styling app-wide
-- [ ] Typography: Barlow (UI) + Barlow Semi Condensed (score numerals), self-hosted, offline-precached, tabular-nums on score surfaces
+- [x] Foundation: DS color/spacing/radius/elevation tokens replace the provisional styling app-wide *(Phase 8 ✓)*
+- [x] Typography: Barlow (UI) + Barlow Semi Condensed (score numerals), self-hosted, offline-precached, tabular-nums on score surfaces *(Phase 8 ✓)*
 - [ ] Core components restyled to DS specs (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog)
 - [ ] Scoring surface restyled (Numpad, Dartboard colors, VisitStrip, ScoreCard, active-score 96px treatment)
 - [ ] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver
 - [ ] All pages restyled (Hub, Setup, History, Stats, Daten/Backup) incl. overlays/toasts
-- [ ] Motion system per DS (100–300ms, standard/spring easing, `prefers-reduced-motion` collapse)
+- [x] Motion system per DS (100–300ms + DS-documented exceptions, standard/spring easing, `prefers-reduced-motion` collapse) *(Phase 8 ✓)*
 
 ### Out of Scope
 
@@ -107,4 +108,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-13 after v1.1 milestone (Chromecast-Integration shipped & archived)*
+*Last updated: 2026-07-14 after Phase 8 (Design Foundation) completion*

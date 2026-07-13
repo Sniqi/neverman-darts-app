@@ -41,6 +41,12 @@ Every shared UI primitive matches its DS component spec wherever it appears acro
 - E2E protection: accessible names/roles unchanged; run the full suite per plan wave.
 - New tests at Claude's discretion: small browser-mode assertions only for genuinely new shared contracts (e.g. `.btn` variant computed styles, chip 56px height, toggle track color), no mandatory new test file.
 
+### Research Open Questions — Resolved (post-research, 2026-07-14)
+- **Q1 Non-DS-covered buttons** (icon-only back 44×44, outline delete, flat action rows, unstyled picker items): add extension classes `.btn--ghost` (borderless, for icon-only/inline; ≥48×48 target — bump back-btns from 44) and `.btn--surface` (flat surface row); outline destructive → destructive-outline flavor using `--destructive`/`--destructive-line`/`--destructive-soft` tokens. German labels + roles unchanged.
+- **Q2 /match audio-bar sizing:** the DS match screen contains NO audio bar (verified: zero audio/caller/volume references in design/*/screens.jsx; ToggleRow only in Setup) — the DS is silent on this app-specific strip. Resolution: adopt the DS **switch** itself (56×34, amber track + glow when on, spring thumb — the COMP-02 visible contract) inside the compact bar; raise interactive targets to ≥48px (`--hit-min`); do NOT force 64px list rows onto the scoring toolbar. Full 64px ToggleRows apply in Setup where the DS shows them. Phase 10 (scoring-surface layout) may reposition the bar.
+- **Q3 ConfirmDialog buttons:** consume the shared `.btn--*` classes (destructive/cancel/cta) directly — dialogs are a ≥2-usage-site pattern; no duplicated local button CSS.
+- **Sweep rule (Pitfall 3):** deleting superseded local button CSS happens in the SAME commit as the class swap — Svelte scoped styles otherwise silently override shared classes.
+
 ### Claude's Discretion
 - Exact class naming inside components.css (BEM-ish `.btn--accent` vs `.btn-accent`) — follow any existing codebase idiom.
 - Whether ghost/secondary variants get distinct classes or share `cancel` styling, per what Button.jsx actually defines.

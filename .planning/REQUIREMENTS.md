@@ -72,32 +72,32 @@ Which phase covers which requirement. Filled during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | — | Pending |
-| FOUND-02 | — | Pending |
-| FOUND-03 | — | Pending |
-| FOUND-04 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| COMP-04 | — | Pending |
-| SCOR-01 | — | Pending |
-| SCOR-02 | — | Pending |
-| SCOR-03 | — | Pending |
-| SCOR-04 | — | Pending |
-| DISP-01 | — | Pending |
-| DISP-02 | — | Pending |
-| DISP-03 | — | Pending |
-| DISP-04 | — | Pending |
-| PAGE-01 | — | Pending |
-| PAGE-02 | — | Pending |
-| PAGE-03 | — | Pending |
-| PAGE-04 | — | Pending |
+| FOUND-01 | Phase 8 | Pending |
+| FOUND-02 | Phase 8 | Pending |
+| FOUND-03 | Phase 8 | Pending |
+| FOUND-04 | Phase 8 | Pending |
+| COMP-01 | Phase 9 | Pending |
+| COMP-02 | Phase 9 | Pending |
+| COMP-03 | Phase 9 | Pending |
+| COMP-04 | Phase 9 | Pending |
+| SCOR-01 | Phase 10 | Pending |
+| SCOR-02 | Phase 10 | Pending |
+| SCOR-03 | Phase 10 | Pending |
+| SCOR-04 | Phase 10 | Pending |
+| DISP-01 | Phase 11 | Pending |
+| DISP-02 | Phase 11 | Pending |
+| DISP-03 | Phase 11 | Pending |
+| DISP-04 | Phase 11 | Pending |
+| PAGE-01 | Phase 12 | Pending |
+| PAGE-02 | Phase 12 | Pending |
+| PAGE-03 | Phase 12 | Pending |
+| PAGE-04 | Phase 12 | Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 20 ⚠️
+- Mapped to phases: 20 (roadmap created)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-13*
-*Last updated: 2026-07-13 after initial definition*
+*Last updated: 2026-07-13 after roadmap creation (Phases 8–12)*

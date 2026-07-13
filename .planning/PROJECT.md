@@ -2,27 +2,27 @@
 
 ## What This Is
 
-A touch-optimized darts scoring web app (PWA) for home play with steel darts. Players enter their thrown darts manually on an on-screen dartboard; a separate spectator display shows the live game state, readable from across the room. Runs on Android tablets and Windows PCs without any dev tools — installable from GitHub Pages, fully offline-capable afterwards.
+A touch-optimized darts scoring web app (PWA) for home play with steel darts. Players enter their thrown darts manually on an on-screen dartboard; a separate spectator display shows the live game state, readable from across the room — as a PC second window, tablet fullscreen view, or cast to a Chromecast TV via Google Cast. Runs on Android tablets and Windows PCs without any dev tools — installable from GitHub Pages, fully offline-capable afterwards.
 
 ## Core Value
 
 A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
 
-## Current Milestone: v1.1 Chromecast-Integration
+## Current State
 
-**Goal:** Den Live-Spielstand vom Tablet (`/match`) per Google Cast auf einen Chromecast am TV bringen — `/display` läuft eigenständig als Custom Cast Receiver, das Tablet bleibt frei zum Scoren.
+**Shipped:** v1.1 Chromecast-Integration (closed 2026-07-13; on-device UAT 5/5 passed 2026-06-19). The PWA is live at https://sniqi.github.io/neverman-darts-app with all v1.0 features plus Google Cast: `/match` acts as Cast sender, `/display` doubles as an unpublished Custom Web Receiver on the user's own Chromecast.
 
-**Target features:**
-- Cast Sender in `/match`: offizieller Cast-Button, Geräte-Discovery, Session-Start/-Stop, Verbindungsstatus-UI
-- Custom Web Receiver: `/display` als eigenständige Receiver-App auf dem Chromecast (gehostet auf GitHub Pages, HTTPS)
-- Zustands-Sync über Cast-Custom-Channel: voller Snapshot beim Verbinden (Hydration) + Deltas pro Wurf
-- Koexistenz: bestehendes PC-Zweitfenster (BroadcastChannel) und Tablet-Fullscreen bleiben funktionsfähig; Cast ist additiv
-- Setup: Receiver bleibt unpublished, eigener Chromecast per Seriennummer registriert; App-ID-Handling im Build
+**Next:** planning milestone v1.2 (Restyling — adopt the Claude Design system in `design/` as the app's visual target state).
 
 ## Requirements
 
 ### Validated
 
+- ✓ **X01 game engine** — 301/401/501 with Single/Double Out, up to 4 players, legs & sets, bull-off (result-only), checkout suggestions, undo via event-log replay — v1.0 (Phase 1)
+- ✓ **Touch dart entry** — SVG dartboard with polar-math hit detection and enlarged triple/double rings + numpad with impossible-score validation, correction window, darts-at-double dialog — v1.0 (Phase 1)
+- ✓ **Spectator display** — PC second window (BroadcastChannel + localStorage hydration) and tablet fullscreen route; scores/legs/sets/averages readable on 27" at 3 m — v1.0 (Phase 2)
+- ✓ **Persistence** — Dexie/IndexedDB player profiles, match history, long-term stats, JSON backup export/import — v1.0 (Phase 3)
+- ✓ **Chromecast** — `/match` as Cast sender (official button, states, stop, graceful degradation), `/display` as unpublished Custom Web Receiver, snapshot+delta sync over a Cast custom channel incl. auto-pause countdown, ORIGIN_SCOPED auto-rejoin with match restore, existing spectator paths unchanged — v1.1 (Phase 7, on-device UAT 5/5)
 - **Statistics (live + lifetime + dashboard)** — live 3-dart/first-9 averages, checkout %, score bands, best/worst leg during play; per-profile lifetime stats with hand-rolled SVG charts at `/stats`; match-detail breakdown. *Validated in Phase 4: Statistics & Achievements.*
 - **Achievements: personal records celebrated live AND stored** — highest visit/checkout, best leg, best match average, 180s detected in real time, celebrated on input + spectator views, and persisted (recompute-from-history). Records celebrate once per genuine new best. *Validated in Phase 4 (human UAT 2026-06-12).*
 - **Audio caller + auto-pause** — Web Speech caller announces each non-bust visit (DE/EN) with a checkout-number hint; sound effects on 180/high-finish/record; independent toggles + a master volume slider (default 50%); auto-pause shows a synced countdown overlay on both views after a configurable number of legs, auto-resuming or via "Weiter". *Validated in Phase 5 (human UAT 2026-06-13).* Audio plays from the scoring window (`/match`) only — the spectator window is passive and browsers block its autoplay.
@@ -30,38 +30,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 ### Active
 
-**Game engine**
-- [ ] X01 game modes: 301, 401, 501 with Single Out / Double Out
-- [ ] Up to 4 players per match
-- [ ] Legs and sets support
-- [ ] Bull-off (Ausbullen) at match start — players throw at bull for real; the app only records the resulting starting order/winner
-- [ ] Checkout suggestions: what to throw with the next 1–3 darts to finish
-- [x] Auto-pause option: after a configurable number of legs (e.g. 5), a pause screen with countdown timer (e.g. 5 min) appears; continues after timer or button press *(Phase 5)*
-
-**Input**
-- [ ] Manual dart entry on a displayed dartboard, optimized for touch — triple and double segments must be large enough to hit reliably with a finger on a tablet
-
-**Spectator display**
-- [ ] On PC: second browser window that can be dragged to a second monitor
-- [ ] On tablet: fullscreen display view within the app
-- [ ] Shows: current score, legs/sets, player names, leg average, match average
-- [ ] Readable on a 27" monitor from 3 m distance
-
-**Statistics & persistence**
-- [ ] Persistent player profiles, match history, and long-term statistics across sessions
-- [ ] Achievements: personal records (e.g. new highest 3-dart score, new highest checkout) — celebrated live with an in-game overlay AND stored in player statistics
-
-**Platform & look**
-- [x] PWA hosted on GitHub Pages: open once in browser, install to home screen (Android) / as app (desktop), works offline afterwards *(Phase 6 — config ready; user go-live pending)*
-- [x] Native dark mode design *(Phases 1–6)*
-- [x] German UI *(Phases 1–6)*
-
-**Cast / Chromecast (v1.1)**
-- [ ] Cast the live display from the tablet (`/match`) to a Chromecast at the TV via Google Cast — board stays free for touch scoring
-- [ ] `/display` runs standalone as a Custom Web Receiver on the Chromecast (no screen-mirroring)
-- [ ] Live state sync over the Cast session: full snapshot on connect + per-throw deltas
-- [ ] Existing PC second-window and tablet fullscreen spectator paths keep working unchanged (Cast is additive)
-- [ ] Receiver stays unpublished; user registers their own Chromecast by serial number
+(None — v1.0 and v1.1 scope fully shipped and validated. Defined with the next milestone.)
 
 ### Out of Scope
 
@@ -72,9 +41,9 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 ## Context
 
-- Empty greenfield repo at `D:\github\neverman-darts-app`; target deployment is GitHub Pages.
-- Primary input device is an Android tablet (touch); the spectator display typically runs on a PC with a 27" monitor viewed from ~3 m.
-- User explicitly requested domain research (with Opus agents) to surface additional features that are standard or sensible in darts scoring apps.
+- Live PWA at https://sniqi.github.io/neverman-darts-app (GitHub Pages, GitHub Actions deploy); SvelteKit 2 + Svelte 5 runes, Dexie, vite-plugin-pwa; ~511 tests (unit + browser + E2E).
+- Primary input device is an Android tablet (touch); the spectator display runs as a PC second window (27" at ~3 m), tablet fullscreen, or on a Chromecast TV (Custom Web Receiver — the Cast device runs **Chrome 90 @ 1280×720**: no container queries, no dvh, no subgrid; modern CSS must be gated behind `@supports`).
+- A complete Claude Design system lives in `design/` (synced 2026-07-13 from the claude.ai/design project): Barlow typefaces, amber `#f0a424` accent on blue-tinted charcoal surfaces, tokens/guidelines/components/templates. It is the **target visual state** — the app still shows the provisional v1.0 styling.
 - Common reference apps in this space: DartCounter, Russ Bray Scorer, autodarts (for feature expectations, not for camera detection).
 
 ## Constraints
@@ -90,15 +59,18 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | PWA hosted on GitHub Pages | Best path to Android + PC with zero install friction; offline via service worker | ✓ Done (Phase 6 — `@vite-pwa/sveltekit`, prompt update, GH Actions deploy; user go-live pending) |
-| Spectator window only on PC; tablet uses in-app fullscreen view | Android has no freely movable windows | — Pending |
-| Bull-off records result only (no bull throw input) | The real throw happens at the board; app only needs the starting order | — Pending |
+| Spectator window only on PC; tablet uses in-app fullscreen view | Android has no freely movable windows | ✓ Good (v1.0, in daily use) |
+| Bull-off records result only (no bull throw input) | The real throw happens at the board; app only needs the starting order | ✓ Good (v1.0) |
 | Auto-pause = pause screen with countdown timer | User preference; continues automatically or by button | ✓ Done (Phase 5) |
-| Achievements celebrated live + persisted in stats | User preference | — Pending |
-| German UI, dark mode native | User preference | — Pending |
+| Achievements celebrated live + persisted in stats | User preference | ✓ Good (Phase 4, human UAT) |
+| German UI, dark mode native | User preference | ✓ Good (v1.0) |
 | Audio plays from scoring window (`/match`) only, not the spectator | Browsers block autoplay in a window that never received a user gesture; the passive Observer stays muted | ✓ Done (Phase 5, UAT-decided 2026-06-13) |
 | Master volume slider (default 50%) for caller + SFX; checkout hint speaks the number | User preference during Phase 5 UAT | ✓ Done (Phase 5) |
-| Chromecast via Google Cast SDK (Custom Receiver), not screen-mirroring or a cloud relay | Casts data, not pixels: tablet stays free for scoring; no backend needed (sync runs over the Cast session on the LAN); fits GitHub Pages static hosting; receiver stays unpublished on the user's own device (one-time $5 Cast dev registration) | — Pending (v1.1) |
-| Reversed "cross-device sync = out of scope" for local Cast only | The Chromecast is a genuine second device, but sync is LAN-local via the Cast session — still no backend, still offline-capable at home; internet/cloud sync remains out of scope | — Pending (v1.1) |
+| Chromecast via Google Cast SDK (Custom Receiver), not screen-mirroring or a cloud relay | Casts data, not pixels: tablet stays free for scoring; no backend needed (sync runs over the Cast session on the LAN); fits GitHub Pages static hosting; receiver stays unpublished on the user's own device (one-time $5 Cast dev registration) | ✓ Good (v1.1, on-device UAT 5/5) |
+| Reversed "cross-device sync = out of scope" for local Cast only | The Chromecast is a genuine second device, but sync is LAN-local via the Cast session — still no backend, still offline-capable at home; internet/cloud sync remains out of scope | ✓ Good (v1.1) |
+| Absolute asset paths (`kit.paths.relative=false`) | Relative `../_app` paths 404 at the domain root when the Cast receiver (or a manual reload) loads `/display` without a trailing slash — absolute paths resolve at any route depth | ✓ Good (v1.1 UAT fix, 5b333e9) |
+| Modern CSS gated behind `@supports` for the receiver | The Cast device runs Chrome 90 (no container queries/dvh/subgrid); duplicate-property fallbacks don't survive the CSS minifier's dedup — `@supports` blocks do | ✓ Good (v1.1 UAT fix) |
+| Cast messages carry a `type` discriminant + sender→receiver contract test | Receiver routes only `data.type === 'snapshot'`; isolated unit tests missed the untagged-payload mismatch — the contract test guards the wire format | ✓ Good (v1.1 UAT fix, 3f028f2) |
 
 ## Evolution
 
@@ -118,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-18 — Milestone v1.1 (Chromecast-Integration) started*
+*Last updated: 2026-07-13 after v1.1 milestone (Chromecast-Integration shipped & archived)*

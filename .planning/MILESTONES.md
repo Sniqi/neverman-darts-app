@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.1 Chromecast-Integration (Shipped: 2026-07-13)
+
+**Phases completed:** 1 phase (Phase 7), 6 plans, 19 tasks
+**Requirements:** 18/18 complete (CAST 6, RECV 5, SYNC 4, SETUP 3) — verified_closeout
+**On-device UAT:** 5/5 passed 2026-06-19 (3rd pass, commit 35ec3c8); formally closed 2026-07-13
+
+**Key accomplishments:**
+
+- Google Cast sender integrated in `/match`: official Cast button in the SpectatorChooser with connection states, "Überträgt auf: <Gerät>" status and stop-casting — the entire Cast row is absent on browsers without Cast support (graceful degradation)
+- `/display` doubles as a Custom Web Receiver on the Chromecast: prerendered route (`trailingSlash='always'`), receiver SDK gated on `isCastReceiverContext()`, idle timeout disabled (`disableIdleTimeout` + `maxInactivity:3600`) so sessions survive long auto-pause breaks
+- Live state sync over a Cast custom channel: trimmed `CastDisplayState` projection (current-leg visit slice, verified < 32 KB for worst-case 4-player sets matches), full-snapshot hydration on connect + per-throw deltas, auto-pause countdown in sync on the TV
+- Session resilience: `ORIGIN_SCOPED` auto-rejoin after tablet reload, `/match` restores the in-progress match on mount and re-pushes the snapshot on the reconnect edge, "Verbindung wiederhergestellt" toast (CAST-05/06)
+- GitHub-Pages deployment hardening from on-device UAT: absolute asset paths (`kit.paths.relative=false` — fixes receiver 404s on the no-trailing-slash `/display` URL), SW `navigateFallbackDenylist` for `/display`, `VITE_CAST_APP_ID` via repo variable, PWA `autoUpdate`, and Chrome-90 receiver CSS fallbacks via `@supports` (no container queries/dvh/subgrid on the Cast device)
+- Written Cast Console registration guide (`docs/CAST-SETUP.md`): unpublished receiver, own Chromecast registered by serial, $5 one-time fee, 15-min propagation — plus existing PC second-window and tablet fullscreen spectator paths verified unchanged (SYNC-04)
+
+---
+
 ## v1.0 MVP (Shipped: 2026-06-13)
 
 **Phases completed:** 6 phases, 33 plans, 55 tasks

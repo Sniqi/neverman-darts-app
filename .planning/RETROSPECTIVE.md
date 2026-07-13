@@ -37,8 +37,43 @@ A touch-optimized X01 darts scoring PWA (German, dark mode): full playable match
 
 ---
 
+## Milestone: v1.1 — Chromecast-Integration
+
+**Shipped:** 2026-07-13 (on-device UAT 5/5 passed 2026-06-19)
+**Phases:** 1 | **Plans:** 6
+
+### What Was Built
+Google Cast integration on top of the shipped PWA: `/match` acts as Cast sender (official button with connection states, device name, stop, full absence on non-Cast browsers), `/display` doubles as an unpublished Custom Web Receiver on the user's own Chromecast, live sync over a Cast custom channel (trimmed `CastDisplayState` projection < 32 KB, snapshot hydration + per-throw deltas, auto-pause countdown in sync), ORIGIN_SCOPED auto-rejoin incl. in-progress-match restore after tablet reload, and a written Cast Console registration guide. Existing PC second-window and tablet fullscreen paths unchanged.
+
+### What Worked
+- Single-phase milestone avoided a verification cliff: all Cast work (sender, receiver, sync, deploy) verified together in one on-device UAT pass structure.
+- Ground-truth diagnosis on real hardware: remote-debugging the receiver's console, a temporary on-screen debug overlay on the TV, and grepping the live deployed bundle each turned a vague symptom ("Failed to cast") into a confirmed root cause before any fix was written.
+- The debug workflow nailed the invisible-Cast-button mystery at the bundle level (deploy ran 4.5 min before the `VITE_CAST_APP_ID` repo variable existed — zero App-ID occurrences in the live JS proved it).
+
+### What Was Inefficient
+- Three on-device UAT passes, each requiring a Pages deploy + physical TV round-trip. Two bug classes were only observable on real hardware: the receiver's Chrome 90 CSS support matrix and no-trailing-slash URL asset resolution.
+- Mock-based unit tests masked two integration bugs: the sender sent untagged snapshots the receiver silently dropped (434 unit tests green, TV stuck on idle), and a synchronous `MockBroadcastChannel` hid an open-post-close message race.
+
+### Patterns Established
+- The Cast receiver runs **Chrome 90 @ 1280×720**: no container queries, no dvh, no subgrid. Gate modern CSS behind `@supports` — duplicate-property fallbacks do NOT survive the CSS minifier's dedup.
+- `kit.paths.relative = false` (absolute asset paths) — relative `../_app` paths 404 at the domain root on no-trailing-slash deep-route loads (Cast receiver, manual reloads).
+- Wire formats get a sender→receiver contract test (`cast-contract.test.ts`) — isolated unit tests of each side cannot catch a message-shape mismatch.
+- PWA `registerType: 'autoUpdate'` so the receiver self-updates on each cast session (no Chromecast reboot after deploys).
+
+### Key Lessons
+- Schedule hardware prerequisites before code-complete: the $5 Cast Console registration (+ 15-min propagation) gated every E2E test; it was flagged as a blocker early and still compressed the UAT window.
+- Every UAT failure was environment/config-shaped (build-time env timing, URL resolution, legacy-browser CSS, wire tagging) — the reducer/state logic held; invest verification effort at the integration boundaries.
+- Close the loop on planning artifacts promptly: UAT passed 2026-06-19, but the debug session and VERIFICATION status stayed open until milestone close (2026-07-13) had to retro-resolve them.
+
+### Cost Observations
+- Model mix: planning on opus, research/execution/review on sonnet (unchanged from v1.0).
+- Fixes were tiny (a 1-line config flag, `@supports` blocks, a type tag); diagnosis on real hardware was the cost driver — 3 UAT passes.
+
+---
+
 ## Cross-Milestone Trends
 
 | Milestone | Phases | Plans | Tests at close | Shipped |
 |-----------|--------|-------|----------------|---------|
 | v1.0 MVP | 6 | 33 | 430 | 2026-06-13 |
+| v1.1 Chromecast-Integration | 1 | 6 | 511 | 2026-07-13 |

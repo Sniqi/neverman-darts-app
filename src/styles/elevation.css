@@ -1,0 +1,38 @@
+/* Neverman Darts — radius, elevation, motion (2026 refresh) */
+:root {
+	--radius-xs: 8px;    /* pills' inner segments, small tags */
+	--radius-sm: 12px;   /* buttons, keys, chips, inputs */
+	--radius-md: 16px;   /* cards, score cards, list containers */
+	--radius-lg: 20px;   /* dialogs, sheets */
+	--radius-xl: 28px;
+	--radius-pill: 999px;
+
+	/* Layered shadows: tight key + wide ambient */
+	--shadow-raise: 0 1px 2px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+	--shadow-panel: 0 2px 6px rgba(0, 0, 0, 0.45), 0 20px 48px rgba(0, 0, 0, 0.5);
+	--glow-accent: 0 0 28px rgba(240, 164, 36, 0.18);
+	--edge-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06); /* @kind shadow */
+	--ring-focus: 0 0 0 3px var(--focus-ring);
+
+	/* Overlays */
+	--backdrop: rgba(5, 7, 12, 0.65);
+	--blur-backdrop: 12px;   /* backdrop-filter on scrims/glass */
+
+	/* Motion: fast + functional. Standard ease for most, spring for confirmations. */
+	--dur-fast: 100ms; /* @kind other */
+	--dur-base: 150ms; /* @kind other */
+	--dur-med: 200ms; /* @kind other */
+	--dur-slow: 300ms; /* @kind other */
+	--ease: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+	--ease-spring: cubic-bezier(0.3, 1.4, 0.4, 1); /* @kind other */
+
+	--press-scale: 0.97; /* @kind other */
+	--press-opacity: 0.9; /* @kind other */
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}

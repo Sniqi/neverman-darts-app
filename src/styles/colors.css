@@ -1,0 +1,55 @@
+/* Neverman Darts — color tokens (2026 refresh).
+   Dark-only, blue-tinted charcoal ramp + one amber accent.
+   Tint/line derivatives are precomputed to static rgba() values for
+   Chrome-90 safety (the Cast receiver has no support for dynamic mixing). */
+:root {
+	/* Base surfaces — elevation = lightness step on the same cool hue */
+	--bg: #0c0e14;
+	--bg-deep: #07080c;          /* dartboard miss zone / deepest layer */
+	--surface: #161a23;          /* cards, controls, rows */
+	--surface-2: #1d2330;        /* nested / raised elements */
+	--surface-3: #29303f;       /* pressed rows, highest layer */
+	--surface-hint: #1a1f2b;     /* info hint bubbles */
+
+	/* Text */
+	--text: #eef1f6;
+	--text-soft: #c4cad6;        /* secondary copy */
+	--text-muted: #8a92a6;       /* meta, hints, labels */
+	--text-faint: rgba(238, 241, 246, 0.38);
+
+	/* Accent (amber) */
+	--accent: #f0a424;
+	--accent-bright: #ffc44d;    /* hover / glow edges / link hover */
+	--accent-deep: #c07d0a;      /* gradient tail on accent fills */
+	--accent-soft: rgba(240, 164, 36, 0.13);
+	--accent-line: rgba(240, 164, 36, 0.45);
+	--on-accent: #191104;        /* text on accent fills */
+	--accent-double: #f6dfae;    /* double-segment pill text */
+
+	/* Semantic */
+	--destructive: #e5484d;
+	--destructive-soft: rgba(229, 72, 77, 0.14);
+	--destructive-line: rgba(229, 72, 77, 0.40);
+	--positive: #3dd68c;         /* leg/checkout won */
+	--positive-soft: rgba(61, 214, 140, 0.13);
+	--triple: #ff7d75;           /* triple-dart float/flash color */
+
+	/* Hairlines & borders */
+	--line: rgba(235, 240, 255, 0.07);
+	--line-strong: rgba(235, 240, 255, 0.14);
+	--border-input: rgba(235, 240, 255, 0.16);  /* keys, chips, inputs */
+	--focus-ring: rgba(240, 164, 36, 0.65);
+
+	/* Dartboard segment fills */
+	--board-single: #222835;
+	--board-red: #ab2430;
+	--board-green: #1d7a46;
+	--board-stroke: #39404f;
+	--board-bg: #0c0e14;
+
+	/* Semantic aliases */
+	--surface-card: var(--surface);
+	--text-body: var(--text);
+	--cta-bg: var(--accent);
+	--cta-text: var(--on-accent);
+}

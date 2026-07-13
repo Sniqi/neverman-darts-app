@@ -223,12 +223,15 @@
 				<label class="toggle-label" for="sets-toggle">Sets</label>
 				{@render infoBtn('sets')}
 			</span>
-			<input
+			<button
 				id="sets-toggle"
-				type="checkbox"
-				bind:checked={setsEnabled}
+				type="button"
 				role="switch"
-			/>
+				aria-checked={setsEnabled}
+				class="switch"
+				class:on={setsEnabled}
+				onclick={() => (setsEnabled = !setsEnabled)}
+			><span class="thumb" aria-hidden="true"></span></button>
 		</div>
 		{@render infoHint('sets', 'Legs zu Sätzen zusammenfassen (wie im Profi-Darts). Aus: Es wird nur auf Legs gespielt.')}
 
@@ -255,14 +258,15 @@
 		<!-- Caller toggle + volume -->
 		<div class="toggle-row">
 			<label class="toggle-label" for="caller-toggle">Caller</label>
-			<input
+			<button
 				id="caller-toggle"
-				type="checkbox"
+				type="button"
 				role="switch"
 				aria-checked={callerEnabled}
-				bind:checked={callerEnabled}
-				onchange={() => saveAudioPref('callerEnabled', callerEnabled)}
-			/>
+				class="switch"
+				class:on={callerEnabled}
+				onclick={() => { callerEnabled = !callerEnabled; saveAudioPref('callerEnabled', callerEnabled); }}
+			><span class="thumb" aria-hidden="true"></span></button>
 		</div>
 		{#if callerEnabled}
 			{@render volumeSlider('caller-volume-slider', 'Caller Lautstärke', callerVolume, (v) => { callerVolume = v; saveAudioPref('callerVolume', v); })}
@@ -271,14 +275,15 @@
 		<!-- Music toggle + volume -->
 		<div class="toggle-row">
 			<label class="toggle-label" for="sfx-toggle">Musik</label>
-			<input
+			<button
 				id="sfx-toggle"
-				type="checkbox"
+				type="button"
 				role="switch"
 				aria-checked={sfxEnabled}
-				bind:checked={sfxEnabled}
-				onchange={() => saveAudioPref('sfxEnabled', sfxEnabled)}
-			/>
+				class="switch"
+				class:on={sfxEnabled}
+				onclick={() => { sfxEnabled = !sfxEnabled; saveAudioPref('sfxEnabled', sfxEnabled); }}
+			><span class="thumb" aria-hidden="true"></span></button>
 		</div>
 		{#if sfxEnabled}
 			{@render volumeSlider('music-volume-slider', 'Musik Lautstärke', musicVolume, (v) => { musicVolume = v; saveAudioPref('musicVolume', v); })}
@@ -292,14 +297,15 @@
 		<!-- Auto-pause toggle -->
 		<div class="toggle-row">
 			<label class="toggle-label" for="pause-toggle">Automatische Pause</label>
-			<input
+			<button
 				id="pause-toggle"
-				type="checkbox"
+				type="button"
 				role="switch"
 				aria-checked={pauseEnabled}
-				bind:checked={pauseEnabled}
-				onchange={() => saveAudioPref('pauseEnabled', pauseEnabled)}
-			/>
+				class="switch"
+				class:on={pauseEnabled}
+				onclick={() => { pauseEnabled = !pauseEnabled; saveAudioPref('pauseEnabled', pauseEnabled); }}
+			><span class="thumb" aria-hidden="true"></span></button>
 		</div>
 
 		<!-- Pause steppers — only when auto-pause is on -->

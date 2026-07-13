@@ -190,7 +190,7 @@
 		background: none;
 		border: none;
 		cursor: pointer;
-		padding: 4px 8px;
+		padding: var(--space-xs) var(--space-sm);
 		text-decoration: underline;
 	}
 
@@ -205,7 +205,7 @@
 		background: none;
 		border: none;
 		cursor: pointer;
-		padding: 4px 8px;
+		padding: var(--space-xs) var(--space-sm);
 		text-decoration: underline;
 	}
 </style>

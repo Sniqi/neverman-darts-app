@@ -50,7 +50,7 @@
 		flex-direction: row;
 		gap: var(--space-xs);
 		align-items: center;
-		padding: 4px var(--space-md);
+		padding: var(--space-xs) var(--space-md);
 		transition: background-color var(--dur-slow) var(--ease);
 	}
 

@@ -260,7 +260,7 @@
 	.player-name-row {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: var(--space-xs);
 		min-height: 24px;
 	}
 

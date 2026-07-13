@@ -90,7 +90,7 @@
 	.input-row {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: var(--space-xs);
 	}
 
 	.input-display {

@@ -438,7 +438,7 @@
 	.dart-column {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: var(--space-sm);
 		flex-shrink: 0;
 	}
 
@@ -532,14 +532,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
-		padding: 8px var(--space-md);
+		padding: var(--space-sm) var(--space-md);
 		background: var(--surface);
 	}
 
 	.audio-row {
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: var(--space-xs);
 		height: 36px;
 	}
 

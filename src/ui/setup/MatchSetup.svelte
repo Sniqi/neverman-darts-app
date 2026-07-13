@@ -366,7 +366,7 @@
 	.back-btn {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: var(--space-xs);
 		background: none;
 		border: none;
 		color: var(--text-muted);

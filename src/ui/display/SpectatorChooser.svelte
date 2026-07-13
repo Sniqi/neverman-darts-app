@@ -320,7 +320,7 @@
 	.popup-blocked-msg {
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: var(--space-sm);
 		font-size: 14px;
 		color: var(--text);
 		margin: 0;
@@ -336,12 +336,12 @@
 	.cast-connected-line {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: var(--space-xs);
 		font-size: 14px;
 		font-weight: 400;
 		line-height: 1.4;
 		margin: 0;
-		padding: 4px 16px;
+		padding: var(--space-xs) var(--space-md);
 	}
 
 	.cast-dot {

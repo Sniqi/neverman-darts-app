@@ -12,7 +12,7 @@
 ### FOUND — Foundation (tokens, fonts, motion)
 
 - [x] **FOUND-01**: User sees the DS color world on every screen — page bg `#0c0e14`, layered surfaces (`#161a23`/`#1d2330`/`#29303f`), amber accent `#f0a424` with gradient fills, semantic red/green — no provisional v1.0 colors remain anywhere
-- [ ] **FOUND-02**: User sees Barlow for all UI text and Barlow Semi Condensed for all score numerals (`tabular-nums`), self-hosted (OFL) with `system-ui` fallback — fonts load offline via the PWA precache
+- [x] **FOUND-02**: User sees Barlow for all UI text and Barlow Semi Condensed for all score numerals (`tabular-nums`), self-hosted (OFL) with `system-ui` fallback — fonts load offline via the PWA precache
 - [x] **FOUND-03**: Spacing (strict 4px multiples), radii (8/12/16/20/999) and elevation (1px alpha hairlines + layered shadows + top edge-highlight) follow the DS tokens on every surface
 - [x] **FOUND-04**: Motion follows the DS spec — 100–300ms, standard ease `cubic-bezier(.2,0,0,1)`, spring for switch/dialog pop, invalid-input shake, score floats — and collapses fully under `prefers-reduced-motion`
 
@@ -73,7 +73,7 @@ Which phase covers which requirement. Filled during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FOUND-01 | Phase 8 | Complete |
-| FOUND-02 | Phase 8 | Pending |
+| FOUND-02 | Phase 8 | Complete |
 | FOUND-03 | Phase 8 | Complete |
 | FOUND-04 | Phase 8 | Complete |
 | COMP-01 | Phase 9 | Pending |

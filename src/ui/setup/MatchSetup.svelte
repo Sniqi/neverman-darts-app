@@ -408,52 +408,62 @@
 		flex: 1;
 		background: var(--surface);
 		color: var(--text);
-		border: 1px solid var(--line-strong);
+		border: 1px solid var(--border-input);
 		border-radius: var(--radius-sm);
 		padding: var(--space-sm);
-		font-size: 16px;
-		min-height: 48px;
+		font-size: var(--text-md);
+		min-height: var(--control-h);
 		cursor: pointer;
-		font-weight: 400;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		box-shadow: var(--edge-highlight);
 	}
 
 	.chip.active {
-		background: var(--accent);
+		background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 45%, var(--accent-deep) 130%);
 		color: var(--on-accent);
 		border-color: var(--accent);
-		font-weight: 600;
+		font-weight: 700;
+		box-shadow: var(--shadow-raise), inset 0 1px 0 rgba(255, 255, 255, .25);
+	}
+
+	.chip:active {
+		transform: scale(var(--press-scale));
+		filter: brightness(1.1);
 	}
 
 	/* Segmented control */
 	.seg-control {
 		display: flex;
+		gap: 4px;
+		padding: 4px;
+		background: var(--bg-deep);
+		border: 1px solid var(--line);
 	}
 
 	.seg-btn {
 		flex: 1;
-		background: var(--surface);
-		color: var(--text);
-		border: 1px solid var(--line-strong);
+		background: transparent;
+		color: var(--text-muted);
 		padding: var(--space-sm) var(--space-md);
-		font-size: 16px;
+		font-size: var(--text-md);
+		font-weight: 500;
 		min-height: 48px;
 		cursor: pointer;
-	}
-
-	.seg-btn:first-child {
-		border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-	}
-
-	.seg-btn:last-child {
-		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-		border-left: none;
+		border-radius: calc(var(--radius-sm) - 4px);
 	}
 
 	.seg-btn.active {
-		background: var(--accent);
+		background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 45%, var(--accent-deep) 130%);
 		color: var(--on-accent);
 		border-color: var(--accent);
-		font-weight: 600;
+		font-weight: 700;
+		box-shadow: var(--shadow-raise), inset 0 1px 0 rgba(255, 255, 255, .25);
+	}
+
+	.seg-btn:active {
+		transform: scale(var(--press-scale));
+		filter: brightness(1.1);
 	}
 
 	/* Steppers */

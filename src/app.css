@@ -3,6 +3,7 @@
 @import './styles/spacing.css';
 @import './styles/elevation.css';
 @import './styles/fonts.css';
+@import './styles/components.css';
 
 * {
 	box-sizing: border-box;

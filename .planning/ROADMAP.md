@@ -89,7 +89,21 @@ Plans:
   3. Every confirmation dialog opens with a blurred scrim and a scale-in animation, and shows stacked full-width buttons with an explicit destructive action plus "Abbrechen".
   4. Stat cards (e.g. on the stats dashboard) show large DS-sized values with the DS caption styling.
 
-**Plans**: TBD
+**Plans**: 7 plans
+Plans:
+**Wave 1**
+
+- [ ] 09-01-PLAN.md — Shared `.btn` + `.switch` primitives (`components.css`) + hub page migration
+- [ ] 09-04-PLAN.md — StatCard restyle (independent — no shared-class dependency)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 09-02-PLAN.md — Route button sweep (stats/history/history-detail/data)
+- [ ] 09-03-PLAN.md — Dialog restyle (ConfirmDialog/DartsAtDoubleDialog/ResumePrompt)
+- [ ] 09-05-PLAN.md — MatchSetup chips/segmented control/steppers/toggle rows
+- [ ] 09-06-PLAN.md — PlayerPicker/ProfileManager/BullOffOrder button sweep
+- [ ] 09-07-PLAN.md — `/match` audio toggle rows
+
 **UI hint**: yes
 
 ### Phase 10: Scoring Surface
@@ -149,7 +163,7 @@ Plans:
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
 | 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
-| 9. Core Components | v1.2 | 0/TBD | Not started | - |
+| 9. Core Components | v1.2 | 0/7 | Not started | - |
 | 10. Scoring Surface | v1.2 | 0/TBD | Not started | - |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |
 | 12. Pages & Overlays | v1.2 | 0/TBD | Not started | - |

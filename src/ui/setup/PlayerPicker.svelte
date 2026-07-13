@@ -62,7 +62,7 @@
 					<span class="guest-badge">Gast</span>
 				{/if}
 				<button
-					class="remove-btn"
+					class="btn btn--ghost btn--icon remove-btn"
 					onclick={() => removePlayer(player.id)}
 					aria-label="Spieler entfernen"
 				>×</button>
@@ -72,7 +72,7 @@
 
 	<!-- Add player button (hidden when max 4 reached) -->
 	{#if players.length < 4}
-		<button class="add-player-btn" onclick={() => (showPicker = !showPicker)}>
+		<button class="btn btn--surface add-player-btn" onclick={() => (showPicker = !showPicker)}>
 			Spieler hinzufügen
 		</button>
 	{/if}
@@ -194,28 +194,11 @@
 	}
 
 	.remove-btn {
-		background: none;
-		border: none;
-		cursor: pointer;
-		color: var(--text);
 		font-size: 20px;
-		min-width: 44px;
-		min-height: 44px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
 	}
 
 	.add-player-btn {
-		background: var(--surface);
-		color: var(--text);
-		border: 1px dashed var(--line-strong);
-		border-radius: var(--radius-sm);
-		padding: var(--space-sm) var(--space-md);
-		font-size: 16px;
-		min-height: 48px;
-		cursor: pointer;
-		text-align: left;
+		border: 1px dashed var(--border-input);
 	}
 
 	.picker-panel {
@@ -251,7 +234,7 @@
 		border: none;
 		cursor: pointer;
 		color: var(--text);
-		font-size: 16px;
+		font-size: var(--text-md);
 		padding: var(--space-sm);
 		border-radius: var(--radius-sm);
 		min-height: 48px;
@@ -260,6 +243,10 @@
 
 	.picker-item:hover:not(:disabled) {
 		background: var(--surface-2);
+	}
+
+	.picker-item:active:not(:disabled) {
+		transform: scale(var(--press-scale));
 	}
 
 	.picker-item:disabled {

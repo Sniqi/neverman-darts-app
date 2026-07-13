@@ -73,32 +73,32 @@
 	{/if}
 
 	<nav class="menu" aria-label="Hauptmenü">
-		<button class="menu-btn menu-btn--accent" onclick={handleNewGame}>
+		<button class="btn btn--accent" onclick={handleNewGame}>
 			Neues Spiel
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
-		<button class="menu-btn profiles-toggle" onclick={() => (profilesOpen = !profilesOpen)} aria-expanded={profilesOpen}>
+		<button class="btn btn--menu" onclick={() => (profilesOpen = !profilesOpen)} aria-expanded={profilesOpen}>
 			Spieler verwalten
 			<span class="toggle-arrow" class:open={profilesOpen}>▼</span>
 		</button>
-		<button class="menu-btn" onclick={() => goto(`${base}/history`)}>
+		<button class="btn btn--menu" onclick={() => goto(`${base}/history`)}>
 			Match-Verlauf
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
-		<button class="menu-btn" onclick={() => goto(`${base}/stats`)}>
+		<button class="btn btn--menu" onclick={() => goto(`${base}/stats`)}>
 			Statistik
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
-		<button class="menu-btn" onclick={() => goto(`${base}/data`)}>
+		<button class="btn btn--menu" onclick={() => goto(`${base}/data`)}>
 			Daten / Backup
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -147,36 +147,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-lg);
-	}
-
-	.menu-btn {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100%;
-		height: 56px;
-		padding: 0 var(--space-md);
-		background: var(--surface);
-		color: var(--text);
-		border: none;
-		border-radius: var(--radius-sm);
-		font-size: 16px;
-		font-weight: 400;
-		cursor: pointer;
-		text-align: left;
-	}
-
-	.menu-btn--accent {
-		background: var(--accent);
-		color: var(--on-accent);
-	}
-
-	.menu-btn:active {
-		opacity: 0.85;
-	}
-
-	.profiles-toggle {
-		font-weight: 400;
 	}
 
 	.toggle-arrow {

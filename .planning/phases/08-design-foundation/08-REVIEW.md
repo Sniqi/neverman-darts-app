@@ -65,7 +65,12 @@ findings:
   warning: 2
   info: 2
   total: 5
-status: issues_found
+status: fixed
+fixed_at: 2026-07-13T00:00:00Z
+fix_scope: critical_warning
+fixed: 2
+wont_fix: 1
+deferred: 2
 ---
 
 # Phase 8: Code Review Report
@@ -73,7 +78,9 @@ status: issues_found
 **Reviewed:** 2026-07-13
 **Depth:** standard
 **Files Reviewed:** 55
-**Status:** issues_found
+**Status:** fixed
+**Fixed at:** 2026-07-13 — CR-01 and WR-02 fixed (commits `1ce517a`, `5753501`);
+WR-01 deferred by design (Phase 11); IN-01/IN-02 no action (out of fix scope).
 
 ## Summary
 
@@ -107,6 +114,8 @@ design tokens completely unused (WR-01, IN-01).
 ## Critical Issues
 
 ### CR-01: `IdleScreen.svelte` uses ungated `100dvh` — breaks on the Chromecast (Chrome 90) receiver
+
+**Status:** Fixed (commit `1ce517a`)
 
 **File:** `src/ui/display/IdleScreen.svelte:18`
 **Issue:**
@@ -170,6 +179,13 @@ screen on real hardware — the exact regression class this phase's own `PlayerP
 
 ### WR-01: New "spectator display scale" typography tokens are defined but never consumed — components hand-roll different values instead
 
+**Status:** Won't fix — deferred by design. Per CONTEXT.md, the `--display-*` cqw
+tokens were defined 1:1 now and are intentionally inert until their consuming
+components are built in Phase 11. Wiring `PlayerPanel`/`MatchHeader`/
+`LegWinBanner`/`MatchWinDisplay` to these tokens now would be out-of-scope
+component-behavior work for a phase whose stated scope is token definitions
+only, and risks drifting from the actual Phase 11 layout requirements.
+
 **File:** `src/styles/typography.css:31-38`
 **Issue:** This phase added five tokens explicitly documented as the sizing scale for the
 spectator display:
@@ -206,6 +222,17 @@ values are intentionally bespoke.
 
 ### WR-02: Fallback-literal removal was applied inconsistently, leaving at least one stale/mismatched fallback value
 
+**Status:** Fixed (commit `5753501`). Finished the fallback-removal sweep across
+all 12 remaining files (`ConfirmDialog.svelte`, `ResumePrompt.svelte`,
+`Numpad.svelte`, `ScorePanel.svelte`, `StatDrawer.svelte`, `VisitStrip.svelte`,
+`CorrectionWindow.svelte`, `DartsAtDoubleDialog.svelte`, `MatchWinOverlay.svelte`,
+`PauseOverlay.svelte`, `RecordOverlay.svelte`, `MatchSetup.svelte`), converting
+every `var(--token, literal)` to bare `var(--token)`, including the stale
+`var(--space-md, 12px)` at `MatchSetup.svelte:376`. `PlayerPanel.svelte`'s
+`var(--player-count, 2)` fallbacks were intentionally left untouched — that is
+a fallback for a JS-set custom property (not a design token) and is correct as
+documented in the Summary above.
+
 **File:** `src/ui/setup/MatchSetup.svelte:376` (representative example)
 **Issue:** Per `ReloadPrompt.test.ts`'s own comment, this phase's stated convention was to
 drop `var(--token, <literal fallback>)` fallbacks from component CSS ("08-03 sweep:
@@ -241,6 +268,10 @@ leftover files for other drifted literals).
 
 ### IN-01: Several new design tokens are defined but never referenced anywhere
 
+**Status:** No action — out of fix scope. Default fix scope is Critical +
+Warning; unused DS tokens are intentional day-one completeness (same rationale
+as WR-01) and not addressed by this fix pass.
+
 **File:** `src/styles/colors.css`, `src/styles/elevation.css`
 **Issue:** Full-source grep shows these tokens are defined in the new token files but never
 consumed by any component:
@@ -261,6 +292,12 @@ Either wire these into the components they were clearly intended for (leg/checko
 until there's a consumer, so the token file reflects what's actually in use.
 
 ### IN-02: `VisitLine.svelte` and `VisitStrip.svelte` are orphaned components that still received token-migration edits
+
+**Status:** No action — out of fix scope. Orphaned-component cleanup is out of
+milestone scope for this fix pass. Note: `VisitStrip.svelte` did receive the
+WR-02 fallback-literal fix (it was one of the 12 swept files) since that edit
+is purely mechanical and harmless regardless of the component's reachability;
+its dead-code status was not otherwise addressed.
 
 **File:** `src/ui/display/VisitLine.svelte`, `src/ui/input/VisitStrip.svelte`
 **Issue:** Neither component is imported anywhere outside its own test file

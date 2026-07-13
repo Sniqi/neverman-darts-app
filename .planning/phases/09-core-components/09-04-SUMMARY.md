@@ -115,3 +115,12 @@ COMP-04 closed — StatCard is the only outstanding success criterion in Phase 0
 ---
 *Phase: 09-core-components*
 *Completed: 2026-07-13*
+
+## Self-Check: PASSED
+
+- FOUND: src/ui/stats/StatCard.svelte
+- FOUND: src/ui/stats/StatCard.test.ts
+- FOUND: .planning/phases/09-core-components/09-04-SUMMARY.md
+- FOUND commit: a201b96
+- FOUND commit: 09cf670
+- FOUND commit: da0169e

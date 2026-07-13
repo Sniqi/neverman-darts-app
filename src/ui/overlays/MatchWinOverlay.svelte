@@ -61,12 +61,12 @@
 	.win-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(17, 19, 24, 0.96);
+		background: var(--backdrop);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		z-index: 100;
-		animation: fadeIn 300ms ease-out;
+		animation: fadeIn var(--dur-slow) var(--ease);
 	}
 
 	@keyframes fadeIn {
@@ -86,14 +86,14 @@
 	.win-heading {
 		font-size: 48px;
 		font-weight: 600;
-		color: #e8a020;
+		color: var(--accent);
 		line-height: 1;
 		margin: 0;
 	}
 
 	.win-body {
 		font-size: 16px;
-		color: #f0f0f0;
+		color: var(--text);
 		margin: 0;
 	}
 
@@ -101,24 +101,25 @@
 		margin: var(--space-sm, 8px) 0 0;
 		font-size: 16px;
 		font-weight: 400;
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.new-game-btn {
 		height: 56px;
 		padding: 0 var(--space-xl, 32px);
-		background: #e8a020;
+		background: var(--accent);
 		border: none;
-		border-radius: 6px;
-		color: #111318;
+		border-radius: var(--radius-sm);
+		color: var(--on-accent);
 		font-size: 18px;
 		font-weight: 600;
 		cursor: pointer;
 		min-width: 200px;
-		transition: opacity 150ms ease;
+		transition: opacity var(--dur-base) var(--ease);
 	}
 
 	.new-game-btn:active {
-		opacity: 0.85;
+		opacity: var(--press-opacity);
+		transform: scale(var(--press-scale));
 	}
 </style>

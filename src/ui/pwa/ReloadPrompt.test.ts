@@ -17,6 +17,13 @@ import { render } from 'vitest-browser-svelte';
 import { expect, test, beforeEach } from 'vitest';
 import { needRefresh, offlineReady, updateSWCalls } from '../../test-mocks/pwa-register-mock';
 import ReloadPrompt from './ReloadPrompt.svelte';
+// PLAT-04 asserts a computed CSS custom property (--accent) via getComputedStyle.
+// This component test renders in isolation (no root +layout.svelte), so the DS
+// :root tokens are not otherwise present in the document — import the global
+// token stylesheet so var(--accent) resolves to the real DS value instead of
+// falling through to an unset/initial border color (08-03 sweep: fallback
+// literals were intentionally dropped from component CSS per CONTEXT.md).
+import '../../app.css';
 
 // Reset stores and call-tracker before each test so tests are independent.
 // vi.spyOn cannot redefine ESM exports in browser mode (namespace not configurable),
@@ -83,13 +90,13 @@ test('with both stores false, the toast is NOT in the DOM', async () => {
 	expect(screen.container.querySelector('.pwa-toast')).toBeFalsy();
 });
 
-test('PLAT-04: toast has position:fixed and accent (#e8a020) border color', async () => {
+test('PLAT-04: toast has position:fixed and accent (#f0a424) border color', async () => {
 	needRefresh.set(true);
 	const screen = render(ReloadPrompt, {});
 	const toast = screen.container.querySelector('.pwa-toast') as HTMLElement;
 	expect(toast).toBeTruthy();
 	const style = window.getComputedStyle(toast);
 	expect(style.position).toBe('fixed');
-	// Border color rendered as rgb(232, 160, 32) == #e8a020
-	expect(style.borderColor).toMatch(/rgb\(232,\s*160,\s*32\)/);
+	// Border color rendered as rgb(240, 164, 36) == #f0a424
+	expect(style.borderColor).toMatch(/rgb\(240,\s*164,\s*36\)/);
 });

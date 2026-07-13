@@ -59,12 +59,12 @@
 		position: fixed;
 		bottom: 1rem;
 		right: 1rem;
-		background: var(--surface, #1e2027);
-		color: var(--text, #f0f0f0);
-		border: 1px solid var(--accent, #e8a020);
-		border-radius: 0.5rem;
+		background: var(--surface);
+		color: var(--text);
+		border: 1px solid var(--accent);
+		border-radius: var(--radius-md);
 		padding: 0.75rem 1rem;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+		box-shadow: var(--shadow-raise);
 		z-index: 9999;
 		max-width: 22rem;
 	}
@@ -83,23 +83,24 @@
 
 	button {
 		background: none;
-		border: 1px solid var(--accent, #e8a020);
-		color: var(--accent, #e8a020);
+		border: 1px solid var(--accent);
+		color: var(--accent);
 		padding: 0.25rem 0.75rem;
-		border-radius: 0.25rem;
+		border-radius: var(--radius-sm);
 		cursor: pointer;
 		font-size: 13px;
 		font-weight: 500;
-		transition: opacity 150ms ease;
+		transition: opacity var(--dur-base) var(--ease);
 	}
 
 	button:active {
-		opacity: 0.85;
+		opacity: var(--press-opacity);
+		transform: scale(var(--press-scale));
 	}
 
 	/* Primary action: filled accent, dark text */
 	button:first-child {
-		background: var(--accent, #e8a020);
-		color: #111318;
+		background: var(--accent);
+		color: var(--on-accent);
 	}
 </style>

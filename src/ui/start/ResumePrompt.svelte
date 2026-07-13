@@ -41,10 +41,10 @@
 
 <style>
 	.resume-card {
-		background: #1e2027;
-		border-radius: 8px;
+		background: var(--surface);
+		border-radius: var(--radius-md);
 		padding: var(--space-md, 16px);
-		animation: slideDown 200ms ease-out;
+		animation: slideDown var(--dur-med) var(--ease);
 	}
 
 	@keyframes slideDown {
@@ -56,13 +56,13 @@
 		font-size: 16px;
 		font-weight: 600;
 		margin: 0 0 var(--space-xs, 4px) 0;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.resume-info {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
+		color: var(--text-muted);
 		margin: 0 0 var(--space-md, 16px) 0;
 		line-height: 1.4;
 	}
@@ -76,7 +76,7 @@
 	.btn-discard {
 		flex: 1;
 		height: 52px;
-		border-radius: 8px;
+		border-radius: var(--radius-sm);
 		font-size: 16px;
 		font-weight: 600;
 		cursor: pointer;
@@ -84,21 +84,23 @@
 	}
 
 	.btn-resume {
-		background: #e8a020;
-		color: #111318;
+		background: var(--accent);
+		color: var(--on-accent);
 	}
 
 	.btn-resume:active {
-		opacity: 0.85;
+		opacity: var(--press-opacity);
+		transform: scale(var(--press-scale));
 	}
 
 	.btn-discard {
 		background: transparent;
-		border: 1px solid #c0392b;
-		color: #c0392b;
+		border: 1px solid var(--destructive);
+		color: var(--destructive);
 	}
 
 	.btn-discard:active {
-		background: rgba(192, 57, 43, 0.1);
+		background: var(--destructive-soft);
+		transform: scale(var(--press-scale));
 	}
 </style>

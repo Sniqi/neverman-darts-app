@@ -76,7 +76,7 @@
 	.pause-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(17, 19, 24, 0.96);
+		background: var(--backdrop);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -95,7 +95,7 @@
 	.pause-heading {
 		font-size: 20px;
 		font-weight: 600;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		line-height: 1.2;
 		margin: 0;
 	}
@@ -103,22 +103,23 @@
 	.pause-subtitle {
 		font-size: 16px;
 		font-weight: 400;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		margin: 0;
 	}
 
 	.countdown-digits {
 		font-size: clamp(4rem, 10vw, 12rem);
 		font-weight: 600;
-		color: var(--accent, #e8a020);
+		color: var(--accent);
 		line-height: 1.0;
 		margin: 0;
 		font-variant-numeric: tabular-nums;
 	}
 
-	/* UI-1: zero flash shares countdown sizing/color but fades out over 800ms per spec */
+	/* UI-1: zero flash shares countdown sizing/color; not a DS-documented exception,
+	   retimed to --dur-slow per CONTEXT.md Motion & Sweep Ambiguities resolution. */
 	.zero-flash {
-		animation: zeroFlashFade 800ms ease-out forwards;
+		animation: zeroFlashFade var(--dur-slow) var(--ease) forwards;
 	}
 
 	@keyframes zeroFlashFade {
@@ -130,19 +131,20 @@
 	.weiter-btn {
 		height: 56px;
 		padding: 0 var(--space-xl, 32px);
-		background: #e8a020;
+		background: var(--accent);
 		border: none;
-		border-radius: 6px;
-		color: #111318;
+		border-radius: var(--radius-sm);
+		color: var(--on-accent);
 		font-size: 18px;
 		font-weight: 600;
 		cursor: pointer;
 		min-width: 200px;
-		transition: opacity 150ms ease;
+		transition: opacity var(--dur-base) var(--ease);
 	}
 
 	.weiter-btn:active {
-		opacity: 0.85;
+		opacity: var(--press-opacity);
+		transform: scale(var(--press-scale));
 	}
 
 	/* UI-2: visually hidden but readable by screen readers */

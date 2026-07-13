@@ -40,11 +40,11 @@
 		position: fixed;
 		inset: 0;
 		z-index: 50;
-		background: rgba(17, 19, 24, 0.88);
+		background: var(--backdrop);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		animation: bannerFadeIn 250ms ease-out;
+		animation: bannerFadeIn var(--dur-med) var(--ease);
 	}
 
 	@keyframes bannerFadeIn {
@@ -61,7 +61,7 @@
 		margin: 0;
 		font-size: clamp(2.5rem, 6vw, 8rem);
 		font-weight: 600;
-		color: #e8a020;
+		color: var(--accent);
 		line-height: 1.1;
 		text-align: center;
 	}

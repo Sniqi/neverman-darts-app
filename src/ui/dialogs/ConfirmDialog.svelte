@@ -60,12 +60,12 @@
 		<p class="dialog-body">{body}</p>
 		<div class="dialog-actions">
 			<button
-				class="cta-btn"
-				class:cta-destructive={ctaStyle === 'destructive'}
-				class:cta-accent={ctaStyle === 'accent'}
+				class="btn"
+				class:btn--destructive={ctaStyle === 'destructive'}
+				class:btn--accent={ctaStyle === 'accent'}
 				onclick={onconfirm}
 			>{ctaLabel}</button>
-			<button class="cancel-btn" onclick={oncancel}>Abbrechen</button>
+			<button class="btn btn--cancel" onclick={oncancel}>Abbrechen</button>
 		</div>
 	</div>
 </div>
@@ -75,6 +75,8 @@
 		position: fixed;
 		inset: 0;
 		background: var(--backdrop);
+		backdrop-filter: blur(var(--blur-backdrop));
+		-webkit-backdrop-filter: blur(var(--blur-backdrop));
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -88,28 +90,31 @@
 	}
 
 	.dialog {
-		background: var(--surface);
+		background: var(--surface-2);
 		border-radius: var(--radius-lg);
-		padding: var(--space-lg);
-		max-width: 360px;
+		padding: var(--space-xl);
+		max-width: 420px;
 		width: calc(100% - 32px);
+		border: 1px solid var(--line-strong);
+		box-shadow: var(--shadow-panel), var(--edge-highlight);
 		animation: dialogIn var(--dur-med) var(--ease-spring);
 	}
 
 	@keyframes dialogIn {
-		from { opacity: 0; transform: scale(0.96); }
-		to { opacity: 1; transform: scale(1); }
+		from { opacity: 0; transform: scale(0.94) translateY(8px); }
+		to { opacity: 1; transform: scale(1) translateY(0); }
 	}
 
 	.dialog-heading {
-		font-size: 20px;
+		font-size: var(--text-xl);
 		font-weight: 600;
+		line-height: 1.25;
 		margin: 0 0 var(--space-md) 0;
 		color: var(--text);
 	}
 
 	.dialog-body {
-		font-size: 16px;
+		font-size: var(--text-base);
 		font-weight: 400;
 		margin: 0 0 var(--space-lg) 0;
 		color: var(--text);
@@ -120,47 +125,5 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm);
-	}
-
-	.cta-btn,
-	.cancel-btn {
-		width: 100%;
-		height: 52px;
-		border-radius: var(--radius-sm);
-		font-size: 16px;
-		font-weight: 600;
-		cursor: pointer;
-		border: none;
-	}
-
-	.cta-destructive {
-		background: var(--destructive);
-		color: var(--text);
-	}
-
-	.cta-accent {
-		background: var(--accent);
-		color: var(--on-accent);
-	}
-
-	.cancel-btn {
-		background: var(--surface);
-		color: var(--text);
-		border: 1px solid var(--line-strong);
-	}
-
-	.cancel-btn:active {
-		background: var(--surface-3);
-		transform: scale(var(--press-scale));
-	}
-
-	.cta-destructive:active {
-		opacity: var(--press-opacity);
-		transform: scale(var(--press-scale));
-	}
-
-	.cta-accent:active {
-		opacity: var(--press-opacity);
-		transform: scale(var(--press-scale));
 	}
 </style>

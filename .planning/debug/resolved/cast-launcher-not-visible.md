@@ -1,8 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "On deployed PWA /match, no Google Cast button/launcher appears in the Anzeigemodus panel — only 'Zweites Fenster öffnen' and 'Anzeige hier im Vollbild'."
 created: 2026-06-18T21:13:33Z
-updated: 2026-06-18T21:20:00Z
+updated: 2026-07-13T00:00:00Z
+resolved: 2026-07-13T00:00:00Z
 ---
 
 ## Current Focus
@@ -66,5 +67,9 @@ root_cause: |
 fix: |
   (diagnose-only — not applied) Re-run the GitHub Pages deploy now that the repo variable exists, so the bundle is rebuilt with VITE_CAST_APP_ID inlined. Trigger via `gh workflow run "Deploy to GitHub Pages"` (workflow_dispatch is enabled) or push any commit to main/master. After the new deploy, the live bundle should contain `9671DA41` and the Cast row should appear in Chrome. Optionally harden the UX so a missing App ID is observable (e.g. a DEV console warning when appId is empty) rather than silently hiding Cast — but that is polish, not the root-cause fix.
 verification: |
-  Not yet verified (diagnose-only). Verification after the fix: (1) confirm the new deploy run finished AFTER 21:04:02Z; (2) grep the live bundle for `9671DA41` — should now be >0; (3) open https://sniqi.github.io/neverman-darts-app/match in Chrome on the Cast LAN and confirm "Auf Chromecast übertragen" appears in the Anzeigemodus panel.
+  VERIFIED via subsequent deploys + on-device UAT. The Pages deploy was re-run after the repo
+  variable existed (deploy run 27793185587 on 9994e1e succeeded 2026-06-18, per 07-UAT.md), and the
+  UAT 3rd pass (2026-06-19) confirmed the Cast row renders and a full Cast session works end-to-end —
+  07-UAT.md Test 1 PASS (user: "Jetzt funktioniert sowohl TV als auch 2. bildschirm /display."),
+  all 5 UAT tests passed (commit 35ec3c8). Closed retroactively at v1.1 milestone close (2026-07-13).
 files_changed: []

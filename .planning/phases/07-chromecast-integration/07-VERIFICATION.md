@@ -1,7 +1,8 @@
 ---
 phase: 07-chromecast-integration
 verified: 2026-06-18T22:30:00Z
-status: human_needed
+human_verified: 2026-06-19
+status: passed
 score: 13/18 truths verified (5 device-gated — cannot verify without physical Chromecast)
 behavior_unverified: 0
 overrides_applied: 0
@@ -27,8 +28,8 @@ human_verification:
 
 **Phase Goal:** Users can cast the live darts scoreboard from the scoring tablet to a Chromecast-connected TV, with the tablet remaining free for touch scoring and all existing spectator paths (PC second window, tablet fullscreen) continuing to work unchanged.
 **Verified:** 2026-06-18T22:30:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Status:** passed (human verification completed 2026-06-19)
+**Re-verification:** Yes — all 5 device-gated human tests executed on-device and PASSED per `07-UAT.md` (3rd pass, 2026-06-19, commit 35ec3c8): Cast connect + TV scoreboard (CAST-01/RECV-01), device name + stop (CAST-03), auto-rejoin after reload (CAST-05/06), live per-throw sync incl. auto-pause (SYNC), 6-min idle survival (RECV-04). Status closed at v1.1 milestone close (2026-07-13).
 
 ---
 

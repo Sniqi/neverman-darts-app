@@ -150,18 +150,18 @@
 		max-width: 480px;
 		margin: 0 auto;
 		min-height: 100dvh;
-		background: #111318;
-		color: #f0f0f0;
+		background: var(--bg);
+		color: var(--text);
 	}
 
 	.heading-bar {
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 		height: 40px;
-		padding: 0 var(--space-md, 16px);
-		background: #111318;
-		border-bottom: 1px solid #2d2d2d;
+		padding: 0 var(--space-md);
+		background: var(--bg);
+		border-bottom: 1px solid var(--surface-3);
 	}
 
 	.back-btn {
@@ -172,10 +172,10 @@
 		height: 44px;
 		background: transparent;
 		border: none;
-		color: #f0f0f0;
+		color: var(--text);
 		cursor: pointer;
 		flex-shrink: 0;
-		margin-left: calc(-1 * var(--space-sm, 8px));
+		margin-left: calc(-1 * var(--space-sm));
 	}
 
 	.back-btn:active {
@@ -186,90 +186,90 @@
 		font-size: 20px;
 		font-weight: 600;
 		margin: 0;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.content {
-		padding: var(--space-md, 16px);
+		padding: var(--space-md);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md, 16px);
+		gap: var(--space-md);
 	}
 
 	/* Summary card */
 	.summary-card {
-		background: #1e2027;
-		border-radius: 8px;
-		padding: var(--space-md, 16px);
+		background: var(--surface);
+		border-radius: var(--radius-md);
+		padding: var(--space-md);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-xs, 4px);
+		gap: var(--space-xs);
 	}
 
 	.summary-date,
 	.summary-format {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
+		color: var(--text-muted);
 		margin: 0;
 	}
 
 	.summary-result {
 		font-size: 16px;
 		font-weight: 600;
-		color: #f0f0f0;
+		color: var(--text);
 		margin: 0;
 	}
 
 	.result-winner {
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	/* Scoreboard section */
 	.scoreboard-section {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.section-heading {
 		font-size: 20px;
 		font-weight: 600;
-		color: #f0f0f0;
+		color: var(--text);
 		margin: 0;
 	}
 
 	.player-rows {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	/* Delete section */
 	.delete-section {
-		padding-top: var(--space-md, 16px);
+		padding-top: var(--space-md);
 	}
 
 	.delete-btn {
 		width: 100%;
 		height: 52px;
-		border: 1px solid #c0392b;
+		border: 1px solid var(--destructive);
 		background: transparent;
-		color: #c0392b;
+		color: var(--destructive);
 		font-size: 16px;
 		font-weight: 600;
-		border-radius: 8px;
+		border-radius: var(--radius-sm);
 		cursor: pointer;
 	}
 
 	.delete-btn:active {
-		background: rgba(192, 57, 43, 0.1);
+		background: var(--destructive-soft);
 	}
 
 	.delete-error {
 		font-size: 14px;
 		font-weight: 400;
-		color: #c0392b;
-		margin: var(--space-sm, 8px) 0 0 0;
+		color: var(--destructive);
+		margin: var(--space-sm) 0 0 0;
 	}
 </style>

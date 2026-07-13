@@ -130,23 +130,23 @@
 	.start-screen {
 		max-width: 480px;
 		margin: 0 auto;
-		padding: var(--space-2xl, 48px) var(--space-md, 16px);
+		padding: var(--space-2xl) var(--space-md);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-xl, 32px);
+		gap: var(--space-xl);
 	}
 
 	.app-title {
 		font-size: 20px;
 		font-weight: 600;
 		margin: 0;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.menu {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-lg, 24px);
+		gap: var(--space-lg);
 	}
 
 	.menu-btn {
@@ -155,11 +155,11 @@
 		justify-content: space-between;
 		width: 100%;
 		height: 56px;
-		padding: 0 var(--space-md, 16px);
-		background: #1e2027;
-		color: #f0f0f0;
+		padding: 0 var(--space-md);
+		background: var(--surface);
+		color: var(--text);
 		border: none;
-		border-radius: 8px;
+		border-radius: var(--radius-sm);
 		font-size: 16px;
 		font-weight: 400;
 		cursor: pointer;
@@ -167,8 +167,8 @@
 	}
 
 	.menu-btn--accent {
-		background: #e8a020;
-		color: #111318;
+		background: var(--accent);
+		color: var(--on-accent);
 	}
 
 	.menu-btn:active {
@@ -181,7 +181,7 @@
 
 	.toggle-arrow {
 		font-size: 12px;
-		transition: transform 0.2s;
+		transition: transform var(--dur-med) var(--ease);
 	}
 
 	.toggle-arrow.open {
@@ -189,6 +189,6 @@
 	}
 
 	.profiles-panel {
-		padding: 0 var(--space-xs, 4px);
+		padding: 0 var(--space-xs);
 	}
 </style>

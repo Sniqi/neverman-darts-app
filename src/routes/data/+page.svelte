@@ -205,18 +205,18 @@
 		max-width: 480px;
 		margin: 0 auto;
 		min-height: 100dvh;
-		background: #111318;
-		color: #f0f0f0;
+		background: var(--bg);
+		color: var(--text);
 	}
 
 	.heading-bar {
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 		height: 40px;
-		padding: 0 var(--space-md, 16px);
-		background: #111318;
-		border-bottom: 1px solid #2d2d2d;
+		padding: 0 var(--space-md);
+		background: var(--bg);
+		border-bottom: 1px solid var(--surface-3);
 	}
 
 	.back-btn {
@@ -227,10 +227,10 @@
 		height: 44px;
 		background: transparent;
 		border: none;
-		color: #f0f0f0;
+		color: var(--text);
 		cursor: pointer;
 		flex-shrink: 0;
-		margin-left: calc(-1 * var(--space-sm, 8px));
+		margin-left: calc(-1 * var(--space-sm));
 	}
 
 	.back-btn:active {
@@ -241,47 +241,47 @@
 		font-size: 20px;
 		font-weight: 600;
 		margin: 0;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.content {
-		padding: var(--space-lg, 24px) var(--space-md, 16px);
+		padding: var(--space-lg) var(--space-md);
 	}
 
 	.section {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md, 16px);
+		gap: var(--space-md);
 	}
 
 	.section-heading {
 		font-size: 20px;
 		font-weight: 600;
 		margin: 0;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.description-card {
-		background: #1e2027;
-		border-radius: 8px;
-		padding: var(--space-md, 16px);
+		background: var(--surface);
+		border-radius: var(--radius-md);
+		padding: var(--space-md);
 	}
 
 	.description-text {
 		font-size: 14px;
 		font-weight: 400;
 		line-height: 1.4;
-		color: #888888;
+		color: var(--text-muted);
 		margin: 0;
 	}
 
 	.action-btn {
 		width: 100%;
 		height: 52px;
-		background: #1e2027;
-		color: #f0f0f0;
+		background: var(--surface);
+		color: var(--text);
 		border: none;
-		border-radius: 8px;
+		border-radius: var(--radius-sm);
 		font-size: 16px;
 		font-weight: 400;
 		cursor: pointer;
@@ -293,7 +293,7 @@
 	}
 
 	.action-btn:active:not(:disabled) {
-		background: #22242d;
+		background: var(--surface-3);
 	}
 
 	.file-input-hidden {
@@ -310,21 +310,21 @@
 
 	.section-divider {
 		border: none;
-		border-top: 1px solid #2d2d2d;
-		margin: var(--space-lg, 24px) 0;
+		border-top: 1px solid var(--surface-3);
+		margin: var(--space-lg) 0;
 	}
 
 	.inline-error {
 		font-size: 14px;
 		font-weight: 400;
-		color: #c0392b;
+		color: var(--destructive);
 		margin: 0;
 	}
 
 	.inline-success {
 		font-size: 14px;
 		font-weight: 400;
-		color: #f0f0f0;
+		color: var(--text);
 		margin: 0;
 	}
 
@@ -334,17 +334,17 @@
 
 	/* Storage warning banner — accent tint (UI-SPEC Surface 5) */
 	.storage-warning {
-		margin-top: var(--space-lg, 24px);
-		background: rgba(232, 160, 32, 0.12);
-		border: 1px solid rgba(232, 160, 32, 0.35);
-		border-radius: 8px;
-		padding: var(--space-sm, 8px) var(--space-sm, 8px);
+		margin-top: var(--space-lg);
+		background: var(--accent-soft);
+		border: 1px solid var(--accent-line);
+		border-radius: var(--radius-sm);
+		padding: var(--space-sm) var(--space-sm);
 	}
 
 	.storage-warning-text {
 		font-size: 14px;
 		font-weight: 400;
-		color: #e8a020;
+		color: var(--accent);
 		margin: 0;
 		line-height: 1.4;
 	}

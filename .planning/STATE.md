@@ -5,15 +5,15 @@ milestone_name: Restyling
 current_phase: 09
 current_phase_name: Core Components
 status: executing
-stopped_at: Phase 9 UI-SPEC approved
-last_updated: "2026-07-13T23:28:17.498Z"
+stopped_at: Completed 09-04-PLAN.md
+last_updated: "2026-07-13T23:34:22.754Z"
 last_activity: 2026-07-13
 last_activity_desc: Phase 09 execution started
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 13
-  completed_plans: 7
+  completed_plans: 8
   percent: 20
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 ## Current Position
 
 Phase: 09 (Core Components) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-07-13 — Phase 09 execution started
 
@@ -94,6 +94,7 @@ Last activity: 2026-07-13 — Phase 09 execution started
 | Phase 08 P05 | 15min | 3 tasks | 12 files |
 | Phase 08 P06 | 5min | 2 tasks | 5 files |
 | Phase 09-core-components P01 | 6min | 3 tasks | 4 files |
+| Phase 09 P04 | 8min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: design-tokens.test.ts forbidden list excludes bare 3-digit greys (#444/#333/#888) to avoid false positives on legitimate new DS values
 - [Phase 09-01]: components.css added as app.css's 6th @import after fonts.css; CSS :active press-state (scale+brightness) kept over Button.jsx's JS pointerdown/up handlers
 - [Phase 09-01]: routes/+page.svelte's profiles-toggle class dropped entirely (no meaningful CSS, no test/logic reference)
+- [Phase 09-04]: Updated stale doc comment in StatCard.svelte (old 20px/600 / 14px/400 values) to match the new DS typography (40px/700/-0.02em value, 17px/500 label), same-task documentation fix
 
 ### Quick Tasks Completed
 
@@ -142,9 +144,9 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-13T23:27:32.730Z
-Stopped at: Phase 9 UI-SPEC approved
-Resume file: .planning/phases/09-core-components/09-UI-SPEC.md
+Last session: 2026-07-13T23:34:22.747Z
+Stopped at: Completed 09-04-PLAN.md
+Resume file: None
 
 ## Operator Next Steps
 

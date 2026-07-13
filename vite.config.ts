@@ -39,8 +39,8 @@ export default defineConfig({
 				start_url: base + '/',
 				scope: base + '/',
 				display: 'standalone',
-				theme_color: '#111318',
-				background_color: '#111318',
+				theme_color: '#0c0e14',
+				background_color: '#0c0e14',
 				icons: [
 					{ src: base + '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
 					{ src: base + '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
@@ -56,8 +56,9 @@ export default defineConfig({
 			workbox: {
 				// client/** prefix matches .svelte-kit/output/client/ (Pitfall 7)
 				// mp3 explicitly included so SFX are precached for offline play (Pitfall 4)
+				// woff2/ttf explicitly included so self-hosted fonts are precached for offline use (Pitfall 4)
 				// prerendered/** omitted — pure SPA, no prerendered pages (Anti-Pattern)
-				globPatterns: ['client/**/*.{js,css,ico,png,svg,webp,webmanifest,mp3}'],
+				globPatterns: ['client/**/*.{js,css,ico,png,svg,webp,webmanifest,mp3,woff2,ttf}'],
 				navigateFallback: base + '/404.html',
 				// D-03/D-04: Exclude /display from SW navigation fallback so the Chromecast
 				// receiver fetches the prerendered build/display/index.html directly, not the

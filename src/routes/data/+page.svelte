@@ -100,7 +100,7 @@
 
 <div class="screen">
 	<header class="heading-bar">
-		<button class="back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück">
+		<button class="btn btn--ghost btn--icon back-btn" onclick={() => goto(`${base}/`)} aria-label="Zurück">
 			<svg
 				width="20"
 				height="20"
@@ -126,7 +126,7 @@
 				<p class="description-text">Erstellt eine JSON-Datei mit allen Profilen und dem Match-Verlauf.</p>
 			</div>
 			<button
-				class="action-btn"
+				class="btn btn--surface"
 				onclick={handleExport}
 				disabled={exporting}
 				aria-busy={exporting}
@@ -159,7 +159,7 @@
 				aria-label="Backup-Datei auswählen"
 			/>
 			<button
-				class="action-btn"
+				class="btn btn--surface"
 				onclick={() => fileInput.click()}
 				disabled={importing}
 			>
@@ -220,21 +220,7 @@
 	}
 
 	.back-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 44px;
-		height: 44px;
-		background: transparent;
-		border: none;
-		color: var(--text);
-		cursor: pointer;
-		flex-shrink: 0;
 		margin-left: calc(-1 * var(--space-sm));
-	}
-
-	.back-btn:active {
-		opacity: 0.7;
 	}
 
 	.screen-title {
@@ -273,27 +259,6 @@
 		line-height: 1.4;
 		color: var(--text-muted);
 		margin: 0;
-	}
-
-	.action-btn {
-		width: 100%;
-		height: 52px;
-		background: var(--surface);
-		color: var(--text);
-		border: none;
-		border-radius: var(--radius-sm);
-		font-size: 16px;
-		font-weight: 400;
-		cursor: pointer;
-	}
-
-	.action-btn:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	.action-btn:active:not(:disabled) {
-		background: var(--surface-3);
 	}
 
 	.file-input-hidden {

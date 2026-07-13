@@ -74,12 +74,12 @@
 	.backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: var(--backdrop);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		z-index: 40;
-		animation: backdropIn 200ms ease-out;
+		animation: backdropIn var(--dur-med) var(--ease);
 	}
 
 	@keyframes backdropIn {
@@ -88,12 +88,12 @@
 	}
 
 	.dialog {
-		background: #1e2027;
-		border-radius: 8px;
+		background: var(--surface);
+		border-radius: var(--radius-lg);
 		padding: var(--space-lg, 24px);
 		max-width: 360px;
 		width: calc(100% - 32px);
-		animation: dialogIn 200ms ease-out;
+		animation: dialogIn var(--dur-med) var(--ease-spring);
 	}
 
 	@keyframes dialogIn {
@@ -105,14 +105,14 @@
 		font-size: 20px;
 		font-weight: 600;
 		margin: 0 0 var(--space-md, 16px) 0;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.dialog-body {
 		font-size: 16px;
 		font-weight: 400;
 		margin: 0 0 var(--space-lg, 24px) 0;
-		color: #f0f0f0;
+		color: var(--text);
 		line-height: 1.5;
 	}
 
@@ -126,7 +126,7 @@
 	.cancel-btn {
 		width: 100%;
 		height: 52px;
-		border-radius: 8px;
+		border-radius: var(--radius-sm);
 		font-size: 16px;
 		font-weight: 600;
 		cursor: pointer;
@@ -134,30 +134,33 @@
 	}
 
 	.cta-destructive {
-		background: #c0392b;
-		color: #f0f0f0;
+		background: var(--destructive);
+		color: var(--text);
 	}
 
 	.cta-accent {
-		background: #e8a020;
-		color: #111318;
+		background: var(--accent);
+		color: var(--on-accent);
 	}
 
 	.cancel-btn {
-		background: #1e2027;
-		color: #f0f0f0;
-		border: 1px solid #444;
+		background: var(--surface);
+		color: var(--text);
+		border: 1px solid var(--line-strong);
 	}
 
 	.cancel-btn:active {
-		background: #22242d;
+		background: var(--surface-3);
+		transform: scale(var(--press-scale));
 	}
 
 	.cta-destructive:active {
-		opacity: 0.85;
+		opacity: var(--press-opacity);
+		transform: scale(var(--press-scale));
 	}
 
 	.cta-accent:active {
-		opacity: 0.85;
+		opacity: var(--press-opacity);
+		transform: scale(var(--press-scale));
 	}
 </style>

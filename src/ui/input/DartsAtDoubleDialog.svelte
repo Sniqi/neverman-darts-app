@@ -47,12 +47,12 @@
 	.backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: var(--backdrop);
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
 		z-index: 20;
-		animation: fadeIn 200ms ease-out;
+		animation: fadeIn var(--dur-med) var(--ease);
 	}
 
 	@keyframes fadeIn {
@@ -63,13 +63,13 @@
 	.sheet {
 		width: 100%;
 		max-width: 480px;
-		background: #1e2027;
-		border-radius: 12px 12px 0 0;
+		background: var(--surface);
+		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 		padding: var(--space-lg, 24px);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-md, 16px);
-		animation: slideUp 250ms ease-out;
+		animation: slideUp var(--dur-med) var(--ease);
 	}
 
 	@keyframes slideUp {
@@ -80,7 +80,7 @@
 	.heading {
 		font-size: 16px;
 		font-weight: 400;
-		color: #f0f0f0;
+		color: var(--text);
 		text-align: center;
 	}
 
@@ -92,17 +92,18 @@
 
 	.option-btn {
 		height: 56px;
-		background: #111318;
-		border: 1px solid #444444;
-		border-radius: 6px;
-		color: #f0f0f0;
+		background: var(--bg);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
 		font-size: 16px;
 		font-weight: 400;
 		cursor: pointer;
-		transition: background-color 100ms ease;
+		transition: background-color var(--dur-fast) var(--ease);
 	}
 
 	.option-btn:active {
-		background: #2d2d2d;
+		background: var(--surface-3);
+		transform: scale(var(--press-scale));
 	}
 </style>

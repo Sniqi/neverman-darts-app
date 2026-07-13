@@ -44,25 +44,25 @@
 		min-width: 120px;
 		display: flex;
 		flex-direction: column;
-		background: var(--surface, #1e2027);
-		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		background: var(--surface);
+		border: 1px solid var(--line);
 		border-left: 3px solid transparent;
-		border-radius: var(--radius-md, 12px);
+		border-radius: var(--radius-md);
 		padding: var(--space-md, 16px);
 	}
 
 	.player-card.active {
-		border-color: var(--accent-line, rgba(232, 160, 32, 0.45));
-		border-left-color: var(--accent, #e8a020);
+		border-color: var(--accent-line);
+		border-left-color: var(--accent);
 		background:
-			linear-gradient(var(--accent-soft, rgba(232, 160, 32, 0.12)), var(--accent-soft, rgba(232, 160, 32, 0.12))),
-			var(--surface, #1e2027);
+			linear-gradient(var(--accent-soft), var(--accent-soft)),
+			var(--surface);
 	}
 
 	.player-name {
 		font-size: 26px;
 		font-weight: 600;
-		color: #f0f0f0;
+		color: var(--text);
 		margin-bottom: 4px;
 	}
 
@@ -73,9 +73,11 @@
 	}
 
 	.remaining {
+		font-family: var(--font-score);
+		font-variant-numeric: tabular-nums;
 		font-weight: 600;
 		line-height: 1;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.remaining-active {
@@ -88,7 +90,7 @@
 
 	.legs-info {
 		font-size: 18px;
-		color: #f0f0f0;
+		color: var(--text);
 		margin-top: 4px;
 	}
 

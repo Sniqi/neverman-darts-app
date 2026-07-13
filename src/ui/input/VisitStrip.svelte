@@ -51,28 +51,28 @@
 		gap: var(--space-xs, 4px);
 		align-items: center;
 		padding: 4px var(--space-md, 16px);
-		transition: background-color 300ms ease-out;
+		transition: background-color var(--dur-slow) var(--ease);
 	}
 
 	.visit-strip.bust {
-		background-color: rgba(192, 57, 43, 0.3);
+		background-color: var(--destructive-line);
 	}
 
 	.dart-slot {
 		height: 48px;
 		flex: 1;
 		min-width: 80px;
-		background: #1e2027;
-		border: 1px solid #444444;
-		border-radius: 4px;
-		color: #f0f0f0;
+		background: var(--surface);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
 		font-size: 14px;
 		font-weight: 400;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: background-color 150ms ease;
+		transition: background-color var(--dur-base) var(--ease);
 	}
 
 	.dart-slot:disabled {
@@ -81,6 +81,7 @@
 	}
 
 	.dart-slot:not(:disabled):active {
-		background: #2d2d2d;
+		background: var(--surface-3);
+		transform: scale(var(--press-scale));
 	}
 </style>

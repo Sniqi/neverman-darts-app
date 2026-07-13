@@ -2,17 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
-current_phase: 8
+current_phase: 08
+current_phase_name: Design Foundation
 status: executing
 stopped_at: Phase 8 UI-SPEC approved
-last_updated: "2026-07-13T19:43:37.947Z"
+last_updated: "2026-07-13T19:55:01.551Z"
 last_activity: 2026-07-13
-last_activity_desc: Roadmap created (Phases 8–12, v1.2 Restyling)
+last_activity_desc: Phase 08 execution started
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 6
+  completed_plans: 1
   percent: 0
 ---
 
@@ -23,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Planning next milestone (v1.2 Restyling)
+**Current focus:** Phase 08 — Design Foundation
 
 ## Current Position
 
-Phase: 8 (not started)
-Plan: —
+Phase: 08 (Design Foundation) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-07-13 — Roadmap created (Phases 8–12, v1.2 Restyling)
+Last activity: 2026-07-13 — Phase 08 execution started
 
 ## Performance Metrics
 
@@ -85,12 +86,16 @@ Last activity: 2026-07-13 — Roadmap created (Phases 8–12, v1.2 Restyling)
 | Phase 07 P03 | 3min | 2 tasks | 2 files |
 | Phase 07 P04 | 6min | 3 tasks | 6 files |
 | Phase 07 P05 | 15min | 3 tasks | 5 files |
+| Phase 08 P01 | 4min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.md → Key Decisions; per-phase implementation decisions are archived in `milestones/v1.0-phases/` and `milestones/v1.1-phases/` SUMMARY files. Platform constraints that outlive the milestone (Chrome-90 Cast receiver, absolute asset paths, audio-from-`/match`-only) are recorded in PROJECT.md → Context / Key Decisions.
+
+- [Phase 08-01]: src/app.css defers the fonts.css import to 08-02 -- importing an unresolved file now breaks the Vite build
+- [Phase 08-01]: 6 color-mix() derived tokens precomputed to static rgba() for Chrome-90 (Cast receiver) safety
 
 ### Quick Tasks Completed
 
@@ -116,7 +121,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-13T18:59:12.661Z
+Last session: 2026-07-13T19:51:09.452Z
 Stopped at: Phase 8 UI-SPEC approved
 Resume file: .planning/phases/08-design-foundation/08-UI-SPEC.md
 

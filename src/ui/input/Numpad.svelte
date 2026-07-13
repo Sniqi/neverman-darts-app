@@ -79,8 +79,8 @@
 	.numpad {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
-		padding: var(--space-md, 16px);
+		gap: var(--space-sm);
+		padding: var(--space-md);
 		background: var(--bg);
 		width: 100%;
 		max-width: 320px;
@@ -137,7 +137,7 @@
 	.key-grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: var(--space-xs, 4px);
+		gap: var(--space-xs);
 	}
 
 	.key {

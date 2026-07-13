@@ -35,7 +35,7 @@
 	.score-panel {
 		display: flex;
 		flex-direction: row;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 		flex-wrap: wrap;
 	}
 
@@ -48,7 +48,7 @@
 		border: 1px solid var(--line);
 		border-left: 3px solid transparent;
 		border-radius: var(--radius-md);
-		padding: var(--space-md, 16px);
+		padding: var(--space-md);
 	}
 
 	.player-card.active {
@@ -69,7 +69,7 @@
 	.score-row {
 		display: flex;
 		align-items: baseline;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.remaining {

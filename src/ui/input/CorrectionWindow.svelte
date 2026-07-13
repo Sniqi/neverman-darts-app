@@ -160,11 +160,11 @@
 	}
 
 	.window {
-		padding: var(--space-lg, 24px);
+		padding: var(--space-lg);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.bust-label {

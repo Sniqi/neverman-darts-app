@@ -48,9 +48,9 @@
 	.visit-strip {
 		display: flex;
 		flex-direction: row;
-		gap: var(--space-xs, 4px);
+		gap: var(--space-xs);
 		align-items: center;
-		padding: 4px var(--space-md, 16px);
+		padding: 4px var(--space-md);
 		transition: background-color var(--dur-slow) var(--ease);
 	}
 

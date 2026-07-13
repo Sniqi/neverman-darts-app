@@ -90,7 +90,7 @@
 	.dialog {
 		background: var(--surface);
 		border-radius: var(--radius-lg);
-		padding: var(--space-lg, 24px);
+		padding: var(--space-lg);
 		max-width: 360px;
 		width: calc(100% - 32px);
 		animation: dialogIn var(--dur-med) var(--ease-spring);
@@ -104,14 +104,14 @@
 	.dialog-heading {
 		font-size: 20px;
 		font-weight: 600;
-		margin: 0 0 var(--space-md, 16px) 0;
+		margin: 0 0 var(--space-md) 0;
 		color: var(--text);
 	}
 
 	.dialog-body {
 		font-size: 16px;
 		font-weight: 400;
-		margin: 0 0 var(--space-lg, 24px) 0;
+		margin: 0 0 var(--space-lg) 0;
 		color: var(--text);
 		line-height: 1.5;
 	}
@@ -119,7 +119,7 @@
 	.dialog-actions {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.cta-btn,

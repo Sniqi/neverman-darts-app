@@ -87,8 +87,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-xl, 32px);
-		padding: var(--space-xl, 32px);
+		gap: var(--space-xl);
+		padding: var(--space-xl);
 		text-align: center;
 	}
 
@@ -130,7 +130,7 @@
 	/* "Weiter" button — exact copy of MatchWinOverlay .new-game-btn (PATTERNS analog) */
 	.weiter-btn {
 		height: 56px;
-		padding: 0 var(--space-xl, 32px);
+		padding: 0 var(--space-xl);
 		background: var(--accent);
 		border: none;
 		border-radius: var(--radius-sm);

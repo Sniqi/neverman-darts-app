@@ -65,10 +65,10 @@
 		max-width: 480px;
 		background: var(--surface);
 		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-		padding: var(--space-lg, 24px);
+		padding: var(--space-lg);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md, 16px);
+		gap: var(--space-md);
 		animation: slideUp var(--dur-med) var(--ease);
 	}
 
@@ -87,7 +87,7 @@
 	.options {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.option-btn {

@@ -54,7 +54,7 @@
 
 	.record-content {
 		text-align: center;
-		padding: var(--space-xl, 32px);
+		padding: var(--space-xl);
 	}
 
 	.record-headline {

@@ -189,7 +189,7 @@
 		font-weight: 600;
 		cursor: pointer;
 		text-align: left;
-		padding: 0 var(--space-md, 16px);
+		padding: 0 var(--space-md);
 		transition: border-color var(--dur-base) var(--ease);
 	}
 
@@ -231,8 +231,8 @@
 	.drawer-content {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: var(--space-md, 16px);
-		padding: var(--space-md, 16px);
+		gap: var(--space-md);
+		padding: var(--space-md);
 		background: var(--bg);
 	}
 
@@ -243,9 +243,9 @@
 	.player-col {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 		border-top: 3px solid transparent;
-		padding-top: var(--space-sm, 8px);
+		padding-top: var(--space-sm);
 	}
 
 	.current-col {
@@ -290,7 +290,7 @@
 	.stat-section {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.column-heading {

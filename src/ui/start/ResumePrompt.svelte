@@ -43,7 +43,7 @@
 	.resume-card {
 		background: var(--surface);
 		border-radius: var(--radius-md);
-		padding: var(--space-md, 16px);
+		padding: var(--space-md);
 		animation: slideDown var(--dur-med) var(--ease);
 	}
 
@@ -55,7 +55,7 @@
 	.resume-heading {
 		font-size: 16px;
 		font-weight: 600;
-		margin: 0 0 var(--space-xs, 4px) 0;
+		margin: 0 0 var(--space-xs) 0;
 		color: var(--text);
 	}
 
@@ -63,13 +63,13 @@
 		font-size: 14px;
 		font-weight: 400;
 		color: var(--text-muted);
-		margin: 0 0 var(--space-md, 16px) 0;
+		margin: 0 0 var(--space-md) 0;
 		line-height: 1.4;
 	}
 
 	.resume-actions {
 		display: flex;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.btn-resume,

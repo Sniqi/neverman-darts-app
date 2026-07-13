@@ -373,7 +373,7 @@
 		font-size: 15px;
 		cursor: pointer;
 		padding: 0;
-		margin-bottom: calc(-1 * var(--space-md, 12px));
+		margin-bottom: calc(-1 * var(--space-md));
 	}
 
 	.back-btn:active {
@@ -558,7 +558,7 @@
 	.label-with-info {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-xs, 4px);
+		gap: var(--space-xs);
 	}
 
 	.info-btn {
@@ -598,7 +598,7 @@
 
 	/* Volume slider (UAT) */
 	.volume-sub {
-		padding-left: var(--space-md, 16px);
+		padding-left: var(--space-md);
 		padding-top: 0;
 		margin-top: -4px;
 	}

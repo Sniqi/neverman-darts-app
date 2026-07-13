@@ -89,11 +89,11 @@ Plans:
   3. Every confirmation dialog opens with a blurred scrim and a scale-in animation, and shows stacked full-width buttons with an explicit destructive action plus "Abbrechen".
   4. Stat cards (e.g. on the stats dashboard) show large DS-sized values with the DS caption styling.
 
-**Plans**: 7 plans
+**Plans**: 1/7 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 09-01-PLAN.md — Shared `.btn` + `.switch` primitives (`components.css`) + hub page migration
+- [x] 09-01-PLAN.md — Shared `.btn` + `.switch` primitives (`components.css`) + hub page migration
 - [ ] 09-04-PLAN.md — StatCard restyle (independent — no shared-class dependency)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -163,7 +163,7 @@ Plans:
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
 | 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
-| 9. Core Components | v1.2 | 0/7 | Not started | - |
+| 9. Core Components | v1.2 | 1/7 | In Progress|  |
 | 10. Scoring Surface | v1.2 | 0/TBD | Not started | - |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |
 | 12. Pages & Overlays | v1.2 | 0/TBD | Not started | - |

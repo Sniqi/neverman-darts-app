@@ -18,8 +18,8 @@
 
 ### COMP — Core components
 
-- [ ] **COMP-01**: Buttons match the DS Button spec — amber top-lit gradient CTA with near-black text and inner sheen, secondary/ghost variants, destructive variant, press state `scale(.97)`, ≥48px targets
-- [ ] **COMP-02**: Chips, segmented controls, steppers and toggle rows match their DS specs (56px chips/segments, spring switch thumbs, − / + steppers)
+- [x] **COMP-01**: Buttons match the DS Button spec — amber top-lit gradient CTA with near-black text and inner sheen, secondary/ghost variants, destructive variant, press state `scale(.97)`, ≥48px targets
+- [x] **COMP-02**: Chips, segmented controls, steppers and toggle rows match their DS specs (56px chips/segments, spring switch thumbs, − / + steppers)
 - [ ] **COMP-03**: Dialogs match the DS ConfirmDialog spec — radius 20, blurred scrim `rgba(5,7,12,.65)` + 12px blur, scale-in from .94, max-width 420px, stacked full-width buttons, explicit destructive CTA + "Abbrechen"
 - [ ] **COMP-04**: Stat cards match the DS StatCard spec (40px values, caption style)
 
@@ -76,8 +76,8 @@ Which phase covers which requirement. Filled during roadmap creation.
 | FOUND-02 | Phase 8 | Complete |
 | FOUND-03 | Phase 8 | Complete |
 | FOUND-04 | Phase 8 | Complete |
-| COMP-01 | Phase 9 | Pending |
-| COMP-02 | Phase 9 | Pending |
+| COMP-01 | Phase 9 | Complete |
+| COMP-02 | Phase 9 | Complete |
 | COMP-03 | Phase 9 | Pending |
 | COMP-04 | Phase 9 | Pending |
 | SCOR-01 | Phase 10 | Pending |

@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
-current_phase: 9
+current_phase: 09
 current_phase_name: Core Components
 status: executing
 stopped_at: Phase 9 UI-SPEC approved
-last_updated: "2026-07-13T23:21:45.244Z"
-last_activity: 2026-07-14
-last_activity_desc: Phase 08 verified (8/8), transitioned to Phase 9
+last_updated: "2026-07-13T23:28:17.498Z"
+last_activity: 2026-07-13
+last_activity_desc: Phase 09 execution started
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 13
+  completed_plans: 7
   percent: 20
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 9 — Core Components
+**Current focus:** Phase 09 — Core Components
 
 ## Current Position
 
-Phase: 9 — Core Components
-Plan: Not started
+Phase: 09 (Core Components) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-07-14 — Phase 08 verified (8/8), transitioned to Phase 9
+Last activity: 2026-07-13 — Phase 09 execution started
 
 ## Performance Metrics
 
@@ -93,6 +93,7 @@ Last activity: 2026-07-14 — Phase 08 verified (8/8), transitioned to Phase 9
 | Phase 08-design-foundation P04 | 25min | 3 tasks | 14 files |
 | Phase 08 P05 | 15min | 3 tasks | 12 files |
 | Phase 08 P06 | 5min | 2 tasks | 5 files |
+| Phase 09-core-components P01 | 6min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: [Phase 08-05]: display/+page.svelte's fullscreen-prompt gradient (#f0ab2c->#e8a020) mapped to var(--accent-bright)->var(--accent); its box-shadow mapped wholesale to var(--glow-accent) despite differing geometry -- no exact token exists, Phase 8 only requires nearest token now
 - [Phase ?]: Profile.color default updated #e8a020 -> #f0a424 (data field, zero current UI render path, safe per RESEARCH.md Pitfall 3/Assumption A1)
 - [Phase ?]: design-tokens.test.ts forbidden list excludes bare 3-digit greys (#444/#333/#888) to avoid false positives on legitimate new DS values
+- [Phase 09-01]: components.css added as app.css's 6th @import after fonts.css; CSS :active press-state (scale+brightness) kept over Button.jsx's JS pointerdown/up handlers
+- [Phase 09-01]: routes/+page.svelte's profiles-toggle class dropped entirely (no meaningful CSS, no test/logic reference)
 
 ### Quick Tasks Completed
 
@@ -139,7 +142,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-13T22:45:30.387Z
+Last session: 2026-07-13T23:27:32.730Z
 Stopped at: Phase 9 UI-SPEC approved
 Resume file: .planning/phases/09-core-components/09-UI-SPEC.md
 

@@ -52,7 +52,14 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
   2. All UI text renders in Barlow and all score numerals render in Barlow Semi Condensed with tabular figures, and both load correctly while the PWA is fully offline.
   3. Spacing, corner radii, and elevation (hairlines, layered shadows, edge-highlights) across every surface follow the DS 4px/radius/elevation scales — no ad-hoc spacing or mismatched corners remain.
   4. Interactive transitions (button press, dialog open, invalid-input shake, score float) animate within the DS's 100–300ms motion spec, and stop moving entirely when "reduce motion" is enabled.
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [ ] 08-01-PLAN.md — DS color/typography/spacing/elevation tokens + reduced-motion E2E proof
+- [ ] 08-02-PLAN.md — Self-hosted WOFF2 fonts, PWA precache, offline-font E2E proof
+- [ ] 08-03-PLAN.md — Sweep: scoring input, dialogs & overlays (15 files)
+- [ ] 08-04-PLAN.md — Sweep: display, setup & history (14 files)
+- [ ] 08-05-PLAN.md — Sweep: stats charts & route pages (12 files)
+- [ ] 08-06-PLAN.md — Profile.color default + durable no-provisional-colors regression test
 **UI hint**: yes
 
 ### Phase 9: Core Components

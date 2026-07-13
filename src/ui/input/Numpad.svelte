@@ -81,7 +81,7 @@
 		flex-direction: column;
 		gap: var(--space-sm, 8px);
 		padding: var(--space-md, 16px);
-		background: #111318;
+		background: var(--bg);
 		width: 100%;
 		max-width: 320px;
 		margin: 0 auto;
@@ -95,20 +95,22 @@
 
 	.input-display {
 		height: 56px;
-		background: #1e2027;
-		border: 2px solid #444444;
-		border-radius: 6px;
-		color: #f0f0f0;
+		background: var(--surface);
+		border: 2px solid var(--line-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
+		font-family: var(--font-score);
+		font-variant-numeric: tabular-nums;
 		font-size: 28px;
 		font-weight: 600;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: border-color 150ms ease;
+		transition: border-color var(--dur-base) var(--ease);
 	}
 
 	.input-display.invalid {
-		border-color: #c0392b;
+		border-color: var(--destructive);
 	}
 
 	@keyframes shake {
@@ -123,12 +125,12 @@
 	}
 
 	.input-display.shake {
-		animation: shake 400ms ease-in-out;
+		animation: shake 400ms var(--ease);
 	}
 
 	.error-msg {
 		font-size: 14px;
-		color: #c0392b;
+		color: var(--destructive);
 		text-align: center;
 	}
 
@@ -141,45 +143,52 @@
 	.key {
 		height: 64px;
 		min-width: 64px;
-		background: #1e2027;
-		border: 1px solid #444444;
-		border-radius: 6px;
-		color: #f0f0f0;
+		background: var(--surface);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
 		font-size: 24px;
 		font-weight: 400;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: background-color 100ms ease;
+		transition: background-color var(--dur-fast) var(--ease);
+	}
+
+	.digit-key {
+		font-family: var(--font-score);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.key:active {
-		background: #2d2d2d;
+		background: var(--surface-3);
+		transform: scale(var(--press-scale));
 	}
 
 	.clear-key {
-		color: #c0392b;
+		color: var(--destructive);
 	}
 
 	.backspace-key {
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.confirm-key {
 		height: 64px;
 		width: 100%;
-		background: #e8a020;
+		background: var(--accent);
 		border: none;
-		border-radius: 6px;
-		color: #111318;
+		border-radius: var(--radius-sm);
+		color: var(--on-accent);
 		font-size: 18px;
 		font-weight: 600;
 		cursor: pointer;
-		transition: opacity 150ms ease;
+		transition: opacity var(--dur-base) var(--ease);
 	}
 
 	.confirm-key:active {
-		opacity: 0.85;
+		opacity: var(--press-opacity);
+		transform: scale(var(--press-scale));
 	}
 </style>

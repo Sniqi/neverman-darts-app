@@ -33,19 +33,19 @@
 		let label: string;
 		let color: string;
 		if (dart.segment === 0) {
-			label = '✕'; color = '#666666';
+			label = '✕'; color = 'var(--text-muted)';
 		} else if (dart.segment === 25 && dart.multiplier === 2) {
 			// Bulls Eye (50 pts) → triple color
-			label = 'Bull (50)'; color = '#f87171';
+			label = 'Bull (50)'; color = 'var(--triple)';
 		} else if (dart.segment === 25) {
 			// Outer bull (25 pts) → double color
-			label = 'Bull (25)'; color = '#e8a020';
+			label = 'Bull (25)'; color = 'var(--accent)';
 		} else if (dart.multiplier === 3) {
-			label = `T${dart.segment} (${dart.multiplier * dart.segment})`; color = '#f87171';
+			label = `T${dart.segment} (${dart.multiplier * dart.segment})`; color = 'var(--triple)';
 		} else if (dart.multiplier === 2) {
-			label = `D${dart.segment} (${dart.multiplier * dart.segment})`; color = '#e8a020';
+			label = `D${dart.segment} (${dart.multiplier * dart.segment})`; color = 'var(--accent)';
 		} else {
-			label = String(dart.segment); color = '#ffffff';
+			label = String(dart.segment); color = 'var(--text)';
 		}
 		const id = floatId++;
 		floats = [...floats, { id, x: svgX, y: svgY, label, color }];
@@ -116,7 +116,7 @@
 			regions.push({
 				key: `is-${seg}`,
 				path: describeAnnularSlice(R_OUTER_BULL, R_INNER_SINGLE, startAngle, endAngle),
-				fill: '#2d2d2d', // all singles same dark color
+				fill: 'var(--board-single)', // all singles same dark color
 				segment: seg,
 				multiplier: 1
 			});
@@ -125,7 +125,7 @@
 			regions.push({
 				key: `tr-${seg}`,
 				path: describeAnnularSlice(R_INNER_SINGLE, R_TRIPLE_END, startAngle, endAngle),
-				fill: isAlt ? '#8b1a1a' : '#1a5c2e',
+				fill: isAlt ? 'var(--board-red)' : 'var(--board-green)',
 				segment: seg,
 				multiplier: 3
 			});
@@ -134,7 +134,7 @@
 			regions.push({
 				key: `os-${seg}`,
 				path: describeAnnularSlice(R_TRIPLE_END, R_OUTER_SINGLE, startAngle, endAngle),
-				fill: '#2d2d2d',
+				fill: 'var(--board-single)',
 				segment: seg,
 				multiplier: 1
 			});
@@ -143,7 +143,7 @@
 			regions.push({
 				key: `db-${seg}`,
 				path: describeAnnularSlice(R_OUTER_SINGLE, R_DOUBLE_END, startAngle, endAngle),
-				fill: isAlt ? '#1a5c2e' : '#8b1a1a',
+				fill: isAlt ? 'var(--board-green)' : 'var(--board-red)',
 				segment: seg,
 				multiplier: 2
 			});
@@ -204,14 +204,14 @@
 	aria-label="Dartboard"
 >
 	<!-- Board background -->
-	<circle cx={CX} cy={CY} r={R_MISS_OUTER} fill="#111318" pointer-events="none" />
+	<circle cx={CX} cy={CY} r={R_MISS_OUTER} fill="var(--board-bg)" pointer-events="none" />
 
 	<!-- Scored regions (data-segment for E2E test targeting, pointer-events:all so Playwright can click) -->
 	{#each regions as region (region.key)}
 		<path
 			d={region.path}
-			fill={flashKey === region.key ? 'rgba(255,255,255,0.35)' : region.fill}
-			stroke="#444444"
+			fill={flashKey === region.key ? 'var(--text-faint)' : region.fill}
+			stroke="var(--board-stroke)"
 			stroke-width="0.5"
 			data-segment={`${region.multiplier === 3 ? 'T' : region.multiplier === 2 ? 'D' : 'S'}${region.segment}`}
 			data-segment-key={region.key}
@@ -223,8 +223,8 @@
 		cx={CX}
 		cy={CY}
 		r={R_OUTER_BULL}
-		fill={flashKey === 'outer-bull' ? 'rgba(255,255,255,0.35)' : '#1a5c2e'}
-		stroke="#444444"
+		fill={flashKey === 'outer-bull' ? 'var(--text-faint)' : 'var(--board-green)'}
+		stroke="var(--board-stroke)"
 		stroke-width="0.5"
 		pointer-events="none"
 	/>
@@ -234,8 +234,8 @@
 		cx={CX}
 		cy={CY}
 		r={R_INNER_BULL}
-		fill={flashKey === 'inner-bull' ? 'rgba(255,255,255,0.35)' : '#8b1a1a'}
-		stroke="#444444"
+		fill={flashKey === 'inner-bull' ? 'var(--text-faint)' : 'var(--board-red)'}
+		stroke="var(--board-stroke)"
 		stroke-width="0.5"
 		pointer-events="none"
 	/>
@@ -243,7 +243,7 @@
 	<!-- Dark outer ring (number zone) — only valid miss tap area -->
 	<path
 		d={`${describeFullCircle(R_MISS_OUTER)} ${describeFullCircle(R_DOUBLE_END)}`}
-		fill={flashKey === 'miss' ? 'rgba(255,255,255,0.15)' : '#0d0d0f'}
+		fill={flashKey === 'miss' ? 'var(--text-faint)' : 'var(--bg-deep)'}
 		fill-rule="evenodd"
 		class="miss-zone"
 	/>
@@ -258,7 +258,7 @@
 			font-size="52"
 			font-weight="800"
 			fill={f.color}
-			stroke="rgba(0,0,0,0.75)"
+			stroke="var(--backdrop)"
 			stroke-width="4"
 			paint-order="stroke"
 			pointer-events="none"
@@ -276,7 +276,7 @@
 			dominant-baseline="central"
 			font-size="28"
 			font-weight="600"
-			fill="#cccccc"
+			fill="var(--text-soft)"
 			pointer-events="none"
 		>{seg}</text>
 	{/each}

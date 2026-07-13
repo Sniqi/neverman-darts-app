@@ -64,13 +64,13 @@
 		z-index: 45;
 		min-width: 240px;
 		max-width: 320px;
-		background: var(--surface, #1e2027);
-		border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.14));
-		border-left: 4px solid var(--accent, #e8a020);
-		border-radius: var(--radius-md, 12px);
+		background: var(--surface);
+		border: 1px solid var(--line-strong);
+		border-left: 4px solid var(--accent);
+		border-radius: var(--radius-md);
 		padding: 12px 16px;
-		box-shadow: var(--shadow-raise, 0 2px 10px rgba(0, 0, 0, 0.4));
-		animation: toastEnter 200ms ease-out forwards;
+		box-shadow: var(--shadow-raise);
+		animation: toastEnter var(--dur-med) var(--ease) forwards;
 	}
 
 	@keyframes toastEnter {
@@ -88,7 +88,7 @@
 		margin: 0 0 2px 0;
 		font-size: 16px;
 		font-weight: 600;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		line-height: 1.2;
 	}
 
@@ -96,7 +96,7 @@
 		margin: 0;
 		font-size: 14px;
 		font-weight: 400;
-		color: rgba(240, 240, 240, 0.6);
+		color: var(--text-soft);
 		line-height: 1.4;
 	}
 </style>

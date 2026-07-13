@@ -132,13 +132,13 @@
 	.overlay {
 		position: absolute;
 		inset: 0;
-		background: rgba(30, 32, 39, 0.92);
+		background: var(--backdrop);
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
 		justify-content: flex-start;
 		z-index: 10;
-		animation: fadeSlideIn 200ms ease-out;
+		animation: fadeSlideIn var(--dur-med) var(--ease);
 	}
 
 	@keyframes fadeSlideIn {
@@ -148,15 +148,15 @@
 
 	.progress-bar {
 		height: 3px;
-		background: #444444;
+		background: var(--line-strong);
 		width: 100%;
 		flex-shrink: 0;
 	}
 
 	.progress-fill {
 		height: 100%;
-		background: #e8a020;
-		transition: width 100ms linear;
+		background: var(--accent);
+		transition: width var(--dur-fast) linear;
 	}
 
 	.window {
@@ -170,23 +170,23 @@
 	.bust-label {
 		font-size: 20px;
 		font-weight: 600;
-		color: #c0392b;
+		color: var(--destructive);
 	}
 
 	.visit-summary {
 		font-size: 16px;
-		color: #f0f0f0;
+		color: var(--text);
 		text-align: center;
 	}
 
 	.total {
 		font-weight: 600;
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.korrigieren-btn {
 		font-size: 14px;
-		color: #e8a020;
+		color: var(--accent);
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -196,12 +196,12 @@
 
 	.paused-hint {
 		font-size: 14px;
-		color: #888888;
+		color: var(--text-muted);
 	}
 
 	.fertig-btn {
 		font-size: 14px;
-		color: #e8a020;
+		color: var(--accent);
 		background: none;
 		border: none;
 		cursor: pointer;

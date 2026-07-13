@@ -168,9 +168,9 @@
 
 <style>
 	.stat-drawer-wrapper {
-		background: var(--surface, #1e2027);
-		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
-		border-radius: var(--radius-md, 12px);
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -184,35 +184,35 @@
 		background: transparent;
 		border: none;
 		border-bottom: 2px solid transparent;
-		color: #f0f0f0;
+		color: var(--text);
 		font-size: 16px;
 		font-weight: 600;
 		cursor: pointer;
 		text-align: left;
 		padding: 0 var(--space-md, 16px);
-		transition: border-color 150ms ease;
+		transition: border-color var(--dur-base) var(--ease);
 	}
 
 	.drawer-toggle.open {
-		border-bottom-color: #e8a020;
+		border-bottom-color: var(--accent);
 	}
 
 	.drawer-toggle:focus-visible {
-		outline: 2px solid #e8a020;
+		outline: 2px solid var(--accent);
 		outline-offset: 2px;
 	}
 
 	.drawer-panel {
 		max-height: 0;
 		overflow: hidden;
-		transition: max-height 200ms ease;
+		transition: max-height var(--dur-med) var(--ease);
 	}
 
 	.drawer-panel.open {
 		max-height: 55dvh;
 		overflow-y: auto;
 		scrollbar-width: thin;
-		scrollbar-color: #444 #1e2027;
+		scrollbar-color: var(--line-strong) var(--surface);
 	}
 
 	.drawer-panel.open::-webkit-scrollbar {
@@ -220,11 +220,11 @@
 	}
 
 	.drawer-panel.open::-webkit-scrollbar-track {
-		background: #1e2027;
+		background: var(--surface);
 	}
 
 	.drawer-panel.open::-webkit-scrollbar-thumb {
-		background-color: #444;
+		background-color: var(--line-strong);
 		border-radius: 3px;
 	}
 
@@ -233,7 +233,7 @@
 		grid-template-columns: 1fr;
 		gap: var(--space-md, 16px);
 		padding: var(--space-md, 16px);
-		background: var(--bg, #111318);
+		background: var(--bg);
 	}
 
 	.drawer-content.two-player {
@@ -249,11 +249,11 @@
 	}
 
 	.current-col {
-		border-top-color: var(--accent, #e8a020);
+		border-top-color: var(--accent);
 	}
 
 	.prev-col {
-		border-top-color: var(--line-strong, rgba(255, 255, 255, 0.14));
+		border-top-color: var(--line-strong);
 		opacity: 0.65;
 	}
 
@@ -266,7 +266,7 @@
 
 	.active-indicator {
 		font-size: 11px;
-		color: #e8a020;
+		color: var(--accent);
 		flex-shrink: 0;
 	}
 
@@ -280,11 +280,11 @@
 	}
 
 	.current-name {
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.prev-name {
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.stat-section {
@@ -296,7 +296,7 @@
 	.column-heading {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
+		color: var(--text-muted);
 		margin: 0;
 	}
 

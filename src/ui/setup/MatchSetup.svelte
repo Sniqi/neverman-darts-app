@@ -369,7 +369,7 @@
 		gap: 4px;
 		background: none;
 		border: none;
-		color: #888;
+		color: var(--text-muted);
 		font-size: 15px;
 		cursor: pointer;
 		padding: 0;
@@ -408,8 +408,8 @@
 		flex: 1;
 		background: var(--surface);
 		color: var(--text);
-		border: 1px solid #444;
-		border-radius: 4px;
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm);
 		font-size: 16px;
 		min-height: 48px;
@@ -419,7 +419,7 @@
 
 	.chip.active {
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 		border-color: var(--accent);
 		font-weight: 600;
 	}
@@ -433,7 +433,7 @@
 		flex: 1;
 		background: var(--surface);
 		color: var(--text);
-		border: 1px solid #444;
+		border: 1px solid var(--line-strong);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 16px;
 		min-height: 48px;
@@ -441,17 +441,17 @@
 	}
 
 	.seg-btn:first-child {
-		border-radius: 4px 0 0 4px;
+		border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 	}
 
 	.seg-btn:last-child {
-		border-radius: 0 4px 4px 0;
+		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 		border-left: none;
 	}
 
 	.seg-btn.active {
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 		border-color: var(--accent);
 		font-weight: 600;
 	}
@@ -463,7 +463,7 @@
 		justify-content: space-between;
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: 4px;
+		border-radius: var(--radius-md);
 	}
 
 	.stepper-label {
@@ -479,7 +479,7 @@
 	.stepper-btn {
 		width: 44px;
 		height: 44px;
-		background: #333;
+		background: var(--surface-3);
 		color: var(--text);
 		border: none;
 		border-radius: 4px;
@@ -504,7 +504,7 @@
 
 	.stepper-unit {
 		font-size: 14px;
-		color: #888;
+		color: var(--text-muted);
 		min-width: 48px;
 	}
 
@@ -515,7 +515,7 @@
 		justify-content: space-between;
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: 4px;
+		border-radius: var(--radius-md);
 	}
 
 	.toggle-label {
@@ -532,9 +532,9 @@
 	.start-btn {
 		width: 100%;
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 		border: none;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 18px;
 		font-weight: 600;
@@ -549,7 +549,7 @@
 
 	.validation-hint {
 		font-size: 14px;
-		color: #888;
+		color: var(--text-muted);
 		margin: 0;
 		text-align: center;
 	}
@@ -571,7 +571,7 @@
 		padding: 0;
 		background: none;
 		border: none;
-		color: #888;
+		color: var(--text-muted);
 		cursor: pointer;
 		border-radius: 50%;
 		flex-shrink: 0;
@@ -586,11 +586,11 @@
 
 	.info-hint {
 		margin: 0;
-		background: #272a33;
-		color: #cfd2d8;
-		border: 1px solid #444;
+		background: var(--surface-hint);
+		color: var(--text-soft);
+		border: 1px solid var(--line-strong);
 		border-left: 3px solid var(--accent);
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 14px;
 		line-height: 1.45;
@@ -606,7 +606,7 @@
 	.volume-slider {
 		flex: 1;
 		height: 44px;
-		accent-color: #e8a020;
+		accent-color: var(--accent);
 		cursor: pointer;
 		min-width: 0;
 	}

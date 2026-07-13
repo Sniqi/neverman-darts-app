@@ -55,7 +55,7 @@
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		border-bottom: 1px solid #2d2d2d;
+		border-bottom: 1px solid var(--line-strong);
 	}
 
 	.row-item:last-child {
@@ -67,17 +67,17 @@
 		align-items: center;
 		width: 100%;
 		min-height: 64px;
-		padding: var(--space-sm, 8px) var(--space-md, 16px);
-		background: #1e2027;
+		padding: var(--space-sm) var(--space-md);
+		background: var(--surface);
 		border: none;
-		color: #f0f0f0;
+		color: var(--text);
 		cursor: pointer;
 		text-align: left;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.row:active {
-		background: #2d2d35;
+		background: var(--surface-3);
 	}
 
 	.row-main {
@@ -96,13 +96,13 @@
 	.date {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
+		color: var(--text-muted);
 	}
 
 	.result {
 		font-size: 16px;
 		font-weight: 600;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.row-names {
@@ -112,28 +112,28 @@
 
 	.winner-name {
 		font-weight: 600;
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.separator {
 		font-weight: 400;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.other-name {
 		font-weight: 400;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.row-format {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
+		color: var(--text-muted);
 	}
 
 	.chevron {
 		font-size: 14px;
-		color: #888888;
+		color: var(--text-muted);
 		flex-shrink: 0;
 	}
 </style>

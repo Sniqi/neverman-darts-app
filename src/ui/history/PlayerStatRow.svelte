@@ -54,57 +54,57 @@
 
 <style>
 	.player-row {
-		border-radius: 8px;
-		padding: var(--space-md, 16px);
+		border-radius: var(--radius-md);
+		padding: var(--space-md);
 	}
 
 	.winner {
-		background: #22242d;
+		background: var(--surface-2);
 	}
 
 	.non-winner {
-		background: #1e2027;
+		background: var(--surface);
 	}
 
 	.player-info {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: var(--space-xs, 4px);
+		margin-bottom: var(--space-xs);
 	}
 
 	.player-name {
 		font-size: 16px;
 		font-weight: 400;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.winner-name {
 		font-weight: 600;
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.wins-label {
 		font-size: 16px;
 		font-weight: 400;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 
 	.avg-line {
 		display: flex;
-		gap: var(--space-xs, 4px);
+		gap: var(--space-xs);
 		align-items: center;
 	}
 
 	.avg-label {
 		font-size: 14px;
 		font-weight: 400;
-		color: #888888;
+		color: var(--text-muted);
 	}
 
 	.avg-value {
 		font-size: 14px;
 		font-weight: 400;
-		color: #f0f0f0;
+		color: var(--text);
 	}
 </style>

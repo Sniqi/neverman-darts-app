@@ -199,7 +199,7 @@
 
 	.hint {
 		font-size: 14px;
-		color: #888;
+		color: var(--text-muted);
 		margin: 0;
 	}
 
@@ -217,13 +217,13 @@
 		gap: var(--space-sm);
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: 4px;
+		border-radius: var(--radius-md);
 		min-height: 56px;
 		cursor: pointer;
 		user-select: none;
 		touch-action: none;
 		border: 2px solid transparent;
-		transition: border-color 0.15s;
+		transition: border-color var(--dur-base) var(--ease);
 	}
 
 	.player-card.tapped {
@@ -236,14 +236,14 @@
 
 	.player-card.dragover {
 		border-color: var(--accent);
-		background: #2a2d35;
+		background: var(--surface-3);
 	}
 
 	.position {
 		width: 28px;
 		height: 28px;
 		border-radius: 50%;
-		background: #333;
+		background: var(--surface-3);
 		color: var(--text);
 		display: flex;
 		align-items: center;
@@ -255,7 +255,7 @@
 
 	.player-card.tapped .position {
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 	}
 
 	.avatar {
@@ -263,7 +263,7 @@
 		height: 36px;
 		border-radius: 50%;
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -278,24 +278,24 @@
 
 	.guest-badge {
 		font-size: 12px;
-		color: #aaa;
-		background: #333;
+		color: var(--text-muted);
+		background: var(--surface-3);
 		padding: 2px 6px;
-		border-radius: 10px;
+		border-radius: var(--radius-pill);
 	}
 
 	.drag-handle {
 		font-size: 20px;
-		color: #555;
+		color: var(--text-faint);
 		cursor: grab;
 	}
 
 	.confirm-btn {
 		width: 100%;
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 		border: none;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 18px;
 		font-weight: 600;

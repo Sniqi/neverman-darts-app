@@ -75,41 +75,41 @@
 
 <style>
 	.stat-breakdown {
-		background: #1e2027;
-		border-radius: 8px;
-		padding: var(--space-md, 16px);
+		background: var(--surface);
+		border-radius: var(--radius-md);
+		padding: var(--space-md);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md, 16px);
+		gap: var(--space-md);
 	}
 
 	.section-heading {
 		font-size: 20px;
 		font-weight: 600;
-		color: #f0f0f0;
+		color: var(--text);
 		margin: 0;
 	}
 
 	.player-stat-block {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.player-name {
 		font-size: 16px;
 		font-weight: 600;
-		color: #f0f0f0;
+		color: var(--text);
 		margin: 0;
 	}
 
 	.player-name.winner {
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.kpi-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 </style>

@@ -73,11 +73,11 @@
 		position: fixed;
 		inset: 0;
 		z-index: 20;
-		background: #111318;
+		background: var(--bg);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		animation: matchWinFadeIn 300ms ease-out;
+		animation: matchWinFadeIn var(--dur-slow) var(--ease);
 	}
 
 	@keyframes matchWinFadeIn {
@@ -89,40 +89,40 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-xl, 32px);
-		padding: var(--space-xl, 32px);
+		gap: var(--space-xl);
+		padding: var(--space-xl);
 		text-align: center;
 	}
 
 	.win-heading {
 		font-size: clamp(2.5rem, 6vw, 8rem);
 		font-weight: 600;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		line-height: 1.1;
 		margin: 0;
 	}
 
 	.winner-name {
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.win-standing {
 		font-size: clamp(1rem, 2vw, 2.5rem);
 		font-weight: 400;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		margin: 0;
 	}
 
 	.record-badge {
-		margin: var(--space-sm, 8px) 0 0;
+		margin: var(--space-sm) 0 0;
 		font-size: 16px;
 		font-weight: 400;
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.averages-row {
 		display: flex;
-		gap: var(--space-2xl, 48px);
+		gap: var(--space-2xl);
 		flex-wrap: wrap;
 		justify-content: center;
 	}
@@ -131,25 +131,25 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-xs, 4px);
+		gap: var(--space-xs);
 	}
 
 	.avg-name {
 		font-size: clamp(0.875rem, 1.5vw, 1.75rem);
 		font-weight: 600;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 	}
 
 	.avg-label {
 		font-size: clamp(0.75rem, 1.2vw, 1.5rem);
 		font-weight: 400;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		opacity: 0.7;
 	}
 
 	.avg-value {
 		font-size: clamp(1rem, 2vw, 2.5rem);
 		font-weight: 600;
-		color: #e8a020;
+		color: var(--accent);
 	}
 </style>

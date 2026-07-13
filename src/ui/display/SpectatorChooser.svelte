@@ -87,7 +87,7 @@
 		height="24"
 		viewBox="0 0 24 24"
 		fill="none"
-		stroke="#e8a020"
+		stroke="var(--accent)"
 		stroke-width="2"
 		stroke-linecap="round"
 		stroke-linejoin="round"
@@ -218,9 +218,9 @@
 		z-index: 40;
 		width: 44px;
 		height: 44px;
-		background: rgba(30, 32, 39, 0.9);
-		border: 1px solid #444;
-		border-radius: 8px;
+		background: var(--surface);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-xs);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -229,7 +229,7 @@
 	}
 
 	.chooser-icon-btn:active {
-		background: rgba(232, 160, 32, 0.15);
+		background: var(--accent-soft);
 	}
 
 	.chooser-menu {
@@ -237,15 +237,15 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		background: #1e2027;
-		border-top: 1px solid #333;
-		border-radius: 12px 12px 0 0;
-		padding: var(--space-lg, 24px);
+		background: var(--surface);
+		border-top: 1px solid var(--line-strong);
+		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+		padding: var(--space-lg);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 		z-index: 50;
-		animation: slideUp 200ms ease-out;
+		animation: slideUp var(--dur-med) var(--ease);
 	}
 
 	@keyframes slideUp {
@@ -267,9 +267,9 @@
 			right: 16px;
 			width: 280px;
 			border-top: none;
-			border: 1px solid #444;
-			border-radius: 8px;
-			animation: fadeIn 200ms ease-out;
+			border: 1px solid var(--line-strong);
+			border-radius: var(--radius-xs);
+			animation: fadeIn var(--dur-med) var(--ease);
 		}
 
 		@keyframes fadeIn {
@@ -287,21 +287,21 @@
 	.chooser-heading {
 		font-size: 20px;
 		font-weight: 600;
-		color: #f0f0f0;
-		margin: 0 0 var(--space-sm, 8px) 0;
+		color: var(--text);
+		margin: 0 0 var(--space-sm) 0;
 	}
 
 	.chooser-action-btn {
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 		width: 100%;
 		min-height: 48px;
-		padding: 0 var(--space-md, 16px);
-		background: #111318;
-		border: 1px solid #333;
-		border-radius: 6px;
-		color: #f0f0f0;
+		padding: 0 var(--space-md);
+		background: var(--bg);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
 		font-size: 16px;
 		font-weight: 400;
 		cursor: pointer;
@@ -309,7 +309,7 @@
 	}
 
 	.chooser-action-btn:active {
-		background: #22242d;
+		background: var(--surface-2);
 	}
 
 	.action-icon {
@@ -322,14 +322,14 @@
 		align-items: center;
 		gap: 6px;
 		font-size: 14px;
-		color: #f0f0f0;
+		color: var(--text);
 		margin: 0;
-		padding: var(--space-xs, 4px) var(--space-md, 16px);
+		padding: var(--space-xs) var(--space-md);
 	}
 
 	.warn-icon {
 		flex-shrink: 0;
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	/* Cast connected status line — shown below the Cast row when a session is active */
@@ -346,15 +346,15 @@
 
 	.cast-dot {
 		font-size: 10px;
-		color: var(--accent, #e8a020);
+		color: var(--accent);
 		flex-shrink: 0;
 	}
 
 	.cast-label {
-		color: rgba(240, 240, 240, 0.6);
+		color: var(--text-muted);
 	}
 
 	.cast-device {
-		color: var(--accent, #e8a020);
+		color: var(--accent);
 	}
 </style>

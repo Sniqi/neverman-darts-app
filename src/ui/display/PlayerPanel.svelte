@@ -210,11 +210,11 @@
 		display: flex;
 		flex-direction: column;
 		padding: clamp(8px, 2cqw, 24px) clamp(8px, 2cqw, 18px);
-		background: linear-gradient(165deg, #1f222b 0%, #16181f 100%);
+		background: linear-gradient(165deg, var(--surface-2) 0%, var(--surface) 100%);
 		border-top: 4px solid transparent;
 		opacity: 0.5;
-		transition: background 200ms ease, border-color 200ms ease, opacity 200ms ease,
-			box-shadow 200ms ease;
+		transition: background var(--dur-med) var(--ease), border-color var(--dur-med) var(--ease),
+			opacity var(--dur-med) var(--ease), box-shadow var(--dur-med) var(--ease);
 		height: 100%;
 		overflow: hidden;
 		gap: clamp(4px, 1.2cqw, 12px);
@@ -225,10 +225,10 @@
 	}
 
 	.player-panel.active {
-		background: linear-gradient(165deg, #2b2f3b 0%, #1c1f29 100%);
-		border-top-color: var(--accent, #e8a020);
-		box-shadow: inset 0 0 60px rgba(232, 160, 32, 0.08),
-			inset 0 4px 0 rgba(232, 160, 32, 0.22);
+		background: linear-gradient(165deg, var(--surface-3) 0%, var(--surface-2) 100%);
+		border-top-color: var(--accent);
+		box-shadow: inset 0 0 60px var(--accent-soft),
+			inset 0 4px 0 var(--accent-line);
 		opacity: 1;
 	}
 
@@ -236,21 +236,21 @@
 	.bust-overlay {
 		position: absolute;
 		inset: 0;
-		background-color: rgba(192, 57, 43, 0.18);
+		background-color: var(--destructive-soft);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		z-index: 5;
-		animation: bustFadeIn 150ms ease-out;
+		animation: bustFadeIn var(--dur-base) var(--ease);
 		pointer-events: none;
 	}
 
 	.bust-label {
 		font-size: clamp(1.5rem, 17cqw, 6rem);
 		font-weight: 600;
-		color: #c0392b;
+		color: var(--destructive);
 		letter-spacing: 0.05em;
-		animation: bustLabelIn 200ms ease-out;
+		animation: bustLabelIn var(--dur-med) var(--ease);
 	}
 
 	@keyframes bustFadeIn {
@@ -267,9 +267,9 @@
 	.top-zone {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
-		padding-bottom: var(--space-md, 16px);
-		border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		gap: var(--space-sm);
+		padding-bottom: var(--space-md);
+		border-bottom: 1px solid var(--line);
 	}
 
 	.name-score-row {
@@ -290,13 +290,13 @@
 		font-weight: 700;
 		line-height: 1.1;
 		letter-spacing: -0.01em;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 	}
 
 	.legs-sets {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-sm, 8px);
+		gap: var(--space-sm);
 	}
 
 	.ls-chip {
@@ -306,16 +306,16 @@
 		font-weight: 600;
 		line-height: 1.15;
 		white-space: nowrap;
-		color: var(--text, #f0f0f0);
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
-		border-radius: var(--radius-sm, 8px);
+		color: var(--text);
+		background: var(--line);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-sm);
 		padding: 0.08em 0.45em;
 	}
 
 	.player-panel.active .ls-chip {
-		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
-		border-color: var(--accent-line, rgba(232, 160, 32, 0.45));
+		background: var(--accent-soft);
+		border-color: var(--accent-line);
 	}
 
 	.remaining-score {
@@ -324,20 +324,21 @@
 		font-weight: 700;
 		line-height: 1;
 		letter-spacing: -0.03em;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		text-align: right;
 		pointer-events: none;
-		transition: color 300ms ease-out;
+		transition: color var(--dur-slow) var(--ease);
+		font-family: var(--font-score);
 	}
 
 	/* RECV-05: momentary white flash when score updates — draws the eye across the room */
 	.remaining-score.updating {
-		color: #ffffff;
+		color: var(--text);
 	}
 
 	.player-panel.active .remaining-score {
-		color: #ffffff;
-		text-shadow: 0 0 55px rgba(232, 160, 32, 0.4), 0 2px 10px rgba(0, 0, 0, 0.5);
+		color: var(--text);
+		text-shadow: 0 0 55px var(--accent-line), 0 2px 10px var(--backdrop);
 	}
 
 	/* History of last ~12 darts, framed as a recessed panel */
@@ -345,17 +346,17 @@
 		flex: 1 1 auto;
 		min-height: 0;
 		display: flex;
-		background: rgba(255, 255, 255, 0.025);
-		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
-		border-radius: var(--radius-md, 12px);
+		background: var(--line);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
 		padding: clamp(4px, 1cqw, 10px);
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+		box-shadow: inset 0 1px 0 var(--line);
 		overflow: hidden;
 	}
 
 	.player-panel.active .history-box {
-		background: rgba(255, 255, 255, 0.04);
-		border-color: var(--line-strong, rgba(255, 255, 255, 0.14));
+		background: var(--line-strong);
+		border-color: var(--line-strong);
 	}
 
 	/* Full-width visit rows. A single 3-column grid aligns darts | total | rest
@@ -377,28 +378,30 @@
 		align-items: center;
 		column-gap: clamp(0.4em, 1.5cqw, 0.9em);
 		padding: clamp(3px, 0.9cqw, 9px) clamp(6px, 1.6cqw, 14px);
-		border-radius: var(--radius-sm, 8px);
-		background: rgba(255, 255, 255, 0.03);
+		border-radius: var(--radius-sm);
+		background: var(--line);
 		opacity: 0.62;
-		transition: opacity 200ms ease, background 200ms ease;
+		transition: opacity var(--dur-med) var(--ease), background var(--dur-med) var(--ease);
 	}
 
 	/* Newest visit reads first: brighter, accent-tinted, amber edge */
 	.history-row.last-row {
 		opacity: 1;
-		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
-		box-shadow: inset 3px 0 0 var(--accent, #e8a020);
+		background: var(--accent-soft);
+		box-shadow: inset 3px 0 0 var(--accent);
 	}
 
-	/* Live in-progress visit: stronger tint + gentle pulse on the amber edge */
+	/* Live in-progress visit: stronger tint + gentle pulse on the amber edge.
+	   liveRowPulse is a LOCKED exception (CONTEXT.md): continuous ambient live
+	   indicator, not a one-shot transition — duration/easing keyword stay literal. */
 	.history-row.live-row {
-		background: rgba(232, 160, 32, 0.18);
+		background: var(--accent-soft);
 		animation: liveRowPulse 1.6s ease-in-out infinite;
 	}
 
 	@keyframes liveRowPulse {
-		0%, 100% { box-shadow: inset 3px 0 0 var(--accent, #e8a020); }
-		50%      { box-shadow: inset 5px 0 0 var(--accent, #e8a020); }
+		0%, 100% { box-shadow: inset 3px 0 0 var(--accent); }
+		50%      { box-shadow: inset 5px 0 0 var(--accent); }
 	}
 
 	/* Darts: pills, left-aligned, wrap only as a last resort */
@@ -418,29 +421,29 @@
 		line-height: 1.1;
 		letter-spacing: 0.01em;
 		padding: 0.12em 0.5em;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		white-space: nowrap;
-		color: rgba(240, 240, 240, 0.78);
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		color: var(--text-soft);
+		background: var(--line);
+		border: 1px solid var(--line);
 	}
 
 	/* High-value darts glow amber so big visits pop from across the room */
 	.dart-pill.triple,
 	.dart-pill.bull {
-		color: var(--accent, #e8a020);
-		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
-		border-color: var(--accent-line, rgba(232, 160, 32, 0.45));
+		color: var(--accent);
+		background: var(--accent-soft);
+		border-color: var(--accent-line);
 	}
 
 	.dart-pill.double {
-		color: #f0d8a8;
-		background: rgba(232, 160, 32, 0.07);
-		border-color: rgba(232, 160, 32, 0.3);
+		color: var(--accent-double);
+		background: var(--accent-soft);
+		border-color: var(--accent-line);
 	}
 
 	.dart-pill.miss {
-		color: rgba(240, 240, 240, 0.35);
+		color: var(--text-faint);
 		border-style: dashed;
 	}
 
@@ -450,8 +453,9 @@
 		font-weight: 700;
 		line-height: 1;
 		text-align: right;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		white-space: nowrap;
+		font-family: var(--font-score);
 	}
 
 	/* Remaining after the visit — quieter, with a direction cue */
@@ -462,12 +466,12 @@
 		font-size: clamp(1rem, 5.4cqw, 3.6rem);
 		font-weight: 600;
 		text-align: right;
-		color: rgba(240, 240, 240, 0.5);
+		color: var(--text-muted);
 		white-space: nowrap;
 	}
 
 	.history-row.last-row .h-remaining {
-		color: rgba(240, 240, 240, 0.78);
+		color: var(--text-soft);
 	}
 
 	.h-arrow {
@@ -477,14 +481,14 @@
 
 	/* Bust: red total, struck-through dart pills, score unchanged */
 	.history-row.bust-row .h-total {
-		color: var(--destructive, #c0392b);
+		color: var(--destructive);
 		font-size: clamp(1rem, 4.8cqw, 3.2rem);
 	}
 
 	.history-row.bust-row .dart-pill {
-		color: rgba(192, 57, 43, 0.7);
-		background: rgba(192, 57, 43, 0.08);
-		border-color: rgba(192, 57, 43, 0.3);
+		color: var(--destructive);
+		background: var(--destructive-soft);
+		border-color: var(--destructive-line);
 		text-decoration: line-through;
 	}
 
@@ -494,12 +498,12 @@
 		font-size: clamp(1rem, 5.5cqw, 3rem);
 		font-weight: 700;
 		letter-spacing: 0.02em;
-		color: var(--accent, #e8a020);
-		background: var(--accent-soft, rgba(232, 160, 32, 0.12));
-		border: 1px solid var(--accent-line, rgba(232, 160, 32, 0.45));
-		border-radius: 999px;
+		color: var(--accent);
+		background: var(--accent-soft);
+		border: 1px solid var(--accent-line);
+		border-radius: var(--radius-pill);
 		padding: 0.12em 0.7em;
-		box-shadow: 0 0 24px rgba(232, 160, 32, 0.12);
+		box-shadow: 0 0 24px var(--accent-soft);
 	}
 
 	/* Averages: structured footer stat-bar with a dividing rule */
@@ -507,13 +511,13 @@
 		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
-		gap: var(--space-xs, 4px) var(--space-md, 16px);
-		padding-top: var(--space-sm, 8px);
-		border-top: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		gap: var(--space-xs) var(--space-md);
+		padding-top: var(--space-sm);
+		border-top: 1px solid var(--line);
 		font-size: clamp(1rem, 5.8cqw, 3.8rem);
 		font-weight: 400;
 		line-height: 1.2;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 	}
 
 	.stat {
@@ -524,7 +528,7 @@
 	}
 
 	.stat-label {
-		color: rgba(240, 240, 240, 0.6);
+		color: var(--text-muted);
 		font-weight: 500;
 	}
 
@@ -536,7 +540,7 @@
 		align-self: stretch;
 		width: 1px;
 		margin: 0.15em 0;
-		background: var(--line-strong, rgba(255, 255, 255, 0.14));
+		background: var(--line-strong);
 	}
 
 	/* Fallback for engines WITHOUT container-query support — notably the Chromecast

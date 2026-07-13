@@ -126,7 +126,7 @@
 	.empty-state {
 		background: var(--surface);
 		padding: var(--space-md);
-		border-radius: 4px;
+		border-radius: var(--radius-md);
 		text-align: center;
 	}
 
@@ -139,7 +139,7 @@
 	.empty-body {
 		font-size: 14px;
 		margin: 0;
-		color: #aaa;
+		color: var(--text-muted);
 	}
 
 	.player-list {
@@ -157,7 +157,7 @@
 		gap: var(--space-sm);
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: 4px;
+		border-radius: var(--radius-md);
 		min-height: 56px;
 	}
 
@@ -166,7 +166,7 @@
 		height: 36px;
 		border-radius: 50%;
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -187,10 +187,10 @@
 
 	.guest-badge {
 		font-size: 12px;
-		color: #aaa;
-		background: #333;
+		color: var(--text-muted);
+		background: var(--surface-3);
 		padding: 2px 6px;
-		border-radius: 10px;
+		border-radius: var(--radius-pill);
 	}
 
 	.remove-btn {
@@ -209,8 +209,8 @@
 	.add-player-btn {
 		background: var(--surface);
 		color: var(--text);
-		border: 1px dashed #444;
-		border-radius: 4px;
+		border: 1px dashed var(--line-strong);
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 16px;
 		min-height: 48px;
@@ -220,8 +220,8 @@
 
 	.picker-panel {
 		background: var(--surface);
-		border: 1px solid #444;
-		border-radius: 4px;
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm);
 		display: flex;
 		flex-direction: column;
@@ -230,7 +230,7 @@
 
 	.picker-section-label {
 		font-size: 12px;
-		color: #888;
+		color: var(--text-muted);
 		margin: var(--space-xs) 0 2px;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -253,13 +253,13 @@
 		color: var(--text);
 		font-size: 16px;
 		padding: var(--space-sm);
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		min-height: 48px;
 		text-align: left;
 	}
 
 	.picker-item:hover:not(:disabled) {
-		background: #2a2d35;
+		background: var(--surface-2);
 	}
 
 	.picker-item:disabled {
@@ -273,7 +273,7 @@
 	}
 
 	.guest-btn {
-		border-top: 1px solid #333;
+		border-top: 1px solid var(--line-strong);
 		margin-top: var(--space-xs);
 	}
 </style>

@@ -37,11 +37,11 @@
 		position: fixed;
 		inset: 0;
 		z-index: 10;
-		background: rgba(17, 19, 24, 0.88);
+		background: var(--backdrop);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		animation: bannerFadeIn 250ms ease-out;
+		animation: bannerFadeIn var(--dur-med) var(--ease);
 	}
 
 	@keyframes bannerFadeIn {
@@ -51,7 +51,7 @@
 
 	.banner-content {
 		text-align: center;
-		padding: var(--space-xl, 32px);
+		padding: var(--space-xl);
 	}
 
 	.banner-message {
@@ -63,20 +63,20 @@
 
 	/* The whole message renders in accent color for maximum legibility from 3m */
 	.banner-name {
-		color: #e8a020;
+		color: var(--accent);
 	}
 
 	.banner-subtitle {
-		margin: var(--space-lg, 24px) 0 0;
+		margin: var(--space-lg) 0 0;
 		font-size: clamp(2rem, 4vw, 5rem);
 		font-weight: 400;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 	}
 
 	.record-badge {
-		margin: var(--space-sm, 8px) 0 0;
+		margin: var(--space-sm) 0 0;
 		font-size: clamp(1.5rem, 3vw, 3.5rem);
 		font-weight: 400;
-		color: #e8a020;
+		color: var(--accent);
 	}
 </style>

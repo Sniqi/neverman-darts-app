@@ -35,16 +35,16 @@
 		display: flex;
 		align-items: center;
 		gap: clamp(0.4rem, 1vw, 1.2rem);
-		padding: var(--space-sm, 8px) var(--space-lg, 24px);
-		background: linear-gradient(180deg, #24272f 0%, #181a21 100%);
+		padding: var(--space-sm) var(--space-lg);
+		background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
 		font-size: clamp(2rem, 4vw, 5.6rem);
 		font-weight: 500;
 		line-height: 1.15;
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		white-space: nowrap;
 		overflow: hidden;
-		border-bottom: 3px solid var(--accent, #e8a020);
-		box-shadow: var(--shadow-panel, 0 6px 20px rgba(0, 0, 0, 0.45));
+		border-bottom: 3px solid var(--accent);
+		box-shadow: var(--shadow-panel);
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -56,7 +56,7 @@
 		right: 0;
 		bottom: -3px;
 		height: 14px;
-		background: linear-gradient(180deg, rgba(232, 160, 32, 0.28), transparent);
+		background: linear-gradient(180deg, var(--accent-soft), transparent);
 		pointer-events: none;
 	}
 
@@ -72,17 +72,17 @@
 	}
 
 	.mh-format {
-		color: rgba(240, 240, 240, 0.74);
+		color: var(--text-soft);
 	}
 
 	.mh-leg {
-		color: var(--accent, #e8a020);
+		color: var(--accent);
 		font-weight: 700;
 		flex-shrink: 0;
 	}
 
 	.mh-dot {
-		color: var(--accent, #e8a020);
+		color: var(--accent);
 		font-size: 0.45em;
 		line-height: 1;
 		opacity: 0.85;

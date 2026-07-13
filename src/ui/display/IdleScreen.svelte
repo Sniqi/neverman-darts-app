@@ -17,9 +17,9 @@
 		justify-content: center;
 		height: 100dvh;
 		width: 100%;
-		background: #111318;
-		color: #f0f0f0;
-		gap: var(--space-md, 16px);
+		background: var(--bg);
+		color: var(--text);
+		gap: var(--space-md);
 	}
 
 	.app-name {

@@ -76,12 +76,12 @@
 		font-size: clamp(1rem, 5cqw, 3.2rem);
 		font-weight: 400;
 		line-height: 1.3;
-		color: var(--text, #f0f0f0);
-		margin-top: var(--space-xs, 4px);
+		color: var(--text);
+		margin-top: var(--space-xs);
 	}
 
 	.visit-sep {
-		color: var(--text, #f0f0f0);
+		color: var(--text);
 		opacity: 0.5;
 	}
 

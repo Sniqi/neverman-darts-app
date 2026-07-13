@@ -161,7 +161,7 @@
 		gap: var(--space-sm);
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: 4px;
+		border-radius: var(--radius-md);
 		min-height: 48px;
 	}
 
@@ -170,7 +170,7 @@
 		height: 32px;
 		border-radius: 50%;
 		background: var(--accent);
-		color: #111318;
+		color: var(--on-accent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -210,8 +210,8 @@
 		flex: 1;
 		background: var(--surface);
 		color: var(--text);
-		border: 1px solid #444444;
-		border-radius: 4px;
+		border: 1px solid var(--border-input);
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm);
 		font-size: 16px;
 	}
@@ -219,8 +219,8 @@
 	.add-btn {
 		background: var(--surface);
 		color: var(--text);
-		border: 1px solid #444444;
-		border-radius: 4px;
+		border: 1px solid var(--border-input);
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 20px;
 		min-width: 44px;
@@ -237,8 +237,8 @@
 	input[type='text'] {
 		background: var(--surface);
 		color: var(--text);
-		border: 1px solid #444444;
-		border-radius: 4px;
+		border: 1px solid var(--border-input);
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm);
 		font-size: 16px;
 		flex: 1;
@@ -248,7 +248,7 @@
 	.sheet-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.5);
+		background: var(--backdrop);
 		z-index: 100;
 	}
 
@@ -258,7 +258,7 @@
 		left: 0;
 		right: 0;
 		background: var(--surface);
-		border-radius: 12px 12px 0 0;
+		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 		padding: var(--space-lg);
 		z-index: 101;
 		display: flex;
@@ -286,9 +286,9 @@
 
 	.delete-btn {
 		background: var(--destructive);
-		color: #f0f0f0;
+		color: var(--text);
 		border: none;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 16px;
 		font-weight: 600;
@@ -297,10 +297,10 @@
 	}
 
 	.cancel-btn {
-		background: #333;
+		background: var(--surface-3);
 		color: var(--text);
 		border: none;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 16px;
 		min-height: 48px;

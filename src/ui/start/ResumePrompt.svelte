@@ -34,8 +34,8 @@
 	<h2 class="resume-heading">Laufendes Spiel fortsetzen?</h2>
 	<p class="resume-info">{infoLine}</p>
 	<div class="resume-actions">
-		<button class="btn-resume" onclick={onresume}>Fortsetzen</button>
-		<button class="btn-discard" onclick={ondiscard}>Verwerfen</button>
+		<button class="btn btn--accent btn-resume" onclick={onresume}>Fortsetzen</button>
+		<button class="btn btn--destructive-outline btn-discard" onclick={ondiscard}>Verwerfen</button>
 	</div>
 </div>
 
@@ -72,35 +72,12 @@
 		gap: var(--space-sm);
 	}
 
-	.btn-resume,
+	.btn-resume {
+		flex: 1;
+		height: 56px;
+	}
+
 	.btn-discard {
 		flex: 1;
-		height: 52px;
-		border-radius: var(--radius-sm);
-		font-size: 16px;
-		font-weight: 600;
-		cursor: pointer;
-		border: none;
-	}
-
-	.btn-resume {
-		background: var(--accent);
-		color: var(--on-accent);
-	}
-
-	.btn-resume:active {
-		opacity: var(--press-opacity);
-		transform: scale(var(--press-scale));
-	}
-
-	.btn-discard {
-		background: transparent;
-		border: 1px solid var(--destructive);
-		color: var(--destructive);
-	}
-
-	.btn-discard:active {
-		background: var(--destructive-soft);
-		transform: scale(var(--press-scale));
 	}
 </style>

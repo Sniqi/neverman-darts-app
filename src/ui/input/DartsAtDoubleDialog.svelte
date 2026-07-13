@@ -48,6 +48,8 @@
 		position: fixed;
 		inset: 0;
 		background: var(--backdrop);
+		backdrop-filter: blur(var(--blur-backdrop));
+		-webkit-backdrop-filter: blur(var(--blur-backdrop));
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;

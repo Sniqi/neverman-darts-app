@@ -40,6 +40,20 @@ The app's foundational visual language — color, typography, spacing/radii/elev
 - **Keyframes stay component-local** (Svelte scoped CSS) consuming global duration/ease tokens — Svelte idiom, no global keyframe utilities.
 - **Base typography applies now:** Barlow globally via body; `--font-score` + `font-variant-numeric: tabular-nums` applied to existing score displays (ScorePanel, PlayerPanel, Numpad digits/entry, StatCards, display surfaces) so FOUND-02's "all score numerals" holds at phase end.
 
+### Motion & Sweep Ambiguities — Resolved (post-research, 2026-07-13)
+Research surfaced a conflict between the ROADMAP success criterion ("100–300ms") and the DS prose spec. Resolution follows the source-of-truth hierarchy (REQUIREMENTS.md preamble: every requirement means "matches the corresponding `design/` spec"; `design/readme.md` explicitly documents the longer effects):
+- **Shake stays 400ms** (`design/readme.md`: "invalid input shakes ±6px/400ms") — expressed via a local duration referencing DS intent, not compressed to 300ms.
+- **Score-float stays 1.6s** ("score floats rise & fade 1.6s") — DS-documented effect duration.
+- **liveRowPulse stays 1.6s ambient/infinite** ("live row pulses its amber inset edge") — functional live indicator, not a decorative loop.
+- **Everything else** (transitions, presses, dialog pop, fades, banners, toasts) lands in the 100–300ms token band with `--dur-*`/`--ease`/`--ease-spring`.
+- **zeroFlashFade (800ms, not DS-documented): retime to `--dur-slow` (300ms)** — only DS-documented exceptions keep longer durations; Phase 10 (SCOR-04 BUST flash spec) revisits if needed.
+- All four exceptions/retimes must still collapse under `prefers-reduced-motion` (FOUND-04).
+
+### Data & Test Sweep Decisions (post-research, 2026-07-13)
+- **`src/db/profiles.ts` default `Profile.color`**: update the default hex to the DS accent `#f0a424` (+ its test fixtures). Zero behavior change — nothing renders the field today, existing stored profiles keep their values (no migration). Keeps the "0 old hex in src/" grep gate clean without an exception list.
+- **`src/ui/pwa/ReloadPrompt.test.ts` (PLAT-04)**: update the literal assertion `rgb(232, 160, 32)` → `rgb(240, 164, 36)` as part of the sweep — expected change, not a regression.
+- **"No provisional colors" regression test**: add a small node/vitest test that scans `src/**/*.svelte` + `src/app.css` + `src/styles/**` for the forbidden old hex list (from the palette map below) — encodes FOUND-01's gate durably, not just as a one-time manual grep.
+
 ### Claude's Discretion
 - Exact static rgba values for the precomputed color-mix tokens (match DS alpha intent).
 - Whether to preload the most critical font files (e.g. Barlow-Regular, BSC-Bold) via `<link rel="preload">` — optional, decide during implementation.

@@ -127,7 +127,6 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ### Blockers/Concerns
 
-- (Pre-existing, documented) 6 E2E tests red since before Phase 8 — spec drift vs June quick tasks (full-match-flow stepper, resume .overlay, spectator-sync score text). Attribution proof + handling rule in `.planning/phases/08-design-foundation/deferred-items.md`; evaluate E2E as "no NEW failures vs baseline" until repaired (recommend /gsd-debug or quick task before milestone audit).
 - (Carried, low priority) Android Chrome backgrounding during a Cast session: sender session lifecycle when the tablet screen locks was never explicitly UAT'd — no issues reported through 3 on-device UAT passes and real use; revisit only if disconnects are observed. (Screen wake lock on /match makes locking rare in practice.)
 
 ## Deferred Items
@@ -136,7 +135,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 |----------|------|--------|-------------|
 | RECV polish | RECV-06: Idle-screen match summary (last result shown between games) | v2 | 2026-06-18 |
 | RECV polish | RECV-07: Receiver UI theme customization | v2 | 2026-06-18 |
-| Test debt | 6 pre-existing red E2E tests (spec drift since 2026-06-14 quick tasks) — see 08 deferred-items.md | repair before milestone audit | 2026-07-14 |
+| Test debt | 6 pre-existing red E2E tests (spec drift since 2026-06-14 quick tasks) — see 08 deferred-items.md | REPAIRED (commit `2956c1e`, 2026-07-14) | 2026-07-14 |
 
 ## Session Continuity
 

@@ -411,8 +411,8 @@
 		height: 100dvh;
 		width: 100%;
 		overflow: hidden;
-		background: #111318;
-		color: #f0f0f0;
+		background: var(--bg);
+		color: var(--text);
 	}
 
 	.panel-area {
@@ -420,8 +420,8 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm, 8px);
-		padding: var(--space-sm, 8px);
+		gap: var(--space-sm);
+		padding: var(--space-sm);
 	}
 
 	.board-area {
@@ -432,7 +432,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 12px;
-		padding: var(--space-sm, 8px);
+		padding: var(--space-sm);
 	}
 
 	.dart-column {
@@ -443,8 +443,8 @@
 	}
 
 	.dart-column.bust .dart-pill {
-		border-color: rgba(192, 57, 43, 0.5);
-		color: #c0392b;
+		border-color: var(--destructive-line);
+		color: var(--destructive);
 	}
 
 	.dart-pill {
@@ -453,24 +453,24 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #1e2027;
-		border: 1px solid #444444;
-		border-radius: 8px;
+		background: var(--surface);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
 		font-size: 16px;
 		font-weight: 400;
-		color: #555;
+		color: var(--text-muted);
 		cursor: pointer;
-		transition: background 120ms ease, border-color 120ms ease;
+		transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 	}
 
 	.dart-pill.filled {
-		border-color: #e8a020;
-		color: #f0f0f0;
+		border-color: var(--accent);
+		color: var(--text);
 		font-weight: 600;
 	}
 
 	.dart-pill:not(:disabled):active {
-		background: #2d2d2d;
+		background: var(--surface-3);
 	}
 
 	.dart-pill:disabled {
@@ -480,9 +480,9 @@
 	/* Control deck — groups input toggle, undo, and audio into one bordered card */
 	.control-deck {
 		flex: 0 0 auto;
-		background: var(--surface, #1e2027);
-		border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
-		border-radius: var(--radius-md, 12px);
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
 		overflow: hidden;
 	}
 
@@ -490,33 +490,33 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 10px var(--space-md, 16px);
-		gap: var(--space-sm, 8px);
-		border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+		padding: 10px var(--space-md);
+		gap: var(--space-sm);
+		border-bottom: 1px solid var(--line);
 	}
 
 	.toggle-btn {
 		height: 40px;
-		padding: 0 var(--space-md, 16px);
-		background: var(--surface-2, #262932);
-		border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.14));
-		border-radius: var(--radius-sm, 8px);
-		color: var(--text, #f0f0f0);
+		padding: 0 var(--space-md);
+		background: var(--surface-2);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
 		font-size: 14px;
 		cursor: pointer;
 	}
 
 	.toggle-btn:active {
-		background: #2d2d2d;
+		background: var(--surface-3);
 	}
 
 	.undo-btn {
 		height: 44px;
-		padding: 0 var(--space-lg, 24px);
+		padding: 0 var(--space-lg);
 		background: transparent;
-		border: 1px solid var(--accent, #e8a020);
-		border-radius: var(--radius-sm, 8px);
-		color: var(--accent, #e8a020);
+		border: 1px solid var(--accent);
+		border-radius: var(--radius-sm);
+		color: var(--accent);
 		font-size: 16px;
 		font-weight: 600;
 		cursor: pointer;
@@ -524,7 +524,7 @@
 	}
 
 	.undo-btn:active {
-		background: rgba(232, 160, 32, 0.1);
+		background: var(--accent-soft);
 	}
 
 	/* Audio controls — lower section of the control deck */
@@ -532,8 +532,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
-		padding: 8px var(--space-md, 16px);
-		background: var(--surface, #1e2027);
+		padding: 8px var(--space-md);
+		background: var(--surface);
 	}
 
 	.audio-row {
@@ -545,7 +545,7 @@
 
 	.audio-label {
 		font-size: 13px;
-		color: #888;
+		color: var(--text-muted);
 		width: 42px;
 		flex-shrink: 0;
 	}
@@ -555,14 +555,14 @@
 		height: 20px;
 		flex-shrink: 0;
 		cursor: pointer;
-		accent-color: #e8a020;
+		accent-color: var(--accent);
 	}
 
 	.audio-slider {
 		flex: 1;
 		min-width: 0;
 		height: 36px;
-		accent-color: #e8a020;
+		accent-color: var(--accent);
 		cursor: pointer;
 	}
 
@@ -573,7 +573,7 @@
 
 	.audio-pct {
 		font-size: 12px;
-		color: #666;
+		color: var(--text-muted);
 		width: 30px;
 		text-align: right;
 		flex-shrink: 0;
@@ -589,19 +589,19 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(28, 31, 39, 0.7);
-		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: var(--backdrop);
+		border: 1px solid var(--line-strong);
 		border-radius: 6px;
-		color: #888;
+		color: var(--text-muted);
 		font-size: 14px;
 		text-decoration: none;
 		backdrop-filter: blur(6px);
-		transition: color 150ms ease, border-color 150ms ease;
+		transition: color var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
 	}
 
 	.back-btn:hover {
-		color: #f0f0f0;
-		border-color: rgba(255, 255, 255, 0.3);
+		color: var(--text);
+		border-color: var(--line-strong);
 	}
 
 	/* Landscape layout (D-02): score panel left ~34%, board right.

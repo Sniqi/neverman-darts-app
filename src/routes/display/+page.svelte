@@ -312,9 +312,9 @@
 		width: 100%;
 		background: radial-gradient(
 			120% 90% at 50% 0%,
-			#1b1e26 0%,
-			#111318 45%,
-			#0b0c10 100%
+			var(--surface) 0%,
+			var(--bg) 45%,
+			var(--bg-deep) 100%
 		);
 		overflow: hidden;
 	}
@@ -339,7 +339,7 @@
 		grid-template-columns: repeat(var(--player-count), 1fr);
 		gap: 2px;
 		/* gap reveals this as thin seam lines between player columns */
-		background: var(--line, rgba(255, 255, 255, 0.08));
+		background: var(--line);
 	}
 
 	/* Layer 3: fullscreen controls (z-index 30) */
@@ -351,28 +351,28 @@
 		z-index: 30;
 		width: 40px;
 		height: 40px;
-		background: rgba(28, 31, 39, 0.6);
-		border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.14));
-		border-radius: var(--radius-sm, 8px);
-		color: #f0f0f0;
+		background: var(--backdrop);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0;
 		backdrop-filter: blur(8px);
-		box-shadow: var(--shadow-raise, 0 2px 10px rgba(0, 0, 0, 0.4));
-		transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+		box-shadow: var(--shadow-raise);
+		transition: background var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
 	}
 
 	.fullscreen-toggle:hover {
-		background: rgba(232, 160, 32, 0.14);
-		border-color: var(--accent, #e8a020);
-		color: var(--accent, #e8a020);
+		background: var(--accent-soft);
+		border-color: var(--accent);
+		color: var(--accent);
 	}
 
 	.fullscreen-toggle:active {
-		background: rgba(232, 160, 32, 0.22);
+		background: var(--accent-soft);
 	}
 
 	.fullscreen-prompt {
@@ -382,17 +382,17 @@
 		transform: translateX(-50%);
 		z-index: 30;
 		height: 48px;
-		padding: 0 var(--space-xl, 32px);
-		background: linear-gradient(180deg, #f0ab2c 0%, #e8a020 100%);
+		padding: 0 var(--space-xl);
+		background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 100%);
 		border: none;
-		border-radius: var(--radius-sm, 8px);
-		color: #111318;
+		border-radius: var(--radius-sm);
+		color: var(--on-accent);
 		font-size: 16px;
 		font-weight: 700;
 		cursor: pointer;
 		min-width: 200px;
-		box-shadow: 0 6px 22px rgba(232, 160, 32, 0.35);
-		animation: fadeIn 150ms ease-out;
+		box-shadow: var(--glow-accent);
+		animation: fadeIn var(--dur-base) var(--ease);
 	}
 
 	@keyframes fadeIn {
@@ -407,17 +407,17 @@
 		z-index: 30;
 		min-height: 48px;
 		min-width: 120px;
-		padding: 0 var(--space-lg, 24px);
-		background: rgba(28, 31, 39, 0.85);
-		border: 1px solid var(--accent, #e8a020);
-		border-radius: var(--radius-sm, 8px);
-		color: var(--accent, #e8a020);
+		padding: 0 var(--space-lg);
+		background: var(--backdrop);
+		border: 1px solid var(--accent);
+		border-radius: var(--radius-sm);
+		color: var(--accent);
 		font-size: 16px;
 		font-weight: 500;
 		cursor: pointer;
 		backdrop-filter: blur(8px);
-		box-shadow: var(--shadow-raise, 0 2px 10px rgba(0, 0, 0, 0.4));
-		animation: fadeInExit 150ms ease-out;
+		box-shadow: var(--shadow-raise);
+		animation: fadeInExit var(--dur-base) var(--ease);
 	}
 
 	@keyframes fadeInExit {
@@ -426,7 +426,7 @@
 	}
 
 	.exit-btn:active {
-		background: rgba(232, 160, 32, 0.1);
+		background: var(--accent-soft);
 	}
 
 </style>

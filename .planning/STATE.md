@@ -6,14 +6,14 @@ current_phase: 08
 current_phase_name: Design Foundation
 status: executing
 stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-07-13T20:55:31.855Z"
+last_updated: "2026-07-13T21:11:34.291Z"
 last_activity: 2026-07-13
 last_activity_desc: Phase 08 execution started
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 08 (Design Foundation) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-07-13 — Phase 08 execution started
 
@@ -89,6 +89,7 @@ Last activity: 2026-07-13 — Phase 08 execution started
 | Phase 08 P01 | 4min | 3 tasks | 6 files |
 | Phase 08 P02 | 40min | 4 tasks | 14 files |
 | Phase 08-design-foundation P03 | 12min | 3 tasks | 16 files |
+| Phase 08-design-foundation P04 | 25min | 3 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase 08-02]: All 7 fonts converted TTF-to-WOFF2 (no TTF fallback needed); optional font preload links skipped per plan discretion
 - [Phase 08-03]: Overlay scrims with no exact old->new hex match (rgba(17,19,24,.88/.92/.96), rgba(0,0,0,.6)) all mapped to var(--backdrop) — DS-documented token for dialog/overlay scrims
 - [Phase 08-03]: Isolated Vitest browser-mode component tests asserting getComputedStyle() on a var(--token) color must import src/app.css directly — No root layout is rendered in isolation, so :root tokens are otherwise absent from the test document (fixed in ReloadPrompt.test.ts)
+- [Phase ?]: [Phase 08-04]: White/near-white translucent fills with no matching accent/destructive token map to var(--line)/var(--line-strong) by alpha proximity, not var(--text-faint) (reserved for text/flash roles)
+- [Phase ?]: [Phase 08-04]: MatchSetup's .info-hint background mapped to var(--surface-hint) -- the DS token documented for 'info hint bubbles' -- overriding a numerically closer --surface-2 match
 
 ### Quick Tasks Completed
 
@@ -127,7 +130,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-13T20:55:13.934Z
+Last session: 2026-07-13T21:10:45.999Z
 Stopped at: Completed 08-02-PLAN.md
 Resume file: None
 

@@ -55,7 +55,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
   3. Spacing, corner radii, and elevation (hairlines, layered shadows, edge-highlights) across every surface follow the DS 4px/radius/elevation scales — no ad-hoc spacing or mismatched corners remain.
   4. Interactive transitions (button press, dialog open, invalid-input shake, score float) animate within the DS's 100–300ms motion spec, and stop moving entirely when "reduce motion" is enabled.
 
-**Plans**: 3/6 plans executed
+**Plans**: 4/6 plans executed
 Plans:
 **Wave 1**
 
@@ -68,7 +68,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 08-03-PLAN.md — Sweep: scoring input, dialogs & overlays (15 files)
-- [ ] 08-04-PLAN.md — Sweep: display, setup & history (14 files)
+- [x] 08-04-PLAN.md — Sweep: display, setup & history (14 files)
 - [ ] 08-05-PLAN.md — Sweep: stats charts & route pages (12 files)
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -148,7 +148,7 @@ Plans:
 | 5. Audio & Auto-Pause | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
-| 8. Design Foundation | v1.2 | 3/6 | In Progress|  |
+| 8. Design Foundation | v1.2 | 4/6 | In Progress|  |
 | 9. Core Components | v1.2 | 0/TBD | Not started | - |
 | 10. Scoring Surface | v1.2 | 0/TBD | Not started | - |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |

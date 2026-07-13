@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Restyling
 current_phase: 08
 current_phase_name: Design Foundation
-status: executing
+status: verifying
 stopped_at: Completed 08-05-PLAN.md
-last_updated: "2026-07-13T21:27:38.453Z"
+last_updated: "2026-07-13T21:35:24.787Z"
 last_activity: 2026-07-13
 last_activity_desc: Phase 08 execution started
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
-  completed_plans: 5
-  percent: 0
+  completed_plans: 6
+  percent: 20
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 Phase: 08 (Design Foundation) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-13 — Phase 08 execution started
 
 ## Performance Metrics
@@ -91,6 +91,7 @@ Last activity: 2026-07-13 — Phase 08 execution started
 | Phase 08-design-foundation P03 | 12min | 3 tasks | 16 files |
 | Phase 08-design-foundation P04 | 25min | 3 tasks | 14 files |
 | Phase 08 P05 | 15min | 3 tasks | 12 files |
+| Phase 08 P06 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: [Phase 08-05]: match/+page.svelte dart-pill border #444 mapped to var(--line-strong), not var(--board-stroke) -- it's a visit-strip hairline, not the Dartboard component itself
 - [Phase ?]: [Phase 08-05]: pressed-state backgrounds (#2d2d2d/#22242d) mapped to var(--surface-3) by DS-documented 'pressed/highest layer' role, overriding numeric hex proximity to --surface-2
 - [Phase ?]: [Phase 08-05]: display/+page.svelte's fullscreen-prompt gradient (#f0ab2c->#e8a020) mapped to var(--accent-bright)->var(--accent); its box-shadow mapped wholesale to var(--glow-accent) despite differing geometry -- no exact token exists, Phase 8 only requires nearest token now
+- [Phase ?]: Profile.color default updated #e8a020 -> #f0a424 (data field, zero current UI render path, safe per RESEARCH.md Pitfall 3/Assumption A1)
+- [Phase ?]: design-tokens.test.ts forbidden list excludes bare 3-digit greys (#444/#333/#888) to avoid false positives on legitimate new DS values
 
 ### Quick Tasks Completed
 
@@ -134,7 +137,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-13T21:27:38.446Z
+Last session: 2026-07-13T21:32:22.479Z
 Stopped at: Completed 08-05-PLAN.md
 Resume file: None
 

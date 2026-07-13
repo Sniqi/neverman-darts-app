@@ -35,7 +35,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
 
 **Milestone Goal:** Bring the entire app UI to the target state of the design system in `design/` — Barlow typography, layered dark surfaces with amber `#f0a424` accent, new radii/elevation/motion — on both surfaces (scoring app + spectator display incl. Cast receiver), without changing any functionality. Pure restyle; all ~511 existing tests stay green.
 
-- [ ] **Phase 8: Design Foundation** - DS color/spacing/radius/elevation tokens, self-hosted Barlow fonts, and the DS motion system replace all provisional v1.0 styling app-wide
+- [x] **Phase 8: Design Foundation** - DS color/spacing/radius/elevation tokens, self-hosted Barlow fonts, and the DS motion system replace all provisional v1.0 styling app-wide (completed 2026-07-13)
 - [ ] **Phase 9: Core Components** - Shared UI primitives (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) match their DS specs everywhere they're used
 - [ ] **Phase 10: Scoring Surface** - `/match` restyled to DS specs (Numpad, Dartboard colors, VisitStrip/DartPill, ScoreCard) with all scoring logic and behavior unchanged
 - [ ] **Phase 11: Spectator Display** - `/display` restyled to DS specs (PC window, tablet fullscreen, Cast receiver) and verified on the real Chromecast device (Chrome 90 @ 1280×720)
@@ -55,7 +55,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
   3. Spacing, corner radii, and elevation (hairlines, layered shadows, edge-highlights) across every surface follow the DS 4px/radius/elevation scales — no ad-hoc spacing or mismatched corners remain.
   4. Interactive transitions (button press, dialog open, invalid-input shake, score float) animate within the DS's 100–300ms motion spec, and stop moving entirely when "reduce motion" is enabled.
 
-**Plans**: 5/6 plans executed
+**Plans**: 6/6 plans complete
 Plans:
 **Wave 1**
 
@@ -73,7 +73,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 08-06-PLAN.md — Profile.color default + durable no-provisional-colors regression test
+- [x] 08-06-PLAN.md — Profile.color default + durable no-provisional-colors regression test
 
 **UI hint**: yes
 
@@ -148,7 +148,7 @@ Plans:
 | 5. Audio & Auto-Pause | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
-| 8. Design Foundation | v1.2 | 5/6 | In Progress|  |
+| 8. Design Foundation | v1.2 | 6/6 | Complete   | 2026-07-13 |
 | 9. Core Components | v1.2 | 0/TBD | Not started | - |
 | 10. Scoring Surface | v1.2 | 0/TBD | Not started | - |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |

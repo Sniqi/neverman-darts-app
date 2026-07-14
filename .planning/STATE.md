@@ -179,6 +179,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 ### Blockers/Concerns
 
 - (Carried, low priority) Android Chrome backgrounding during a Cast session: sender session lifecycle when the tablet screen locks was never explicitly UAT'd — no issues reported through 3 on-device UAT passes and real use; revisit only if disconnects are observed. (Screen wake lock on /match makes locking rare in practice.)
+- (New, advisory — WR-01 from 11-04-REVIEW.md) On the pause-*trigger* dispatch only, `dispatch()` sends a stale Cast snapshot (`pauseActive:false`) at match.svelte.ts:126 before `#checkAutoPause` (:146) sends the fresh one, so the real receiver could briefly flash "leg won, no pause overlay" before self-correcting. Deliberately left as-is per Plan 11-04's decision not to reorder `dispatch()`; self-heals within ≤1s via the next countdown tick. **Watch for this during /gsd-verify-work 11 Test 5** — if a visible flash appears on-device, reorder dispatch() (move the unconditional `#publishToCast()` after `#checkAutoPause`) + add a regression test.
 
 ## Deferred Verification
 

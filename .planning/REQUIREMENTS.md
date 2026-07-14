@@ -33,7 +33,7 @@
 ### DISP — Spectator display (`/display`: PC window, tablet fullscreen, Cast receiver)
 
 - [x] **DISP-01**: Player panels use the DS display scale — cqw-clamped typography (`--display-score` up to clamp(6rem, 27cqw, 26rem)), active-player amber edge + inner glow + tint, inactive panels at 55% opacity
-- [ ] **DISP-02**: Match header and panel backgrounds match the DS display spec — dark linear gradients, amber bloom under the header rule, ● separators
+- [x] **DISP-02**: Match header and panel backgrounds match the DS display spec — dark linear gradients, amber bloom under the header rule, ● separators
 - [ ] **DISP-03**: The Chromecast receiver (Chrome 90 @ 1280×720) renders the restyled display correctly — every modern CSS feature (container queries, dvh, subgrid) gated behind `@supports` with working fallbacks, verified on-device
 - [x] **DISP-04**: All display behavior is unchanged after the restyle — BroadcastChannel/Cast sync, idle screen, leg/set banners, win overlay, pause countdown render and update exactly as before
 
@@ -85,7 +85,7 @@ Which phase covers which requirement. Filled during roadmap creation.
 | SCOR-03 | Phase 10 | Complete |
 | SCOR-04 | Phase 10 | Complete |
 | DISP-01 | Phase 11 | Complete |
-| DISP-02 | Phase 11 | Pending |
+| DISP-02 | Phase 11 | Complete |
 | DISP-03 | Phase 11 | Pending |
 | DISP-04 | Phase 11 | Complete |
 | PAGE-01 | Phase 12 | Pending |

@@ -109,7 +109,7 @@
 		font-size: var(--text-xl);
 		font-weight: 600;
 		line-height: 1.25;
-		margin: 0 0 var(--space-md) 0;
+		margin: 0 0 var(--space-sm) 0;
 		color: var(--text);
 	}
 

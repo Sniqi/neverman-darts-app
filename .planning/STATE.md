@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
-current_phase: 10
-current_phase_name: Scoring Surface
+current_phase: 11
+current_phase_name: Spectator Display
 status: verifying
 stopped_at: Completed 10-05-PLAN.md (SCOR-04 gap closure)
-last_updated: "2026-07-14T02:53:57.352Z"
+last_updated: "2026-07-14T03:00:41.804Z"
 last_activity: 2026-07-14
-last_activity_desc: Phase 10 execution started
+last_activity_desc: Phase 10 complete, transitioned to Phase 11
 progress:
   total_phases: 5
   completed_phases: 3
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 10 — Scoring Surface
+**Current focus:** Phase 11 — Spectator Display
 
 ## Current Position
 
-Phase: 10 (Scoring Surface) — EXECUTING
-Plan: 5 of 5
+Phase: 11 — Spectator Display
+Plan: Not started
 Status: Phase complete — gap closure (10-05) done, ready for re-verification
-Last activity: 2026-07-14 — Phase 10 execution started
+Last activity: 2026-07-14 — Phase 10 complete, transitioned to Phase 11
 
 ## Performance Metrics
 
 **Velocity (v1.0 reference):**
 
-- Total plans completed: 46
+- Total plans completed: 51
 - Average duration: ~6 min/plan
 - Total execution time: estimated ~3.5 hours
 
@@ -53,6 +53,7 @@ Last activity: 2026-07-14 — Phase 10 execution started
 | 06 | 3 | - | - |
 | 08 | 6 | - | - |
 | 09 | 7 | - | - |
+| 10 | 5 | - | - |
 
 **v1.1 (final):** 1 phase, 6 plans, ~6 min/plan; 3 on-device UAT passes (2026-06-18/19)
 
@@ -169,8 +170,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T02:53:57.344Z
-Stopped at: Completed 10-05-PLAN.md (SCOR-04 gap closure)
+Last session: 2026-07-14
+Stopped at: Phase 10 complete (verified 7/7 after gap closure), ready to plan Phase 11 (autonomous run --from 8 in progress)
 Resume file: None
 
 ## Operator Next Steps

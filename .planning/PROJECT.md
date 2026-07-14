@@ -37,6 +37,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - **Audio caller + auto-pause** — Web Speech caller announces each non-bust visit (DE/EN) with a checkout-number hint; sound effects on 180/high-finish/record; independent toggles + a master volume slider (default 50%); auto-pause shows a synced countdown overlay on both views after a configurable number of legs, auto-resuming or via "Weiter". *Validated in Phase 5 (human UAT 2026-06-13).* Audio plays from the scoring window (`/match`) only — the spectator window is passive and browsers block its autoplay.
 - **PWA & deployment** — installable PWA (manifest + service worker via `@vite-pwa/sveltekit`, `registerType: 'prompt'`); full offline precache incl. SFX; subpath-correct build for GitHub Pages (`BASE_PATH=/neverman-darts-app`); German dark update toast ("Neue Version verfügbar"); GitHub Actions deploy workflow. *Config validated + accepted in Phase 6 (2026-06-13).* Live go-live (create repo, enable Pages, push) is the user's outward-facing step — workflow is committed and ready.
 - ✓ **Design foundation (v1.2)** — DS tokens app-wide (colors/spacing/radii/elevation as static Chrome-90-safe values), Barlow + Barlow Semi Condensed self-hosted as WOFF2 (offline-precached, tabular-nums on score surfaces), DS motion tokens with reduced-motion collapse, zero provisional colors (grep-gated by `src/lib/design-tokens.test.ts`) — v1.2 (Phase 8, verified 8/8 must-haves)
+- ✓ **Scoring surface (v1.2)** — Numpad 76px/DS gradient confirm + ⌫ aria-label, Dartboard DS flash/float literals (geometry byte-identical), shared `dart-notation.ts` with DS strings (`Bull (50)`/`✕`), DS DartPill states + bust treatment, ScoreCard 96px/800 amber-edge active (compact clamp for 3-4 players landscape, E2E-regression-guarded) — v1.2 (Phase 10, verified 7/7 after gap closure)
 - ✓ **Core components (v1.2)** — shared `.btn` (5 DS variants + 4 extensions) & `.switch` primitives in `src/styles/components.css`; dialogs on DS spec (blur scrim, scale-in .94, 420px, stacked buttons); chips/segmented/steppers/toggles at DS sizes with spring thumbs; StatCard 40px/BSC — v1.2 (Phase 9, verified 15/15 must-haves, 535 tests + 9/9 E2E)
 
 ### Active
@@ -46,7 +47,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - [x] Foundation: DS color/spacing/radius/elevation tokens replace the provisional styling app-wide *(Phase 8 ✓)*
 - [x] Typography: Barlow (UI) + Barlow Semi Condensed (score numerals), self-hosted, offline-precached, tabular-nums on score surfaces *(Phase 8 ✓)*
 - [x] Core components restyled to DS specs (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) *(Phase 9 ✓)*
-- [ ] Scoring surface restyled (Numpad, Dartboard colors, VisitStrip, ScoreCard, active-score 96px treatment)
+- [x] Scoring surface restyled (Numpad, Dartboard colors, VisitStrip, ScoreCard, active-score 96px treatment; 3-4-player landscape compact clamp) *(Phase 10 ✓)*
 - [ ] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver
 - [ ] All pages restyled (Hub, Setup, History, Stats, Daten/Backup) incl. overlays/toasts
 - [x] Motion system per DS (100–300ms + DS-documented exceptions, standard/spring easing, `prefers-reduced-motion` collapse) *(Phase 8 ✓)*
@@ -109,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-14 after Phase 9 (Core Components) completion*
+*Last updated: 2026-07-14 after Phase 10 (Scoring Surface) completion*

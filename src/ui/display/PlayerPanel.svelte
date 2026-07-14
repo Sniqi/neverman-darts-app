@@ -210,8 +210,8 @@
 		display: flex;
 		flex-direction: column;
 		padding: clamp(8px, 2cqw, 24px) clamp(8px, 2cqw, 18px);
-		background: linear-gradient(165deg, var(--surface-2) 0%, var(--surface) 100%);
-		border-top: 4px solid transparent;
+		background: linear-gradient(165deg, #1a1e29 0%, #12151d 100%);
+		border-top: 5px solid transparent;
 		opacity: 0.5;
 		transition: background var(--dur-med) var(--ease), border-color var(--dur-med) var(--ease),
 			opacity var(--dur-med) var(--ease), box-shadow var(--dur-med) var(--ease);
@@ -225,10 +225,12 @@
 	}
 
 	.player-panel.active {
-		background: linear-gradient(165deg, var(--surface-3) 0%, var(--surface-2) 100%);
+		background: linear-gradient(165deg, #272d3c 0%, #191d28 100%);
 		border-top-color: var(--accent);
-		box-shadow: inset 0 0 60px var(--accent-soft),
-			inset 0 4px 0 var(--accent-line);
+		/* Precomputed translucent-accent mixes (7% ambient glow, 22% top-edge glow) —
+		   Chrome-90 safe static rgba(), not a live color-mix() function. */
+		box-shadow: inset 0 0 80px rgba(240, 164, 36, 0.07),
+			inset 0 5px 0 rgba(240, 164, 36, 0.22);
 		opacity: 1;
 	}
 
@@ -236,7 +238,7 @@
 	.bust-overlay {
 		position: absolute;
 		inset: 0;
-		background-color: var(--destructive-soft);
+		background-color: rgba(229, 72, 77, 0.16);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -246,10 +248,12 @@
 	}
 
 	.bust-label {
-		font-size: clamp(1.5rem, 17cqw, 6rem);
-		font-weight: 600;
+		font-family: var(--font-score);
+		font-size: clamp(3rem, 14cqw, 12rem);
+		font-weight: 800;
 		color: var(--destructive);
-		letter-spacing: 0.05em;
+		letter-spacing: var(--tracking-caps);
+		text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
 		animation: bustLabelIn var(--dur-med) var(--ease);
 	}
 
@@ -346,17 +350,12 @@
 		flex: 1 1 auto;
 		min-height: 0;
 		display: flex;
-		background: var(--line);
+		background: rgba(0, 0, 0, 0.22);
 		border: 1px solid var(--line);
 		border-radius: var(--radius-md);
-		padding: clamp(4px, 1cqw, 10px);
-		box-shadow: inset 0 1px 0 var(--line);
+		padding: clamp(5px, 1cqw, 12px);
+		box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.25);
 		overflow: hidden;
-	}
-
-	.player-panel.active .history-box {
-		background: var(--line-strong);
-		border-color: var(--line-strong);
 	}
 
 	/* Full-width visit rows. A single 3-column grid aligns darts | total | rest

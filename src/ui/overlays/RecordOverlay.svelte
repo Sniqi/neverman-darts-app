@@ -41,6 +41,8 @@
 		inset: 0;
 		z-index: 50;
 		background: var(--backdrop);
+		backdrop-filter: blur(var(--blur-backdrop));
+		-webkit-backdrop-filter: blur(var(--blur-backdrop));
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -55,6 +57,16 @@
 	.record-content {
 		text-align: center;
 		padding: var(--space-xl);
+		background: var(--surface-2);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--line-strong);
+		box-shadow: var(--shadow-panel), var(--edge-highlight);
+		animation: recordContentIn var(--dur-med) var(--ease-spring);
+	}
+
+	@keyframes recordContentIn {
+		from { opacity: 0; transform: scale(0.94) translateY(8px); }
+		to { opacity: 1; transform: scale(1) translateY(0); }
 	}
 
 	.record-headline {

@@ -1,7 +1,7 @@
 ---
 phase: 9
 slug: core-components
-status: draft
+status: complete
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-07-14
@@ -38,24 +38,24 @@ created: 2026-07-14
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 09-01-T1 | 09-01 | 1 | COMP-01, COMP-02 | T-09-01-SC | zero new packages; no forbidden hex introduced | unit | `npx vitest run --project unit -t "design tokens"` | ✅ existing regression test | ⬜ pending |
-| 09-01-T2 | 09-01 | 1 | COMP-01 | T-09-01-01 | hub button accessible names/onclick unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ⬜ pending |
-| 09-01-T3 | 09-01 | 1 | COMP-01, COMP-02 | T-09-01-SC | shared .btn/.switch classes render at DS values | browser (new, Wave 0 gap) | `npx vitest run --project=browser -t "components-css"` | ❌ MISSING — created by this task | ⬜ pending |
-| 09-02-T1 | 09-02 | 2 | COMP-01 | T-09-02-01 | back-btn/menu-btn/delete-btn accessible names unchanged | e2e | `npx playwright test` | ✅ existing full suite | ⬜ pending |
-| 09-02-T2 | 09-02 | 2 | COMP-01 | T-09-02-01 | export/import buttons keep disabled/onclick behavior | e2e | `npx playwright test` | ✅ existing full suite | ⬜ pending |
-| 09-03-T1 | 09-03 | 2 | COMP-01, COMP-03 | T-09-03-01 | ConfirmDialog props/ARIA/German labels unchanged | e2e | `npx playwright test` | ✅ existing full suite | ⬜ pending |
-| 09-03-T2 | 09-03 | 2 | COMP-01, COMP-03 | T-09-03-01 | "Fortsetzen"/"Verwerfen" accessible names unchanged | e2e | `npx playwright test e2e/resume.spec.ts` | ✅ existing spec | ⬜ pending |
-| 09-03-T3 | 09-03 | 2 | COMP-03 | T-09-03-01 | ConfirmDialog computed blur/radius/max-width match DS spec | browser (new, Wave 0 gap) | `npx vitest run --project=browser -t "ConfirmDialog"` | ❌ MISSING — created by this task | ⬜ pending |
-| 09-04-T1 | 09-04 | 1 | COMP-04 | T-09-04-01 | StatCard props (label/value) unchanged | browser | `npx vitest run --project=browser -t "StatCard"` | ❌ MISSING — created by Task 2, exercised here | ⬜ pending |
-| 09-04-T2 | 09-04 | 1 | COMP-04 | T-09-04-01 | StatCard computed value/label typography match DS spec | browser (new, Wave 0 gap) | `npx vitest run --project=browser -t "StatCard"` | ❌ MISSING — created by this task | ⬜ pending |
-| 09-05-T1 | 09-05 | 2 | COMP-02 | T-09-05-02 | chip/segment aria-pressed + accessible names unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ⬜ pending |
-| 09-05-T2 | 09-05 | 2 | COMP-01, COMP-02 | T-09-05-02 | "Legs verringern"/"Spiel starten" accessible names unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ⬜ pending |
-| 09-05-T3 | 09-05 | 2 | COMP-02 | T-09-05-01 | id/role=switch/aria-checked preserved on all 4 toggles | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec (line 27 `getByRole('switch',{name:'Sets'})`) | ⬜ pending |
-| 09-06-T1 | 09-06 | 2 | COMP-01 | T-09-06-01 | "Spieler hinzufügen"/"Gast hinzufügen" accessible names unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ⬜ pending |
-| 09-06-T2 | 09-06 | 2 | COMP-01, COMP-03 | T-09-06-01 | ProfileManager accessible names + data-testid unchanged | browser | `npx vitest run --project=browser -t "ProfileManager"` | ✅ existing test file | ⬜ pending |
-| 09-06-T3 | 09-06 | 2 | COMP-01 | T-09-06-01 | "Spielreihenfolge bestätigen" accessible name unchanged | e2e | `npx playwright test` | ✅ existing full suite | ⬜ pending |
-| 09-07-T1 | 09-07 | 2 | COMP-02 | T-09-07-01, T-09-07-02 | id/role=switch/aria-checked preserved; row height 48px not 64px | e2e | `npx playwright test` | ✅ existing full suite (indirect) | ⬜ pending |
-| 09-07-T2 | 09-07 | 2 | COMP-02 | T-09-07-01 | direct role=switch/aria-checked toggle proof for /match | e2e (new, Wave 0 gap) | `npx playwright test e2e/match-audio-toggle.spec.ts` | ❌ MISSING — created by this task | ⬜ pending |
+| 09-01-T1 | 09-01 | 1 | COMP-01, COMP-02 | T-09-01-SC | zero new packages; no forbidden hex introduced | unit | `npx vitest run --project unit -t "design tokens"` | ✅ existing regression test | ✅ green |
+| 09-01-T2 | 09-01 | 1 | COMP-01 | T-09-01-01 | hub button accessible names/onclick unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ✅ green |
+| 09-01-T3 | 09-01 | 1 | COMP-01, COMP-02 | T-09-01-SC | shared .btn/.switch classes render at DS values | browser (new, Wave 0 gap) | `npx vitest run --project=browser -t "components-css"` | ❌ MISSING — created by this task | ✅ green |
+| 09-02-T1 | 09-02 | 2 | COMP-01 | T-09-02-01 | back-btn/menu-btn/delete-btn accessible names unchanged | e2e | `npx playwright test` | ✅ existing full suite | ✅ green |
+| 09-02-T2 | 09-02 | 2 | COMP-01 | T-09-02-01 | export/import buttons keep disabled/onclick behavior | e2e | `npx playwright test` | ✅ existing full suite | ✅ green |
+| 09-03-T1 | 09-03 | 2 | COMP-01, COMP-03 | T-09-03-01 | ConfirmDialog props/ARIA/German labels unchanged | e2e | `npx playwright test` | ✅ existing full suite | ✅ green |
+| 09-03-T2 | 09-03 | 2 | COMP-01, COMP-03 | T-09-03-01 | "Fortsetzen"/"Verwerfen" accessible names unchanged | e2e | `npx playwright test e2e/resume.spec.ts` | ✅ existing spec | ✅ green |
+| 09-03-T3 | 09-03 | 2 | COMP-03 | T-09-03-01 | ConfirmDialog computed blur/radius/max-width match DS spec | browser (new, Wave 0 gap) | `npx vitest run --project=browser -t "ConfirmDialog"` | ❌ MISSING — created by this task | ✅ green |
+| 09-04-T1 | 09-04 | 1 | COMP-04 | T-09-04-01 | StatCard props (label/value) unchanged | browser | `npx vitest run --project=browser -t "StatCard"` | ❌ MISSING — created by Task 2, exercised here | ✅ green |
+| 09-04-T2 | 09-04 | 1 | COMP-04 | T-09-04-01 | StatCard computed value/label typography match DS spec | browser (new, Wave 0 gap) | `npx vitest run --project=browser -t "StatCard"` | ❌ MISSING — created by this task | ✅ green |
+| 09-05-T1 | 09-05 | 2 | COMP-02 | T-09-05-02 | chip/segment aria-pressed + accessible names unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ✅ green |
+| 09-05-T2 | 09-05 | 2 | COMP-01, COMP-02 | T-09-05-02 | "Legs verringern"/"Spiel starten" accessible names unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ✅ green |
+| 09-05-T3 | 09-05 | 2 | COMP-02 | T-09-05-01 | id/role=switch/aria-checked preserved on all 4 toggles | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec (line 27 `getByRole('switch',{name:'Sets'})`) | ✅ green |
+| 09-06-T1 | 09-06 | 2 | COMP-01 | T-09-06-01 | "Spieler hinzufügen"/"Gast hinzufügen" accessible names unchanged | e2e | `npx playwright test e2e/full-match-flow.spec.ts` | ✅ existing spec | ✅ green |
+| 09-06-T2 | 09-06 | 2 | COMP-01, COMP-03 | T-09-06-01 | ProfileManager accessible names + data-testid unchanged | browser | `npx vitest run --project=browser -t "ProfileManager"` | ✅ existing test file | ✅ green |
+| 09-06-T3 | 09-06 | 2 | COMP-01 | T-09-06-01 | "Spielreihenfolge bestätigen" accessible name unchanged | e2e | `npx playwright test` | ✅ existing full suite | ✅ green |
+| 09-07-T1 | 09-07 | 2 | COMP-02 | T-09-07-01, T-09-07-02 | id/role=switch/aria-checked preserved; row height 48px not 64px | e2e | `npx playwright test` | ✅ existing full suite (indirect) | ✅ green |
+| 09-07-T2 | 09-07 | 2 | COMP-02 | T-09-07-01 | direct role=switch/aria-checked toggle proof for /match | e2e (new, Wave 0 gap) | `npx playwright test e2e/match-audio-toggle.spec.ts` | ❌ MISSING — created by this task | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -87,4 +87,16 @@ None. Per CONTEXT.md's explicit resolution of the `/match` audio-bar sizing ques
 - [x] Feedback latency < 180s (targeted vitest `-t` filters and single-spec Playwright runs are all well under this; full-suite gates run once per wave)
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending (plans not yet executed)
+**Approval:** approved 2026-07-14 (post-execution audit)
+
+---
+
+## Validation Audit 2026-07-14
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+All 18 mapped verifications ran green during execution; verifier independently re-ran the full suite (535/535 vitest, 9/9 Playwright incl. the new Wave-0 specs, build clean). Review round added MatchSetup.test.ts (WR-01) closing the switch-label runtime-proof gap.

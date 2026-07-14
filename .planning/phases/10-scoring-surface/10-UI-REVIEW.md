@@ -120,3 +120,8 @@
 
 _Fixed: 2026-07-14_
 _Fixer: Claude (gsd-code-fixer)_
+
+
+### Orchestrator correction (2026-07-14, post-fix)
+
+Fix 3 was reverted to the DS literal: `DartPill.jsx:20` derives double bg/border from `--accent` (7%/30%), not `--accent-double` — the `.jsx` is the authoritative value source (established hierarchy: jsx wins for values, prose for intent). The fixer's accent-double-based precomputes were replaced with `rgba(240,164,36,0.07)`/`rgba(240,164,36,0.3)`. Finding 3 status: **wont-fix (DS literal upheld)** — the original shipped values were correct.

@@ -491,14 +491,13 @@
 		font-weight: 600;
 	}
 
-	/* bg/border below are the precomputed static values for color-mix(in oklab, var(--accent-double) 7%/30%, transparent)
-	   -- recomputed from --accent-double (#f6dfae) so bg/border match the pale-amber text color, per CONTEXT.md's
-	   "translucent amber bg+border" intent for doubles. DartPill.jsx:20 literally derives bg/border from --accent
-	   instead, but that produces a tint closer to a triple than the intended pale-amber double (UI-REVIEW.md WR-02). */
+	/* bg/border are precomputed statics for DartPill.jsx:20's literal
+	   color-mix(in oklab, var(--accent) 7%/30%, transparent) — the .jsx is the
+	   authoritative value source (text stays --accent-double per the same line). */
 	.dart-pill--double {
 		color: var(--accent-double);
-		background: rgba(246, 223, 174, 0.07);
-		border-color: rgba(246, 223, 174, 0.30);
+		background: rgba(240, 164, 36, 0.07);
+		border-color: rgba(240, 164, 36, 0.3);
 		font-weight: 600;
 	}
 

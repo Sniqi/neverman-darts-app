@@ -35,7 +35,7 @@ expected: Leg-Gewinn-Banner und Match-Win-Anzeige erscheinen und verschwinden wi
 result: [pending]
 
 ### 5. Pause-Countdown (DISP-04)
-expected: Auto-Pause zeigt den synchronisierten Countdown auf dem TV; „Weiter" beendet ihn beidseitig
+expected: Auto-Pause zeigt den synchronisierten Countdown auf dem TV; „Weiter" beendet ihn beidseitig. ZUSATZ (Phase 12 WR-02): Der neue Blur-Scrim (backdrop-filter 12px) muss auf dem Receiver flüssig rendern (Chrome 90 unterstützt blur; prüfe Performance des Vollbild-Blurs)
 result: [pending]
 
 ### 6. Auto-Rejoin (DISP-04)

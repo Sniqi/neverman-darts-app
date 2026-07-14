@@ -38,7 +38,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
 - [x] **Phase 8: Design Foundation** - DS color/spacing/radius/elevation tokens, self-hosted Barlow fonts, and the DS motion system replace all provisional v1.0 styling app-wide (completed 2026-07-13)
 - [x] **Phase 9: Core Components** - Shared UI primitives (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) match their DS specs everywhere they're used (completed 2026-07-14)
 - [x] **Phase 10: Scoring Surface** - `/match` restyled to DS specs (Numpad, Dartboard colors, VisitStrip/DartPill, ScoreCard) with all scoring logic and behavior unchanged (completed 2026-07-14)
-- [ ] **Phase 11: Spectator Display** - `/display` restyled to DS specs (PC window, tablet fullscreen, Cast receiver) and verified on the real Chromecast device (Chrome 90 @ 1280×720)
+- [x] **Phase 11: Spectator Display** - `/display` restyled to DS specs (PC window, tablet fullscreen, Cast receiver) and verified on the real Chromecast device (Chrome 90 @ 1280×720) (completed 2026-07-14)
 - [ ] **Phase 12: Pages & Overlays** - Start hub, setup, history, stats, and data/backup pages plus all global overlays/toasts restyled to DS specs
 
 ## Phase Details
@@ -144,7 +144,7 @@ Plans:
   3. On the real Chromecast device (Chrome 90 @ 1280×720), the restyled display renders correctly with no layout breakage — every modern CSS feature used (container queries, dvh, subgrid) is confirmed to fall back correctly via `@supports`.
   4. BroadcastChannel/Cast sync, the idle screen, leg/set banners, the win overlay, and the pause countdown all still render and update exactly as before the restyle.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 Plans:
 **Wave 1**
 
@@ -153,7 +153,7 @@ Plans:
 
 **Wave 2** *(blocked on 11-01 completion)*
 
-- [ ] 11-03-PLAN.md — PlayerPanel restyle: backgrounds/box-shadows/BUST/history-box, --display-* typography, formatDart consolidation + Chrome-90 fallback sync (DISP-01, DISP-03 code-side)
+- [x] 11-03-PLAN.md — PlayerPanel restyle: backgrounds/box-shadows/BUST/history-box, --display-* typography, formatDart consolidation + Chrome-90 fallback sync (DISP-01, DISP-03 code-side)
 
 **UI hint**: yes
 
@@ -186,5 +186,5 @@ Plans:
 | 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
 | 9. Core Components | v1.2 | 7/7 | Complete    | 2026-07-14 |
 | 10. Scoring Surface | v1.2 | 5/5 | Complete    | 2026-07-14 |
-| 11. Spectator Display | v1.2 | 2/3 | In Progress|  |
+| 11. Spectator Display | v1.2 | 3/3 | Complete   | 2026-07-14 |
 | 12. Pages & Overlays | v1.2 | 0/TBD | Not started | - |

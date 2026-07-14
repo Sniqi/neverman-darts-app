@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Restyling
 current_phase: 11
 current_phase_name: Spectator Display
-status: executing
+status: verifying
 stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-07-14T04:13:33.301Z"
+last_updated: "2026-07-14T04:23:39.331Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 11 execution started
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 21
-  completed_plans: 20
-  percent: 60
+  completed_plans: 21
+  percent: 80
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 
 Phase: 11 (Spectator Display) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-14 — Phase 11 execution started
 
 ## Performance Metrics
@@ -109,6 +109,7 @@ Last activity: 2026-07-14 — Phase 11 execution started
 | Phase 10-scoring-surface P05 | 25min | 2 tasks | 3 files |
 | Phase 11 P01 | 7min | 2 tasks | 4 files |
 | Phase 11 P02 | 5min | 2 tasks | 1 files |
+| Phase 11-spectator-display P03 | 12min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -149,6 +150,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: formatDartShort outer-bull string is 'Outer' (matching DartPill.jsx literally), not 'Bull' or 'Outer Bull' -- per CONTEXT.md Q1 resolution
 - [Phase 11]: MatchHeader's background gradient intentionally left unchanged (nearest-token mapping stays acceptable), distinct from PlayerPanel's locked-literal background requirement in Plan 11-03
 - [Phase 11]: Bloom's color-mix(in oklab, var(--accent) 28%, transparent) precomputed to static rgba(240, 164, 36, 0.28) per project-wide Chrome-90 rule
+- [Phase ?]: [Phase 11-03]: Active box-shadow amber mixes precomputed to static 7%/22% rgba(); comment describes as translucent-accent mix, avoiding literal color-mix( string per phase-wide grep gate
+- [Phase ?]: [Phase 11-03]: .dart-pill font-size switched to relative 0.82em off .h-darts's --display-body, matching DS DartPill size=0.82em pattern
 
 ### Quick Tasks Completed
 
@@ -175,7 +178,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T04:12:51.512Z
+Last session: 2026-07-14T04:20:29.402Z
 Stopped at: Completed 11-01-PLAN.md
 Resume file: None
 

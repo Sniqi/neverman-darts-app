@@ -290,7 +290,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-size: clamp(1.6rem, 11cqw, 8.5rem);
+		font-size: var(--display-name);
 		font-weight: 700;
 		line-height: 1.1;
 		letter-spacing: -0.01em;
@@ -306,7 +306,7 @@
 	.ls-chip {
 		display: inline-flex;
 		align-items: baseline;
-		font-size: clamp(1.1rem, 6.5cqw, 4.4rem);
+		font-size: var(--display-body);
 		font-weight: 600;
 		line-height: 1.15;
 		white-space: nowrap;
@@ -324,10 +324,10 @@
 
 	.remaining-score {
 		flex: 0 0 auto;
-		font-size: clamp(3rem, 23cqw, 16rem);
-		font-weight: 700;
-		line-height: 1;
-		letter-spacing: -0.03em;
+		font-size: var(--display-score);
+		font-weight: 800;
+		line-height: 0.95;
+		letter-spacing: var(--tracking-tight);
 		color: var(--text);
 		text-align: right;
 		pointer-events: none;
@@ -342,7 +342,8 @@
 
 	.player-panel.active .remaining-score {
 		color: var(--text);
-		text-shadow: 0 0 55px var(--accent-line), 0 2px 10px var(--backdrop);
+		/* Precomputed translucent-accent mix (40%) — Chrome-90 safe static rgba(). */
+		text-shadow: 0 0 55px rgba(240, 164, 36, 0.40), 0 2px 10px var(--backdrop);
 	}
 
 	/* History of last ~12 darts, framed as a recessed panel */
@@ -366,7 +367,7 @@
 		display: grid;
 		grid-template-columns: 1fr auto auto;
 		align-content: end;
-		row-gap: clamp(3px, 0.8cqw, 9px);
+		row-gap: clamp(4px, 0.8cqw, 10px);
 		overflow: hidden;
 	}
 
@@ -375,10 +376,10 @@
 		grid-column: 1 / -1;
 		grid-template-columns: subgrid;
 		align-items: center;
-		column-gap: clamp(0.4em, 1.5cqw, 0.9em);
-		padding: clamp(3px, 0.9cqw, 9px) clamp(6px, 1.6cqw, 14px);
+		column-gap: clamp(0.4em, 1.5cqw, 1em);
+		padding: clamp(4px, 0.9cqw, 10px) clamp(8px, 1.6cqw, 16px);
 		border-radius: var(--radius-sm);
-		background: var(--line);
+		background: rgba(255, 255, 255, 0.03);
 		opacity: 0.62;
 		transition: opacity var(--dur-med) var(--ease), background var(--dur-med) var(--ease);
 	}
@@ -387,14 +388,16 @@
 	.history-row.last-row {
 		opacity: 1;
 		background: var(--accent-soft);
-		box-shadow: inset 3px 0 0 var(--accent);
+		box-shadow: inset 4px 0 0 var(--accent);
 	}
 
 	/* Live in-progress visit: stronger tint + gentle pulse on the amber edge.
 	   liveRowPulse is a LOCKED exception (CONTEXT.md): continuous ambient live
 	   indicator, not a one-shot transition — duration/easing keyword stay literal. */
 	.history-row.live-row {
-		background: var(--accent-soft);
+		/* Precomputed translucent-accent mix (17%) — Chrome-90 safe static rgba(),
+		   reading more saturated than the last-completed row's 13% token. */
+		background: rgba(240, 164, 36, 0.17);
 		animation: liveRowPulse 1.6s ease-in-out infinite;
 	}
 
@@ -409,13 +412,14 @@
 		flex-wrap: wrap;
 		gap: clamp(0.2em, 0.8cqw, 0.5em);
 		min-width: 0;
+		font-size: var(--display-body);
 	}
 
 	.dart-pill {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		font-size: clamp(1rem, 5cqw, 3.2rem);
+		font-size: 0.82em;
 		font-weight: 600;
 		line-height: 1.1;
 		letter-spacing: 0.01em;
@@ -448,7 +452,7 @@
 
 	/* Visit total — the headline number for the row */
 	.h-total {
-		font-size: clamp(1.2rem, 6.7cqw, 4.5rem);
+		font-size: var(--display-emph);
 		font-weight: 700;
 		line-height: 1;
 		text-align: right;
@@ -462,11 +466,12 @@
 		display: inline-flex;
 		align-items: baseline;
 		gap: 0.25em;
-		font-size: clamp(1rem, 5.4cqw, 3.6rem);
+		font-size: var(--display-body);
 		font-weight: 600;
 		text-align: right;
 		color: var(--text-muted);
 		white-space: nowrap;
+		font-family: var(--font-score);
 	}
 
 	.history-row.last-row .h-remaining {
@@ -481,7 +486,7 @@
 	/* Bust: red total, struck-through dart pills, score unchanged */
 	.history-row.bust-row .h-total {
 		color: var(--destructive);
-		font-size: clamp(1rem, 4.8cqw, 3.2rem);
+		font-size: var(--display-body);
 	}
 
 	.history-row.bust-row .dart-pill {
@@ -494,15 +499,17 @@
 	/* Checkout route (D-06): amber callout pill */
 	.checkout-route {
 		align-self: flex-start;
-		font-size: clamp(1rem, 5.5cqw, 3rem);
+		font-size: var(--display-emph);
+		font-family: var(--font-score);
 		font-weight: 700;
 		letter-spacing: 0.02em;
+		line-height: 1.2;
 		color: var(--accent);
 		background: var(--accent-soft);
 		border: 1px solid var(--accent-line);
 		border-radius: var(--radius-pill);
-		padding: 0.12em 0.7em;
-		box-shadow: 0 0 24px var(--accent-soft);
+		padding: 0.08em 0.7em;
+		box-shadow: var(--glow-accent);
 	}
 
 	/* Averages: structured footer stat-bar with a dividing rule */
@@ -513,7 +520,7 @@
 		gap: var(--space-xs) var(--space-md);
 		padding-top: var(--space-sm);
 		border-top: 1px solid var(--line);
-		font-size: clamp(1rem, 5.8cqw, 3.8rem);
+		font-size: var(--display-caption);
 		font-weight: 400;
 		line-height: 1.2;
 		color: var(--text);
@@ -533,6 +540,7 @@
 
 	.stat-val {
 		font-weight: 700;
+		font-family: var(--font-score);
 	}
 
 	.stat-div {

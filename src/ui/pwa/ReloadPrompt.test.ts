@@ -90,13 +90,13 @@ test('with both stores false, the toast is NOT in the DOM', async () => {
 	expect(screen.container.querySelector('.pwa-toast')).toBeFalsy();
 });
 
-test('PLAT-04: toast has position:fixed and accent (#f0a424) border color', async () => {
+test('PLAT-04: toast has position:fixed and neutral hairline (--line-strong) border color', async () => {
 	needRefresh.set(true);
 	const screen = render(ReloadPrompt, {});
 	const toast = screen.container.querySelector('.pwa-toast') as HTMLElement;
 	expect(toast).toBeTruthy();
 	const style = window.getComputedStyle(toast);
 	expect(style.position).toBe('fixed');
-	// Border color rendered as rgb(240, 164, 36) == #f0a424
-	expect(style.borderColor).toMatch(/rgb\(240,\s*164,\s*36\)/);
+	// Border color rendered as the computed value of --line-strong (colors.css:39)
+	expect(style.borderColor).toMatch(/rgba\(235,\s*240,\s*255,\s*0\.14\)/);
 });

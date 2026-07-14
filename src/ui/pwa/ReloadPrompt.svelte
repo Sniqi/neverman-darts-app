@@ -47,9 +47,9 @@
 		</p>
 		<div class="pwa-toast-actions">
 			{#if $needRefresh}
-				<button onclick={() => updateServiceWorker(true)}>Aktualisieren</button>
+				<button class="btn btn--cta" onclick={() => updateServiceWorker(true)}>Aktualisieren</button>
 			{/if}
-			<button onclick={close}>Schließen</button>
+			<button class="btn btn--ghost" onclick={close}>Schließen</button>
 		</div>
 	</div>
 {/if}
@@ -59,11 +59,11 @@
 		position: fixed;
 		bottom: 1rem;
 		right: 1rem;
-		background: var(--surface);
+		background: var(--surface-2);
 		color: var(--text);
-		border: 1px solid var(--accent);
+		border: 1px solid var(--line-strong);
 		border-radius: var(--radius-md);
-		padding: 0.75rem 1rem;
+		padding: var(--space-sm) var(--space-md);
 		box-shadow: var(--shadow-raise);
 		z-index: 9999;
 		max-width: 22rem;
@@ -71,7 +71,7 @@
 
 	.pwa-toast p {
 		margin: 0;
-		font-size: 14px;
+		font-size: var(--text-sm);
 		line-height: 1.4;
 	}
 
@@ -81,26 +81,8 @@
 		margin-top: 0.5rem;
 	}
 
-	button {
-		background: none;
-		border: 1px solid var(--accent);
-		color: var(--accent);
-		padding: 0.25rem 0.75rem;
-		border-radius: var(--radius-sm);
-		cursor: pointer;
-		font-size: 13px;
-		font-weight: 500;
-		transition: opacity var(--dur-base) var(--ease);
-	}
-
-	button:active {
-		opacity: var(--press-opacity);
-		transform: scale(var(--press-scale));
-	}
-
-	/* Primary action: filled accent, dark text */
-	button:first-child {
-		background: var(--accent);
-		color: var(--on-accent);
+	.pwa-toast-actions .btn {
+		flex: 1;
+		width: auto;
 	}
 </style>

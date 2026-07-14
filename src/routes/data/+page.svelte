@@ -202,7 +202,7 @@
 
 <style>
 	.screen {
-		max-width: 480px;
+		max-width: 520px;
 		margin: 0 auto;
 		min-height: 100dvh;
 		background: var(--bg);
@@ -224,7 +224,7 @@
 	}
 
 	.screen-title {
-		font-size: 20px;
+		font-size: var(--text-xl);
 		font-weight: 600;
 		margin: 0;
 		color: var(--text);
@@ -241,7 +241,7 @@
 	}
 
 	.section-heading {
-		font-size: 20px;
+		font-size: var(--text-lg);
 		font-weight: 600;
 		margin: 0;
 		color: var(--text);
@@ -254,7 +254,7 @@
 	}
 
 	.description-text {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		line-height: 1.4;
 		color: var(--text-muted);
@@ -280,14 +280,14 @@
 	}
 
 	.inline-error {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--destructive);
 		margin: 0;
 	}
 
 	.inline-success {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--text);
 		margin: 0;
@@ -307,7 +307,7 @@
 	}
 
 	.storage-warning-text {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--accent);
 		margin: 0;

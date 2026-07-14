@@ -64,7 +64,7 @@
 		z-index: 45;
 		min-width: 240px;
 		max-width: 320px;
-		background: var(--surface);
+		background: var(--surface-2);
 		border: 1px solid var(--line-strong);
 		border-left: 4px solid var(--accent);
 		border-radius: var(--radius-md);
@@ -86,7 +86,7 @@
 
 	.toast-heading {
 		margin: 0 0 2px 0;
-		font-size: 16px;
+		font-size: var(--text-base);
 		font-weight: 600;
 		color: var(--text);
 		line-height: 1.2;
@@ -94,7 +94,7 @@
 
 	.toast-body {
 		margin: 0;
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--text-soft);
 		line-height: 1.4;

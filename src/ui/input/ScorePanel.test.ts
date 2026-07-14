@@ -64,3 +64,34 @@ test('.player-name computed text-overflow is ellipsis and white-space is nowrap'
 	expect(style.textOverflow).toBe('ellipsis');
 	expect(style.whiteSpace).toBe('nowrap');
 });
+
+// SCOR-04 gap closure (10-05, 10-VERIFICATION.md): compact-mode clamp for 3-4 player
+// landscape to avoid clipping the active score (see e2e/score-panel-landscape.spec.ts
+// for the visual/overflow proof at the actual 1024x768 landscape viewport).
+test('.score-panel has class compact when playerCount is 4', async () => {
+	matchStore.restore({
+		...initialState(),
+		phase: 'playing',
+		activePlayerIndex: 0,
+		players: [
+			{ id: 'p1', name: 'Alice', isGuest: false, remaining: 501, legsWon: 0, setsWon: 0, visits: [] },
+			{ id: 'p2', name: 'Bob', isGuest: false, remaining: 501, legsWon: 0, setsWon: 0, visits: [] },
+			{ id: 'p3', name: 'Carol', isGuest: false, remaining: 501, legsWon: 0, setsWon: 0, visits: [] },
+			{ id: 'p4', name: 'Dave', isGuest: false, remaining: 501, legsWon: 0, setsWon: 0, visits: [] }
+		]
+	});
+	const screen = render(ScorePanel);
+	const panel = screen.container.querySelector('.score-panel') as HTMLElement;
+	expect(panel).toBeTruthy();
+	expect(panel.classList.contains('compact')).toBe(true);
+});
+
+test('.score-panel does not have class compact for the default 2-player fixture, and .remaining-active stays at 96px', async () => {
+	const screen = render(ScorePanel);
+	const panel = screen.container.querySelector('.score-panel') as HTMLElement;
+	expect(panel).toBeTruthy();
+	expect(panel.classList.contains('compact')).toBe(false);
+	const el = screen.container.querySelector('.remaining-active') as HTMLElement;
+	const style = window.getComputedStyle(el);
+	expect(style.fontSize).toBe('96px');
+});

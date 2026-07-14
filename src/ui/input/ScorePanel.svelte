@@ -4,9 +4,11 @@
 	// CheckoutSuggestion is rendered beside active player's remaining score.
 	import { matchStore } from '../../stores/match.svelte.js';
 	import CheckoutSuggestion from './CheckoutSuggestion.svelte';
+
+	let playerCount = $derived(matchStore.state.players.length);
 </script>
 
-<div class="score-panel">
+<div class="score-panel" class:compact={playerCount >= 3}>
 	{#each matchStore.state.players as player, i (player.id)}
 		{@const isActive = i === matchStore.state.activePlayerIndex}
 		<div class="player-card" class:active={isActive}>
@@ -128,6 +130,14 @@
 			justify-content: center;
 			padding: 20px;
 			min-width: 0;
+		}
+
+		.score-panel.compact .player-card {
+			padding: 10px 4px;
+		}
+
+		.score-panel.compact .remaining-active {
+			font-size: clamp(22px, 4vw, var(--text-score-active));
 		}
 	}
 </style>

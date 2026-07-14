@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 09 — Core Components
+**Current focus:** Phase 10 — Scoring Surface
 
 ## Current Position
 
@@ -158,8 +158,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T00:07:24.921Z
-Stopped at: Completed 09-04-PLAN.md
+Last session: 2026-07-14
+Stopped at: Phase 9 complete (verified 15/15), ready to plan Phase 10 (autonomous run --from 8 in progress)
 Resume file: None
 
 ## Operator Next Steps

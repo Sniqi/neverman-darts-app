@@ -144,7 +144,17 @@ Plans:
   3. On the real Chromecast device (Chrome 90 @ 1280×720), the restyled display renders correctly with no layout breakage — every modern CSS feature used (container queries, dvh, subgrid) is confirmed to fall back correctly via `@supports`.
   4. BroadcastChannel/Cast sync, the idle screen, leg/set banners, the win overlay, and the pause countdown all still render and update exactly as before the restyle.
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+
+- [ ] 11-01-PLAN.md — Notation consolidation: shared `formatDartShort` (dart-notation.ts) + VisitLine.svelte planned test-string update
+- [ ] 11-02-PLAN.md — MatchHeader restyle to DS typography/spacing/bloom (DISP-02)
+
+**Wave 2** *(blocked on 11-01 completion)*
+
+- [ ] 11-03-PLAN.md — PlayerPanel restyle: backgrounds/box-shadows/BUST/history-box, --display-* typography, formatDart consolidation + Chrome-90 fallback sync (DISP-01, DISP-03 code-side)
+
 **UI hint**: yes
 
 ### Phase 12: Pages & Overlays
@@ -176,5 +186,5 @@ Plans:
 | 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
 | 9. Core Components | v1.2 | 7/7 | Complete    | 2026-07-14 |
 | 10. Scoring Surface | v1.2 | 5/5 | Complete    | 2026-07-14 |
-| 11. Spectator Display | v1.2 | 0/TBD | Not started | - |
+| 11. Spectator Display | v1.2 | 0/3 | Not started | - |
 | 12. Pages & Overlays | v1.2 | 0/TBD | Not started | - |

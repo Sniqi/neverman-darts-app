@@ -147,7 +147,7 @@
 
 <style>
 	.screen {
-		max-width: 480px;
+		max-width: 520px;
 		margin: 0 auto;
 		min-height: 100dvh;
 		background: var(--bg);
@@ -169,7 +169,7 @@
 	}
 
 	.screen-title {
-		font-size: 20px;
+		font-size: var(--text-xl);
 		font-weight: 600;
 		margin: 0;
 		color: var(--text);
@@ -194,14 +194,14 @@
 
 	.summary-date,
 	.summary-format {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--text-muted);
 		margin: 0;
 	}
 
 	.summary-result {
-		font-size: 16px;
+		font-size: var(--text-md);
 		font-weight: 600;
 		color: var(--text);
 		margin: 0;
@@ -219,7 +219,7 @@
 	}
 
 	.section-heading {
-		font-size: 20px;
+		font-size: var(--text-lg);
 		font-weight: 600;
 		color: var(--text);
 		margin: 0;
@@ -237,7 +237,7 @@
 	}
 
 	.delete-error {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--destructive);
 		margin: var(--space-sm) 0 0 0;

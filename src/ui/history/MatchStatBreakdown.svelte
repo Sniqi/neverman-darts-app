@@ -84,7 +84,7 @@
 	}
 
 	.section-heading {
-		font-size: 20px;
+		font-size: var(--text-lg);
 		font-weight: 600;
 		color: var(--text);
 		margin: 0;
@@ -97,7 +97,7 @@
 	}
 
 	.player-name {
-		font-size: 16px;
+		font-size: var(--text-md);
 		font-weight: 600;
 		color: var(--text);
 		margin: 0;

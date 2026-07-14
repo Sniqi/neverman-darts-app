@@ -74,7 +74,7 @@
 	}
 
 	.player-name {
-		font-size: 16px;
+		font-size: var(--text-md);
 		font-weight: 400;
 		color: var(--text);
 	}
@@ -85,7 +85,7 @@
 	}
 
 	.wins-label {
-		font-size: 16px;
+		font-size: var(--text-md);
 		font-weight: 400;
 		color: var(--text);
 	}
@@ -97,13 +97,13 @@
 	}
 
 	.avg-label {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--text-muted);
 	}
 
 	.avg-value {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--text);
 	}

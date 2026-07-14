@@ -7,6 +7,7 @@
 	import { onDestroy } from 'svelte';
 	import { legAverage, matchAverage } from '../../engine/averages.js';
 	import { getSuggestion } from '../../engine/checkout.js';
+	import { formatDartShort } from '../input/dart-notation.js';
 	import type { PlayerState, MatchConfig, DartScore, Visit } from '../../engine/types.js';
 
 	interface Props {
@@ -18,14 +19,6 @@
 	}
 
 	let { player, isActive, config, legStartIndex, currentVisit = [] }: Props = $props();
-
-	function formatDart(dart: DartScore): string {
-		if (dart.segment === 0) return '0';
-		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';
-		if (dart.multiplier === 1 && dart.segment === 25) return 'Outer';
-		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
-		return `${prefix}${dart.segment}`;
-	}
 
 	let liveVisitTotal = $derived(currentVisit.reduce((s, d) => s + d.multiplier * d.segment, 0));
 
@@ -166,7 +159,7 @@
 					class:double={d.multiplier === 2 && d.segment !== 25}
 					class:bull={d.segment === 25}
 					class:miss={d.segment === 0}
-				>{formatDart(d)}</span>
+				>{formatDartShort(d)}</span>
 			{/each}
 		</div>
 	{/snippet}
@@ -228,7 +221,7 @@
 		background: linear-gradient(165deg, #272d3c 0%, #191d28 100%);
 		border-top-color: var(--accent);
 		/* Precomputed translucent-accent mixes (7% ambient glow, 22% top-edge glow) —
-		   Chrome-90 safe static rgba(), not a live color-mix() function. */
+		   static rgba() for Chrome-90 safety, not a live color-mix expression. */
 		box-shadow: inset 0 0 80px rgba(240, 164, 36, 0.07),
 			inset 0 5px 0 rgba(240, 164, 36, 0.22);
 		opacity: 1;
@@ -563,16 +556,16 @@
 				clamp(8px, calc(2vw / var(--player-count, 2)), 18px);
 			gap: clamp(4px, calc(1.2vw / var(--player-count, 2)), 12px);
 		}
-		.player-name    { font-size: clamp(1.6rem, calc(11vw  / var(--player-count, 2)), 8.5rem); }
-		.remaining-score { font-size: clamp(3rem,  calc(23vw  / var(--player-count, 2)), 16rem); }
-		.ls-chip        { font-size: clamp(1.1rem, calc(6.5vw / var(--player-count, 2)), 4.4rem); }
-		.bust-label     { font-size: clamp(1.5rem, calc(17vw  / var(--player-count, 2)), 6rem); }
-		.dart-pill      { font-size: clamp(1rem,   calc(5vw   / var(--player-count, 2)), 3.2rem); }
-		.h-total        { font-size: clamp(1.2rem, calc(6.7vw / var(--player-count, 2)), 4.5rem); }
-		.h-remaining    { font-size: clamp(1rem,   calc(5.4vw / var(--player-count, 2)), 3.6rem); }
-		.checkout-route { font-size: clamp(1rem,   calc(5.5vw / var(--player-count, 2)), 3rem); }
-		.stats-line     { font-size: clamp(1rem,   calc(5.8vw / var(--player-count, 2)), 3.8rem); }
-		.history-row.bust-row .h-total { font-size: clamp(1rem, calc(4.8vw / var(--player-count, 2)), 3.2rem); }
+		.player-name    { font-size: clamp(3rem,   calc(10vw  / var(--player-count, 2)), 12rem); }
+		.remaining-score { font-size: clamp(6rem,  calc(27vw  / var(--player-count, 2)), 26rem); }
+		.ls-chip        { font-size: clamp(2rem,   calc(5vw   / var(--player-count, 2)), 6.5rem); }
+		.bust-label     { font-size: clamp(3rem,   calc(14vw  / var(--player-count, 2)), 12rem); }
+		.h-darts        { font-size: clamp(2rem,   calc(5vw   / var(--player-count, 2)), 6.5rem); }
+		.h-total        { font-size: clamp(2.5rem, calc(6.5vw / var(--player-count, 2)), 8rem); }
+		.h-remaining    { font-size: clamp(2rem,   calc(5vw   / var(--player-count, 2)), 6.5rem); }
+		.checkout-route { font-size: clamp(2.5rem, calc(6.5vw / var(--player-count, 2)), 8rem); }
+		.stats-line     { font-size: clamp(1.75rem, calc(4vw  / var(--player-count, 2)), 5rem); }
+		.history-row.bust-row .h-total { font-size: clamp(2rem, calc(5vw / var(--player-count, 2)), 6.5rem); }
 	}
 
 	/* The Chromecast's Chrome 90 also lacks `subgrid` (Chrome 117+). The history rows normally

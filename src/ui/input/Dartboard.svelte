@@ -45,7 +45,7 @@
 		} else if (dart.multiplier === 2) {
 			label = `D${dart.segment} (${dart.multiplier * dart.segment})`; color = 'var(--accent)';
 		} else {
-			label = String(dart.segment); color = 'var(--text)';
+			label = String(dart.segment); color = '#ffffff';
 		}
 		const id = floatId++;
 		floats = [...floats, { id, x: svgX, y: svgY, label, color }];

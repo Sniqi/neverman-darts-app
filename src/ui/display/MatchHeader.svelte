@@ -34,11 +34,12 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-		gap: clamp(0.4rem, 1vw, 1.2rem);
-		padding: var(--space-sm) var(--space-lg);
+		gap: clamp(0.5rem, 1.2vw, 1.6rem);
+		padding: clamp(8px, 1vw, 20px) clamp(16px, 2.5vw, 48px);
 		background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
-		font-size: clamp(2rem, 4vw, 5.6rem);
-		font-weight: 500;
+		font-family: var(--font-score);
+		font-size: clamp(1.75rem, 3.4vw, 6.5rem);
+		font-weight: 600;
 		line-height: 1.15;
 		color: var(--text);
 		white-space: nowrap;
@@ -67,7 +68,7 @@
 	}
 
 	.mh-mode {
-		font-weight: 600;
+		font-weight: 700;
 		flex-shrink: 0;
 	}
 
@@ -77,16 +78,16 @@
 
 	.mh-leg {
 		color: var(--accent);
-		font-weight: 700;
+		font-weight: 800;
 		flex-shrink: 0;
 	}
 
 	.mh-dot {
 		color: var(--accent);
-		font-size: 0.45em;
+		font-size: 0.4em;
 		line-height: 1;
 		opacity: 0.85;
 		flex-shrink: 0;
-		transform: translateY(-0.1em);
+		transform: translateY(-0.15em);
 	}
 </style>

@@ -157,8 +157,9 @@
 		gap: var(--space-sm);
 		background: var(--surface);
 		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md);
-		min-height: 56px;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line);
+		min-height: var(--row-h);
 	}
 
 	.avatar {

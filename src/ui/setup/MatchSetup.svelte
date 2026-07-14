@@ -159,7 +159,7 @@
 		</svg>
 		Zurück
 	</button>
-	<h1>Neverman Darts</h1>
+	<h1>Neues Spiel</h1>
 
 	<!-- Player picker section -->
 	<section>
@@ -360,13 +360,13 @@
 
 <style>
 	.setup-screen {
-		max-width: 480px;
+		max-width: 520px;
 		margin: 0 auto;
 		padding: var(--space-lg);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-xl);
-		padding-bottom: var(--space-2xl);
+		padding-bottom: var(--space-3xl);
 	}
 
 	.back-btn {
@@ -374,13 +374,14 @@
 		align-items: center;
 		gap: var(--space-xs);
 		width: auto;
-		font-size: 15px;
+		font-size: var(--text-base);
 		padding: 0;
 		margin-bottom: calc(-1 * var(--space-md));
 	}
 
 	h1 {
-		font-size: 20px;
+		font-size: var(--text-xl);
+		letter-spacing: -0.01em;
 		font-weight: 600;
 		margin: 0;
 	}
@@ -392,7 +393,7 @@
 	}
 
 	h2 {
-		font-size: 20px;
+		font-size: var(--text-lg);
 		font-weight: 600;
 		margin: 0;
 	}

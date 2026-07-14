@@ -169,14 +169,14 @@ Plans:
   3. The statistics dashboard shows DS typography/colors, with the existing bespoke SVG charts recolored to the DS palette (not rebuilt).
   4. The data/backup page and global overlays/toasts (PWA update toast, resume prompt, pause overlay, record celebrations) all match their DS specs.
 
-**Plans**: 3/5 plans executed
+**Plans**: 4/5 plans executed
 Plans:
 **Wave 1**
 
 - [x] 12-01-PLAN.md — Hub + Setup restyle to DS 520px column/list-box/type-scale (PAGE-01)
 - [x] 12-02-PLAN.md — History list + detail restyle to DS HistoryRow spec (PAGE-02)
 - [x] 12-03-PLAN.md — Stats dashboard restyle + 2-line chart recolor fix (PAGE-03)
-- [ ] 12-04-PLAN.md — Overlay restyle: Pause/Record/MatchWin panel treatment + button swap (PAGE-04)
+- [x] 12-04-PLAN.md — Overlay restyle: Pause/Record/MatchWin panel treatment + button swap (PAGE-04)
 - [ ] 12-05-PLAN.md — Toast restyle (ReloadPrompt + coupled test/ResumeToast) + Data/backup page (PAGE-04)
 
 **UI hint**: yes
@@ -196,4 +196,4 @@ Plans:
 | 9. Core Components | v1.2 | 7/7 | Complete    | 2026-07-14 |
 | 10. Scoring Surface | v1.2 | 5/5 | Complete    | 2026-07-14 |
 | 11. Spectator Display | v1.2 | 3/3 | Complete   | 2026-07-14 |
-| 12. Pages & Overlays | v1.2 | 3/5 | In Progress|  |
+| 12. Pages & Overlays | v1.2 | 4/5 | In Progress|  |

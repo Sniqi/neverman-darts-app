@@ -39,7 +39,7 @@
 
 ### PAGE — App pages & overlays
 
-- [ ] **PAGE-01**: Start hub and match setup match the DS screens — centered 520px column, list boxes (radius 16), collapsible "Profile verwalten", terse German labels
+- [x] **PAGE-01**: Start hub and match setup match the DS screens — centered 520px column, list boxes (radius 16), collapsible "Profile verwalten", terse German labels
 - [ ] **PAGE-02**: Match history (list + detail) matches the DS HistoryRow spec
 - [ ] **PAGE-03**: Statistics dashboard restyled — DS type/colors; the bespoke SVG charts are recolored to the DS palette (not rebuilt)
 - [ ] **PAGE-04**: Daten/Backup page plus global overlays and toasts (PWA update toast, resume prompt, pause overlay, record celebrations) match the DS specs
@@ -88,7 +88,7 @@ Which phase covers which requirement. Filled during roadmap creation.
 | DISP-02 | Phase 11 | Complete |
 | DISP-03 | Phase 11 | Complete |
 | DISP-04 | Phase 11 | Complete |
-| PAGE-01 | Phase 12 | Pending |
+| PAGE-01 | Phase 12 | Complete |
 | PAGE-02 | Phase 12 | Pending |
 | PAGE-03 | Phase 12 | Pending |
 | PAGE-04 | Phase 12 | Pending |

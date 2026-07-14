@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
-current_phase: 11
-current_phase_name: Spectator Display
+current_phase: 12
+current_phase_name: Pages & Overlays
 status: executing
 stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-07-14T05:16:59.862Z"
+last_updated: "2026-07-14T05:20:34.483Z"
 last_activity: 2026-07-14
-last_activity_desc: Phase 11 execution started
+last_activity_desc: Phase 12 execution started
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 21
-  completed_plans: 21
+  total_plans: 26
+  completed_plans: 22
   percent: 80
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 12 — Pages & Overlays (Phase 11 UAT deferred → /gsd-verify-work 11)
+**Current focus:** Phase 12 — Pages & Overlays
 
 ## Current Position
 
-Phase: 11 (Spectator Display) — EXECUTING
-Plan: 3 of 3
+Phase: 12 (Pages & Overlays) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-07-14 — Phase 11 execution started
+Last activity: 2026-07-14 — Phase 12 execution started
 
 ## Performance Metrics
 
@@ -110,6 +110,7 @@ Last activity: 2026-07-14 — Phase 11 execution started
 | Phase 11 P01 | 7min | 2 tasks | 4 files |
 | Phase 11 P02 | 5min | 2 tasks | 1 files |
 | Phase 11-spectator-display P03 | 12min | 3 tasks | 1 files |
+| Phase 12 P01 | 5min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -184,7 +185,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14
+Last session: 2026-07-14T05:19:59.472Z
 Stopped at: Phase 11 executed (human_needed: on-device UAT deferred), continuing with Phase 12 (autonomous --from 8)
 Resume file: None
 

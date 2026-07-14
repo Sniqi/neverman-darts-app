@@ -46,14 +46,16 @@ created: 2026-07-14
 | 10-03-T2 | 10-03 | 1 | SCOR-03 | T-10-03-01, T-10-03-02 | VisitLine.svelte/.test.ts (Phase 11) byte-unchanged | regression (browser) | `npm test -- --project=browser src/ui/display/VisitLine.test.ts` | ✅ exists, must stay green | ⬜ pending |
 | 10-03-T3 | 10-03 | 1 | SCOR-03 | T-10-03-02 | Live board-tap → pill-text wiring proof | E2E | `npx playwright test dart-notation` | ❌ → created this task | ⬜ pending |
 | 10-04-T1 | 10-04 | 1 | SCOR-04 | T-10-04-01 | Store-read logic (isActive/suggestion guard) untouched | unit (browser) | `npm run test:browser -- src/ui/input/ScorePanel.test.ts src/ui/input/CheckoutSuggestion.test.ts` | ❌ → created this task | ⬜ pending |
-| 10-04-T2 | 10-04 | 1 | SCOR-04 | T-10-04-01, T-10-04-02 | 96px/44px DS values; zero new bust code in ScorePanel; landscape overflow explicitly checked | unit (browser) + manual | `npm run test:browser -- src/ui/input/ScorePanel.test.ts src/ui/input/CheckoutSuggestion.test.ts` | ✅ (created by T1) | ⬜ pending |
+| 10-04-T2 | 10-04 | 1 | SCOR-04 | T-10-04-01, T-10-04-02 | 96px/44px DS values; zero new bust code in ScorePanel | unit (browser) | `npm run test:browser -- src/ui/input/ScorePanel.test.ts src/ui/input/CheckoutSuggestion.test.ts` | ✅ (created by T1) | ⬜ pending |
+| 10-05-T1 | 10-05 | 1 | SCOR-04 (gap closure) | T-10-05-02 | Reproduces 10-VERIFICATION.md's 3-4 player landscape score-panel overflow at 1024x768 | E2E | `npx playwright test score-panel-landscape` | ❌ → created this task | ⬜ pending |
+| 10-05-T2 | 10-05 | 1 | SCOR-04 (gap closure) | T-10-05-01, T-10-05-02 | `.compact` clamp() fix eliminates overflow; 2-player landscape/all portrait stay at 96px/44px | unit (browser) + E2E | `npx playwright test score-panel-landscape && npm run test:browser -- src/ui/input/ScorePanel.test.ts` | ✅ (created by T1) | ⬜ pending |
 
 **Phase gate (all plans, after Wave 1 completes):**
 
 | Check | Command | Baseline |
 |-------|---------|----------|
 | Full Vitest suite | `npx vitest run` | 535+ green (was 535 at Phase 9 close; grows by ~17 new tests this phase: 6 Numpad + 3 Dartboard + 6 dart-notation + 5 ScorePanel/CheckoutSuggestion) |
-| Full Playwright suite | `npx playwright test` | 9/9 green baseline → 10/10 after Plan 10-03 adds `dart-notation.spec.ts` |
+| Full Playwright suite | `npx playwright test` | 9/9 green baseline → 10/10 after Plan 10-03 adds `dart-notation.spec.ts` → 12/12 after Plan 10-05 (gap closure) adds `score-panel-landscape.spec.ts` |
 
 ---
 
@@ -72,19 +74,17 @@ RESEARCH.md identified 6 Wave 0 coverage gaps (files with zero prior test covera
 
 ## Manual-Only Verifications
 
-| Behavior | Requirement | Why Manual | Test Instructions |
-|----------|-------------|------------|--------------------|
-| 3-4 player landscape layout does not clip/overflow with the 96px active score (RESEARCH.md Pitfall 4) | SCOR-04 | Requires a real/emulated tablet landscape viewport (~1024px wide) with multiple concurrent player cards — not practical to assert precisely via computed-style unit tests (font-size/weight are covered automatically; visual overflow/clipping across a narrow flex column is not) | `npm run dev`, start a match with 4 guest players, rotate to landscape (or resize browser to ~1024×768), confirm the active player's 96px score and all 3 inactive 44px scores render without clipping, wrapping, or overlapping. Embedded as a `<human-check>` in Plan 10-04 Task 2 (not a blocking checkpoint — `human_verify_mode: end-of-phase` per config.json). If it overflows, raise as a scope question at end-of-phase review rather than silently patching with a functional layout change. |
+None. The only manual-only item this phase carried — 3-4 player landscape layout clipping the 96px active score (RESEARCH.md Pitfall 4) — was never actually exercised before phase sign-off, surfaced as a real, screenshot-confirmed gap in 10-VERIFICATION.md, and is now closed by Plan 10-05's automated Playwright regression test (`npx playwright test score-panel-landscape`, 1024x768, 3 and 4 players), which asserts `scrollWidth <= clientWidth` on `.score-panel` and every `.player-card`, plus a bounding-rect containment check on the active score. This replaces the never-executed manual spot-check so the scenario can no longer silently regress.
 
 ---
 
 ## Validation Sign-Off
 
-- [x] All tasks have `<automated>` verify or Wave 0 dependencies (every task across all 4 plans has an `<automated>` command; Plan 10-04 Task 2 additionally has a non-blocking `<human-check>`)
+- [x] All tasks have `<automated>` verify (every task across all 5 plans, including gap closure Plan 10-05, has an `<automated>` command — the one prior non-blocking `<human-check>` in Plan 10-04 Task 2 is superseded by Plan 10-05's automated regression test, see Manual-Only Verifications above)
 - [x] Sampling continuity: no 3 consecutive tasks without automated verify (every single task has one)
 - [x] Wave 0 covers all MISSING references (6/6 gaps closed, see above)
 - [x] No watch-mode flags (all commands use `vitest run` / `npx playwright test`, never `--watch`)
 - [x] Feedback latency < 180s (targeted single-file `test:browser`/`playwright test` runs are seconds; full-suite gate ~60s vitest + ~3min E2E, run once per wave per Sampling Rate above)
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** approved (planner sign-off — 2026-07-14)
+**Approval:** approved (planner sign-off — 2026-07-14; updated for gap closure Plan 10-05 — 2026-07-14)

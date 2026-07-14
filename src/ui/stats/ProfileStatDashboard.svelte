@@ -124,7 +124,7 @@
 	}
 
 	.section-heading {
-		font-size: 20px;
+		font-size: var(--text-lg);
 		font-weight: 600;
 		margin: 0 0 var(--space-md) 0;
 		color: var(--text);

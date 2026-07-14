@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
-current_phase: 12
+current_phase: 11
+current_phase_name: spectator-display
 status: verifying
-stopped_at: "Phase 11 executed (human_needed: on-device UAT deferred), continuing with Phase 12 (autonomous --from 8)"
-last_updated: "2026-07-14T05:56:06.248Z"
+stopped_at: Phase 11 gap-closure plan 11-04 executed (pause-not-shown-on-Chromecast fix); Phase 11 now fully complete (4/4 plans) pending on-device UAT re-verification
+last_updated: "2026-07-14T13:39:11.463Z"
 last_activity: 2026-07-14
-last_activity_desc: Phase 12 complete
+last_activity_desc: Phase 11 gap-closure plan 11-04 executed
 progress:
   total_phases: 5
   completed_phases: 5
-  total_plans: 26
-  completed_plans: 26
+  total_plans: 27
+  completed_plans: 27
   percent: 100
-current_phase_name: Pages & Overlays
 ---
 
 # Project State
@@ -24,14 +24,14 @@ current_phase_name: Pages & Overlays
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Milestone-Endgame — Phase 11 On-Device-UAT (/gsd-verify-work 11), dann Audit/Complete
+**Current focus:** Milestone-Endgame — Phase 11 On-Device-UAT re-verification (/gsd-verify-work 11, Test 5), dann Audit/Complete
 
 ## Current Position
 
-Phase: 12
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-07-14 — Phase 12 complete
+Phase: 11 (spectator-display) — COMPLETE (4/4 plans)
+Plan: 4 of 4 (gap-closure)
+Status: Phase complete — ready for on-device UAT re-verification (Test 5)
+Last activity: 2026-07-14 — Phase 11 gap-closure plan 11-04 executed
 
 ## Performance Metrics
 
@@ -116,6 +116,7 @@ Last activity: 2026-07-14 — Phase 12 complete
 | Phase 12-pages-overlays P03 | 10min | 2 tasks | 4 files |
 | Phase 12 P04 | 12min | 2 tasks | 3 files |
 | Phase 12 P05 | 8min | 2 tasks | 4 files |
+| Phase 11 P04 | 10min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -162,6 +163,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: RecordOverlay panel treatment applied for visual consistency across all 3 overlays (discretionary per UI-SPEC)
 - [Phase ?]: ReloadPrompt border-color test updated in same commit as CSS change (--line-strong) per RESEARCH Pitfall 1
 - [Phase ?]: ResumeToast text token swap applied as optional discretionary consistency pass, radius/shadow/accent-stripe/animation untouched
+- [Phase 11]: Gap-closure fix: #broadcastPause() now unconditionally calls #publishToCast() after its BroadcastChannel post — Closes UAT Test 5: pause trigger/tick/resume were BroadcastChannel-only (same-machine), never reaching the real Chromecast receiver; dispatch()'s existing Cast publish was NOT reordered since the later call naturally supersedes the stale one
 
 ### Quick Tasks Completed
 
@@ -194,8 +196,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14
-Stopped at: Phases 8/9/10/12 complete+verified; Phase 11 executed, awaiting on-device Chromecast UAT (11-UAT.md, 6 items) — autonomous run paused at the designed human gate
+Last session: 2026-07-14T13:39:11.455Z
+Stopped at: Phase 11 gap-closure plan 11-04 executed (pause-not-shown-on-Chromecast fix); Phase 11 now fully complete (4/4 plans) pending on-device UAT re-verification
 Resume file: None
 
 ## Operator Next Steps

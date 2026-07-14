@@ -49,15 +49,17 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	/* Soft amber bloom riding just under the accent rule */
+	/* Soft amber bloom riding just under the accent rule. Background is a
+	   precomputed static rgba for MatchHeader.jsx's literal translucent-accent
+	   mix at 28% intensity — Chrome 90 (Cast receiver) has no color-mixing support. */
 	.match-header::after {
 		content: '';
 		position: absolute;
 		left: 0;
 		right: 0;
 		bottom: -3px;
-		height: 14px;
-		background: linear-gradient(180deg, var(--accent-soft), transparent);
+		height: 16px;
+		background: linear-gradient(180deg, rgba(240, 164, 36, 0.28), transparent);
 		pointer-events: none;
 	}
 

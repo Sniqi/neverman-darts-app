@@ -39,6 +39,11 @@ The spectator display (PC second window, tablet fullscreen, Chromecast receiver)
 - Test gate per plan: full vitest suite + full Playwright (incl. spectator-sync 3 tests) green.
 - **Phase closes via human on-device UAT** (DISP-03: "verified on-device"): the autonomous run pauses at end-of-phase with a UAT checklist — cast to the real TV, verify panels/header rendering, live sync, idle screen, leg/set banner, win overlay, pause countdown, auto-rejoin. This pause is by design, not a failure.
 
+### Research Open Questions — Resolved (post-research, 2026-07-14)
+- **Q1 Short-pill outer-bull string:** `DartPill.jsx:7` is the authoritative VALUE source — its short-pill form (`'Outer'` for outer bull) wins over the UI-SPEC's paraphrase. Implementation: `src/ui/input/dart-notation.ts` gains a second export `formatDartShort` transcribing DartPill.jsx's short strings verbatim; `VisitLine.svelte` consumes the short form (its pills are tight); the long form (`Bull (50)`/`Bull (25)`) remains for the scoring-surface slots. Both locked decisions (shared module + DS literals) stay satisfied. `VisitLine.test.ts` updates to the short-form strings (planned expected change) and tightens the loose `'Bull'` substring assertion.
+- **Q2 UI-SPEC frontmatter:** set `status: approved` + `reviewed_at` (checker approved 2026-07-14; frontmatter lagged).
+- **Q3 Omitted color-mix deltas:** the two DS literals the UI-SPEC missed (active-score text-shadow 40%, bust-overlay 16%) ARE in scope — ship them as precomputed statics like every other color-mix value (RESEARCH.md has the computed rgba values).
+
 ### Claude's Discretion
 - Exact bloom implementation (radial-gradient vs box-shadow) — match DS .jsx.
 - Base fallback values inside the non-@supports path (keep current proven values or nearest DS-static equivalents — whichever renders better at 1280×720; document choice).

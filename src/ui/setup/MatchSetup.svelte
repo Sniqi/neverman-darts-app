@@ -438,6 +438,8 @@
 		padding: 4px;
 		background: var(--bg-deep);
 		border: 1px solid var(--line);
+		border-radius: var(--radius-sm);
+		overflow: hidden;
 	}
 
 	.seg-btn {

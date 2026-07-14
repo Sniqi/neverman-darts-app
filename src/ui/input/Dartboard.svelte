@@ -210,7 +210,7 @@
 	{#each regions as region (region.key)}
 		<path
 			d={region.path}
-			fill={flashKey === region.key ? 'var(--text-faint)' : region.fill}
+			fill={flashKey === region.key ? 'rgba(255,255,255,0.35)' : region.fill}
 			stroke="var(--board-stroke)"
 			stroke-width="0.5"
 			data-segment={`${region.multiplier === 3 ? 'T' : region.multiplier === 2 ? 'D' : 'S'}${region.segment}`}
@@ -223,10 +223,11 @@
 		cx={CX}
 		cy={CY}
 		r={R_OUTER_BULL}
-		fill={flashKey === 'outer-bull' ? 'var(--text-faint)' : 'var(--board-green)'}
+		fill={flashKey === 'outer-bull' ? 'rgba(255,255,255,0.35)' : 'var(--board-green)'}
 		stroke="var(--board-stroke)"
 		stroke-width="0.5"
 		pointer-events="none"
+		data-segment-key="outer-bull"
 	/>
 
 	<!-- Inner bull (50) -->
@@ -234,16 +235,17 @@
 		cx={CX}
 		cy={CY}
 		r={R_INNER_BULL}
-		fill={flashKey === 'inner-bull' ? 'var(--text-faint)' : 'var(--board-red)'}
+		fill={flashKey === 'inner-bull' ? 'rgba(255,255,255,0.35)' : 'var(--board-red)'}
 		stroke="var(--board-stroke)"
 		stroke-width="0.5"
 		pointer-events="none"
+		data-segment-key="inner-bull"
 	/>
 
 	<!-- Dark outer ring (number zone) — only valid miss tap area -->
 	<path
 		d={`${describeFullCircle(R_MISS_OUTER)} ${describeFullCircle(R_DOUBLE_END)}`}
-		fill={flashKey === 'miss' ? 'var(--text-faint)' : 'var(--bg-deep)'}
+		fill={flashKey === 'miss' ? 'rgba(255,255,255,0.15)' : 'var(--bg-deep)'}
 		fill-rule="evenodd"
 		class="miss-zone"
 	/>
@@ -255,10 +257,10 @@
 			y={f.y}
 			text-anchor="middle"
 			dominant-baseline="central"
-			font-size="52"
+			font-size="56"
 			font-weight="800"
 			fill={f.color}
-			stroke="var(--backdrop)"
+			stroke="rgba(0,0,0,.75)"
 			stroke-width="4"
 			paint-order="stroke"
 			pointer-events="none"

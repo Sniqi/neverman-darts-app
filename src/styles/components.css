@@ -135,7 +135,8 @@
 }
 
 /* .btn.btn--icon — fixed 48x48 square hit target for icon-only buttons.
-   Two-class selector so it reliably overrides .btn--ghost's inherited width. */
+   Two-class selector for extra specificity so this reliably overrides .btn's own
+   width: 100% regardless of which variant class(es) are combined with it. */
 .btn.btn--icon {
 	width: var(--hit-min);
 	height: var(--hit-min);

@@ -68,6 +68,12 @@ Every remaining app page and every global overlay/toast matches the DS screens, 
 
 </specifics>
 
+<post_phase_notes>
+## Post-Phase Notes (Audit-Dispositionen, 2026-07-14)
+- Blur-Radius-Mismatch 8px (display chrome buttons, v1.1) vs 12px (`--blur-backdrop`, Overlays) ist ABSICHTLICH (IN-01 wont-fix) — nicht "vereinheitlichen".
+- Optionale Härtung: Computed-Style-Assertion für die kompakte Toast-Button-Höhe (`.pwa-toast-actions .btn` = `--hit-min`) — nice-to-have, Suite deckt Verhalten ab.
+</post_phase_notes>
+
 <deferred>
 ## Deferred Ideas
 

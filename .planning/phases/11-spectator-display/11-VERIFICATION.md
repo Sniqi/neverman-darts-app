@@ -1,37 +1,26 @@
 ---
 phase: 11-spectator-display
-verified: 2026-07-14T06:45:00Z
-status: human_needed
-score: 4/4 automated must-haves verified
+verified: 2026-07-14T17:50:00Z
+status: passed
+score: 4/4 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
-human_verification:
-  - test: "DISP-03: On-device Chromecast (Chrome 90 @ 1280x720) rendering check — cast the /match scoring window's display to the real Chromecast receiver hardware."
-    expected: >
-      All of the following render and behave correctly on the physical device: PlayerPanel
-      backgrounds/box-shadows/BUST overlay/typography scale, MatchHeader typography/bloom,
-      dart pills via formatDartShort, live sync of remaining score/history rows, idle screen,
-      leg/set win banner, match win overlay, pause countdown, and auto-rejoin — with no
-      layout breakage from the Chrome-90 @supports fallback layer (cqw/container-type,
-      subgrid, dvh all unsupported on this engine and must fall back cleanly).
-    why_human: >
-      Chrome 90 on the Cast receiver is real, non-emulatable hardware. 11-CONTEXT.md and
-      11-VALIDATION.md both designate this an explicit Manual-Only verification — the
-      code-side @supports discipline (fallback values, zero live color-mix()) can be and
-      has been verified statically, but whether the fallback CSS actually renders
-      correctly on the physical Chrome-90 engine cannot be confirmed by grep/unit/E2E
-      tests. No 11-UAT.md exists yet in .planning/phases/11-spectator-display/, and
-      ROADMAP.md's "verified on the real Chromecast device" phrasing for Phase 11 is
-      the goal-statement text, not a completed UAT record — no on-device evidence was
-      found in the repository.
+re_verification:
+  previous_status: human_needed
+  previous_score: "3/4 automated + 1 present-and-wired-but-behavior-unverified (routed to human)"
+  gaps_closed:
+    - "DISP-03 on-device Chromecast (Chrome 90 @ 1280x720) rendering/behavior check — now confirmed via 11-UAT.md (6/6 pass, all on real Chromecast receiver hardware)"
+    - "DISP-04 pause countdown never reached the physical Chromecast receiver — fixed in gap-closure Plan 11-04 (commits 2531eed RED, b1a6e19 GREEN); re-verified on-device in UAT Test 5 retest (pass)"
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 11: Spectator Display Verification Report
 
 **Phase Goal:** The spectator display (PC second window, tablet fullscreen, and Chromecast receiver) matches the DS display spec and is confirmed working on the real Chromecast device, with all sync and behavior unchanged.
-**Verified:** 2026-07-14T06:45:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-07-14T17:50:00Z
+**Status:** passed
+**Re-verification:** Yes — after DISP-03 on-device UAT completion and DISP-04 gap-closure (Plan 11-04)
 
 ## Goal Achievement
 
@@ -39,78 +28,85 @@ human_verification:
 
 | # | Truth (from ROADMAP Success Criteria) | Status | Evidence |
 |---|------|--------|----------|
-| 1 | Player panels scale typography with the DS cqw clamps; active player shows amber edge + inner glow + tint; inactive panels sit at 55% opacity | VERIFIED | `PlayerPanel.svelte`: `.player-name/.ls-chip/.h-total/.stats-line/.remaining-score` all use `var(--display-*)` tokens (typography.css:34-38); `.player-panel.active` has `border-top-color: var(--accent)` (5px), `box-shadow: inset 0 0 80px rgba(240,164,36,0.07), inset 0 5px 0 rgba(240,164,36,0.22)`; base `.player-panel { opacity: 0.5 }`, `.active { opacity: 1 }` — matches DS `PlayerPanel.jsx` opacity:active?1:0.55 (nearly identical net effect, base value pre-existing/unchanged per plan scope) |
-| 2 | Match header and panel backgrounds show DS dark gradients, amber bloom under the header rule, ● separators between stats | VERIFIED | `MatchHeader.svelte`: `.match-header::after { background: linear-gradient(180deg, rgba(240,164,36,0.28), transparent); height:16px }` (28%-intensity bloom, precomputed); `.mh-dot { content: '●' }` renders between mode/format/leg segments; `PlayerPanel.svelte` backgrounds `linear-gradient(165deg,#1a1e29,#12151d)` / active `linear-gradient(165deg,#272d3c,#191d28)` byte-match `design/components/display/PlayerPanel.jsx:22` |
-| 3 | On real Chromecast (Chrome 90 @ 1280×720), restyled display renders correctly, no layout breakage; every modern CSS feature (container queries, dvh, subgrid) confirmed to fall back via `@supports` | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | Code-side fallback discipline confirmed complete and correct (see Key Link Verification below — all 8 raw `cqw` declarations in PlayerPanel.svelte have vw-fallback twins after CR-01 fix `56e79b8`; zero live `color-mix()`; subgrid `@supports not` block present). Actual on-device rendering on Chrome 90 hardware is unexercised — no 11-UAT.md exists. Routed to human verification. |
-| 4 | BroadcastChannel/Cast sync, idle screen, leg/set banners, win overlay, pause countdown render and update exactly as before the restyle | VERIFIED | `git diff f92ccc1..HEAD -- src/lib/cast-*.ts src/lib/storage.ts src/lib/sync-constants.ts` = 0 lines changed (zero sync-code touched); `npx playwright test` 12/12 pass including all 3 `e2e/spectator-sync.spec.ts` specs (live sync, reload re-hydration, no-reload live update); LegWinBanner/MatchWinDisplay/PauseOverlay files untouched by this phase's diff (`git diff f92ccc1..HEAD --stat` shows only MatchHeader/PlayerPanel/VisitLine/dart-notation modified) |
+| 1 | Player panels scale typography with the DS cqw clamps; active player shows amber edge + inner glow + tint; inactive panels sit at 55% opacity | ✓ VERIFIED | `PlayerPanel.svelte` unchanged since prior verification — `clamp(3rem, 14cqw, 12rem)` score typography, `.player-panel.active { border-top-color: var(--accent); box-shadow: inset 0 0 80px rgba(240,164,36,0.07), inset 0 5px 0 rgba(240,164,36,0.22) }`, base `.player-panel { opacity: 0.5 }`. Confirmed on real hardware in 11-UAT.md Test 1 (Receiver-Rendering, DISP-03) — "Panels/Header/Typo wie oben" — pass |
+| 2 | Match header and panel backgrounds show DS dark gradients, amber bloom under the header rule, ● separators between stats | ✓ VERIFIED | `MatchHeader.svelte` unchanged — `.match-header::after { background: linear-gradient(180deg, rgba(240,164,36,0.28), transparent) }`, `.mh-dot { content: '●' }`; `PlayerPanel.svelte` gradients `linear-gradient(165deg,#1a1e29,#12151d)` / active `linear-gradient(165deg,#272d3c,#191d28)`. Confirmed on real hardware in 11-UAT.md Test 1 — pass |
+| 3 | On real Chromecast (Chrome 90 @ 1280×720), restyled display renders correctly, no layout breakage; every modern CSS feature (container queries, dvh, subgrid) confirmed to fall back via `@supports` | ✓ VERIFIED | Code-side fallback discipline previously confirmed (all 8 raw `cqw` declarations have vw-fallback twins, zero live `color-mix()`, subgrid `@supports not` block present). **On-device confirmation now complete:** 11-UAT.md Test 1 ("Receiver-Rendering DISP-03") — "Panels/Header/Typo wie oben; History-Zeilen-Spacing intakt (CR-01-Fix); nichts unter ~34px; keine kaputten Klammern/Umbrüche bei 1280×720" — result: pass, executed on the physical Chromecast receiver |
+| 4 | BroadcastChannel/Cast sync, idle screen, leg/set banners, win overlay, pause countdown render and update exactly as before the restyle | ✓ VERIFIED | Sync-code files (`cast-*.ts`, `storage.ts`, `sync-constants.ts`) remain zero-diff since `f92ccc1`; only `src/stores/match.svelte.ts` changed (surgical pause-publish fix, +13/-1 lines). `npx vitest run` = 567/567 pass (39 files); `npx playwright test` = 12/12 pass (incl. 3 spectator-sync specs). **Pause countdown on real device:** was the sole prior gap (UAT Test 5 first pass: "pass, aber der chromecast zeigt die Pause nicht an") — root-caused in `.planning/debug/pause-not-shown-on-receiver.md`, fixed in Plan 11-04 (`#broadcastPause()` now also calls `#publishToCast()`), regression-tested (4 new "Gap Test 5" unit tests, all pass), and **re-verified on the physical Chromecast** in 11-UAT.md Test 5 retest — result: pass, "Pause overlay now appears on the receiver." Tests 2/3/4/6 (live sync, idle, banners/overlay, auto-rejoin) all independently re-confirmed pass on-device |
 
-**Score:** 3/4 truths automated-verified, 1 present-and-wired-but-behavior-unverified (routed to human verification) — no failures.
+**Score:** 4/4 truths verified — no failures, no items routed to human verification.
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `src/ui/input/dart-notation.ts` | Exports `formatDart` (unchanged) + new `formatDartShort` transcribed verbatim from `DartPill.jsx` | ✓ VERIFIED | Both exports present; `formatDartShort` logic byte-identical to `design/components/scoring/DartPill.jsx:4-10` (miss→'✕', inner bull→'Bull', outer bull→'Outer', else prefix+segment) |
-| `src/ui/display/VisitLine.svelte` | Zero local `formatDart` definitions; imports `formatDartShort` | ✓ VERIFIED | `grep -c "function formatDart"` = 0; imports and calls `formatDartShort` at both call sites (lines 20, 34) |
-| `src/ui/display/MatchHeader.svelte` | Typography/spacing/weight/bloom match DS literals; no `@supports` needed (plain vw) | ✓ VERIFIED | All Task 1/2 acceptance-criteria values present exactly: `font-family: var(--font-score)`, `font-size: clamp(1.75rem, 3.4vw, 6.5rem)`, `font-weight: 600`, `.mh-mode` 700, `.mh-leg` 800, `.mh-dot` 0.4em/-0.15em, bloom `rgba(240,164,36,0.28)` height 16px |
-| `src/ui/display/PlayerPanel.svelte` | Restyled backgrounds/box-shadows/typography; formatDart consolidated; @supports fallback synced | ✓ VERIFIED | All Task 1-3 acceptance-criteria values present exactly (backgrounds, box-shadows, BUST overlay/label, history-box, typography tokens, checkout pill, formatDartShort import/usage, full vw-fallback block with all 8 cqw declarations covered after CR-01 fix) |
+| `src/ui/input/dart-notation.ts` | Exports `formatDart` (unchanged) + `formatDartShort` transcribed verbatim from `DartPill.jsx` | ✓ VERIFIED | Both exports present at lines 13/21; unchanged since prior verification |
+| `src/ui/display/VisitLine.svelte` | Zero local `formatDart` definitions; imports `formatDartShort` | ✓ VERIFIED | `grep -c "function formatDart"` = 0; imports and calls `formatDartShort` at lines 20, 34 |
+| `src/ui/display/MatchHeader.svelte` | Typography/spacing/weight/bloom match DS literals | ✓ VERIFIED | Unchanged since prior verification; confirmed on-device in 11-UAT.md Test 1 |
+| `src/ui/display/PlayerPanel.svelte` | Restyled backgrounds/box-shadows/typography; formatDart consolidated; @supports fallback synced | ✓ VERIFIED | Unchanged since prior verification; confirmed on-device in 11-UAT.md Test 1 |
+| `src/stores/match.svelte.ts` | `#broadcastPause()` republishes to the active Cast session on every call (trigger, tick, resume) | ✓ VERIFIED | Line ~462: unconditional `this.#publishToCast()` added at the end of `#broadcastPause()`, after the existing BroadcastChannel try/catch. Confirmed present in current tree; matches Plan 11-04's `<action>` exactly |
+| `src/stores/match.svelte.test.ts` | 4 new regression tests under `describe('matchStore.pause', ...)` | ✓ VERIFIED | `npx vitest run --project=unit src/stores/match.svelte.test.ts -t "Gap Test 5"` → 4 passed, 45 skipped (test-name filter working as expected) |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|-----|-----|--------|---------|
 | `VisitLine.svelte` | `dart-notation.ts` | `import { formatDartShort }` | WIRED | Confirmed via grep, used at 2 call sites |
-| `PlayerPanel.svelte` | `dart-notation.ts` | `import { formatDartShort }` | WIRED | Confirmed via grep, used at dartPills snippet call site (line 162) |
-| Every changed `--display-*`/literal-cqw rule in PlayerPanel.svelte primary layer | Matching `@supports not (container-type: inline-size)` vw-fallback | Same numeric N | WIRED | All 8 raw cqw declarations (`.player-panel` padding/gap, `.bust-label`, `.history-box` padding, `.history-section` row-gap, `.history-row` column-gap/padding, `.h-darts` gap) have fallback twins with matching N — confirmed post CR-01 fix (`56e79b8`); `.dart-pill` correctly has no fallback (now relative `0.82em`, resolves off `.h-darts`) |
-| Sync/engine code | Untouched | `git diff f92ccc1..HEAD` on cast-*.ts/storage.ts/sync-constants.ts | WIRED (verified empty) | Zero-line diff confirmed — DISP-04 protection intact |
+| `PlayerPanel.svelte` | `dart-notation.ts` | `import { formatDartShort }` | WIRED | Confirmed via grep, used at line 162 |
+| `#checkAutoPause()` / `decrementPause()` / `resumePause()` | `#broadcastPause()` | Direct call | WIRED | All 3 mutators call `#broadcastPause()` (lines 396, 411, 421, 428 in match.svelte.ts) |
+| `#broadcastPause()` | `#publishToCast()` → `castSenderManager.sendSnapshot()` → `activeSession.sendMessage(CAST_NS)` | Unconditional call after BroadcastChannel try/catch | WIRED | Confirmed at match.svelte.ts:462; this is the exact link that closed UAT Test 5's gap, and it is now confirmed both by unit test (Gap Test 5, 4/4 pass) and on real hardware (11-UAT.md Test 5 retest, pass) |
+| Sync/engine code | Untouched | `git diff f92ccc1..HEAD` on cast-*.ts/storage.ts/sync-constants.ts | WIRED (verified empty) | Zero-line diff confirmed — DISP-04 protection intact; only `match.svelte.ts` changed in this phase's gap-closure plan |
 
 ### Behavioral Spot-Checks / Test Runs
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| Full unit/component suite | `npx vitest run` | 39 files / 563 tests passed | ✓ PASS |
+| Full unit/component suite | `npx vitest run` | 39 files / 567 tests passed | ✓ PASS |
+| Gap Test 5 (pause→Cast publish regression) | `npx vitest run --project=unit src/stores/match.svelte.test.ts -t "Gap Test 5"` | 4/4 passed | ✓ PASS |
 | Full E2E suite incl. spectator-sync (DISP-04 regression net) | `npx playwright test` | 12/12 passed (all 3 spectator-sync specs green) | ✓ PASS |
 | Production build | `npm run build` | Built successfully, PWA precache 423 entries, static site written | ✓ PASS |
-| Zero live color-mix() | `grep -rn "color-mix(" src/ui/display/` | 0 matches (exit 1) | ✓ PASS |
-| Every cqw in PlayerPanel has a fallback twin | Manual line-by-line diff of 8 cqw declarations vs `@supports not` block | All 8 covered | ✓ PASS |
-| Zero diffs in sync files | `git diff f92ccc1..HEAD -- src/lib/cast-*.ts storage.ts sync-constants.ts` | 0 lines | ✓ PASS |
+| Zero diffs in sync files since prior verification baseline | `git diff f92ccc1..HEAD -- src/lib/cast-*.ts storage.ts sync-constants.ts` | 0 lines | ✓ PASS |
+| On-device Chromecast UAT (all 6 tests) | See 11-UAT.md | 6/6 passed, 0 issues, 0 pending | ✓ PASS |
 
-Note: `node_modules` was absent at verification start (fresh checkout); `npm install` was run first (451 packages) to make the above commands runnable — this is an environment-setup step, not a code finding.
+Note: `node_modules` was present at verification start (no fresh-checkout setup needed this run).
 
 ### Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
 |-------------|-------------|--------------|--------|----------|
-| DISP-01 | 11-01, 11-03 | Player panels use DS display scale, active/inactive treatment | ✓ SATISFIED | PlayerPanel.svelte typography/background/box-shadow values match DS literals; formatDartShort shared formatter |
-| DISP-02 | 11-02 | Match header + panel backgrounds match DS spec | ✓ SATISFIED | MatchHeader.svelte typography/bloom/dot values match DS literals exactly |
-| DISP-03 | 11-03 | Chromecast receiver renders restyled display correctly, @supports fallbacks working, verified on-device | ? NEEDS HUMAN | Code-side @supports discipline fully verified (all cqw covered, zero color-mix); on-device confirmation is the explicit remaining gap — no 11-UAT.md found |
-| DISP-04 | 11-01, 11-03 | All display behavior unchanged (sync, idle, banners, overlay, pause) | ✓ SATISFIED | Zero sync-file diff; 12/12 Playwright incl. 3 spectator-sync specs green |
+| DISP-01 | 11-01, 11-03 | Player panels use DS display scale, active/inactive treatment | ✓ SATISFIED | PlayerPanel.svelte values match DS literals; confirmed on-device |
+| DISP-02 | 11-02 | Match header + panel backgrounds match DS spec | ✓ SATISFIED | MatchHeader.svelte values match DS literals exactly; confirmed on-device |
+| DISP-03 | 11-03 | Chromecast receiver renders restyled display correctly, @supports fallbacks working, verified on-device | ✓ SATISFIED | Code-side @supports discipline fully verified (all cqw covered, zero color-mix); **on-device confirmation now complete** — 11-UAT.md Test 1, pass, no layout breakage at 1280×720 |
+| DISP-04 | 11-01, 11-03, 11-04 | All display behavior unchanged (sync, idle, banners, overlay, pause) | ✓ SATISFIED | Zero sync-file diff (except surgical match.svelte.ts fix); 567/567 unit + 12/12 Playwright green; pause-on-Cast gap fixed (Plan 11-04) and re-verified on-device (11-UAT.md Test 5 retest, pass) |
 
-No orphaned requirements — all 4 DISP-* IDs in REQUIREMENTS.md map to a plan's `requirements:` frontmatter field.
+No orphaned requirements — all 4 DISP-* IDs in REQUIREMENTS.md map to a plan's `requirements:` frontmatter field and are marked "Complete".
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| — | — | No `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER` markers found in any of the 4 phase-modified files | — | None |
+| — | — | No `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER` markers found in any of the 6 phase-modified files (dart-notation.ts, VisitLine.svelte, MatchHeader.svelte, PlayerPanel.svelte, match.svelte.ts, match.svelte.test.ts) | — | None |
 
-One prior finding from 11-REVIEW.md (CR-01: Chrome-90 cqw fallback missing 4 declarations) was fixed in commit `56e79b8` and independently re-verified above (all 8 cqw declarations now have fallback twins). WR-01 (hardcoded English darts jargon) was reviewed and correctly dispositioned as a won't-fix — `design/readme.md`'s CONTENT FUNDAMENTALS explicitly specifies English/hybrid darts jargon ("Double Out", "Bull", "BUST", "Sets"), so this is DS-conformant, not a CLAUDE.md German-UI violation. IN-01 (`VisitLine.svelte` is dead/unrouted code) is a pre-existing condition noted for milestone audit, not a Phase 11 regression — `PlayerPanel.svelte` is the actual rendered component on `/display`.
+**WR-01 disposition (evaluated, not a gap):** 11-04-REVIEW.md flagged a real, provable defect — on the exact dispatch that crosses the auto-pause threshold, `dispatch()`'s pre-existing unconditional `#publishToCast()` call (line ~126, runs before `#checkAutoPause()` at line ~146) sends one stale snapshot (`pauseActive:false`) immediately followed by a fresh one from `#broadcastPause()`. This is confirmed still present in the current code (`dispatch()` was deliberately not reordered, per Plan 11-04's explicit scope decision) and is a genuine, not-yet-eliminated code characteristic — the review's own suggested fix (reordering `dispatch()`) was NOT applied. However: (1) it was explicitly tracked as a "watch item" in STATE.md with instructions to reorder if a visible flash is observed on-device; (2) 11-UAT.md's Test 5 retest note explicitly states "WR-01 stale-flash NOT observed on-device"; (3) it is registered and accepted as a low-severity threat (T-11-04-01/02) in 11-SECURITY.md with a self-healing (≤1s) rationale. Given the phase's truths concern observable, on-device behavior (which UAT directly exercised and passed) rather than internal message-count purity, this is correctly dispositioned as an accepted, documented, non-blocking characteristic rather than a FAILED must-have — consistent with the review's own classification as a "warning," not a "critical" finding, and with its suggested fix being explicitly optional polish.
+
+One prior finding from 11-REVIEW.md (CR-01: Chrome-90 cqw fallback missing 4 declarations) was fixed in commit `56e79b8` and remains fixed (unchanged since prior verification).
 
 ## Human Verification Required
 
-### 1. DISP-03: On-device Chromecast rendering check
-
-**Test:** Cast the live match display from `/match` to the physical Chromecast receiver (Chrome 90 @ 1280×720). Verify: PlayerPanel backgrounds/box-shadows/BUST overlay/typography render correctly at every column count (2/3/4 players); MatchHeader typography and amber bloom render correctly; dart pills show the short-form notation; live score/history sync updates in real time; idle screen displays between matches; leg/set win banner and match win overlay render and dismiss correctly; pause countdown displays; the receiver auto-rejoins an in-progress match after being closed/reopened.
-
-**Expected:** No layout breakage — the Chrome-90 `@supports not (container-type: inline-size)` and `@supports not (grid-template-columns: subgrid)` fallback blocks must render legible, non-collapsed spacing/typography (this class of defect was previously found and fixed twice: UAT 07 3rd pass, and this phase's own CR-01). All DISP-04 behaviors (sync/idle/banners/overlay/pause/auto-rejoin) must be indistinguishable from pre-restyle behavior.
-
-**Why human:** Chrome 90 on the Cast receiver is real, non-emulatable hardware per 11-CONTEXT.md and 11-VALIDATION.md's own Manual-Only Verifications table. Static analysis (grep, unit tests, Playwright against a normal browser) can confirm the fallback CSS exists and is syntactically complete, but cannot confirm it actually renders correctly on the physical old-Chromium engine. No `.planning/phases/11-spectator-display/11-UAT.md` exists yet, and no on-device evidence was found anywhere in the repository or git history for this phase.
+None. The single item that previously required human verification (DISP-03 on-device Chromecast rendering/behavior, including the DISP-04 pause-countdown sub-check) has concrete on-device evidence in `.planning/phases/11-spectator-display/11-UAT.md`: 6/6 tests pass, 0 issues, 0 pending, executed on the physical Chromecast receiver hardware (Chrome 90 @ 1280×720) — including the retested Test 5 (pause countdown), which failed on first pass and now passes after the Plan 11-04 gap-closure fix.
 
 ### Gaps Summary
 
-No gaps. All automated must-haves (artifacts, key links, requirements DISP-01/02/04) are fully verified against the actual codebase, not just SUMMARY.md claims — every literal DS value, background gradient, box-shadow precomputation, typography token, and the Chrome-90 fallback table were independently re-derived from `design/components/display/*.jsx` and cross-checked against the shipped `.svelte` files. The single outstanding item is DISP-03's on-device confirmation, which by this phase's own design (11-CONTEXT.md: "Phase closes via human on-device UAT") is expected to remain open until a human runs the Chromecast checklist. This is not a code defect — it is the phase's planned human checkpoint.
+No gaps. All 4 ROADMAP Success Criteria are verified against the actual codebase and confirmed with on-device evidence (not just SUMMARY.md claims):
+
+- Every literal DS value (backgrounds, box-shadows, typography tokens, bloom) was independently re-derived from `design/components/display/*.jsx` and cross-checked against the shipped `.svelte` files (unchanged since the prior automated pass).
+- The Chrome-90 `@supports` fallback table was re-confirmed unchanged and complete.
+- The one item the prior VERIFICATION.md (2026-07-14T06:45:00Z) correctly left open — on-device confirmation — now has a complete, passing on-device record in `11-UAT.md` (6/6, including the pause-countdown retest after the Plan 11-04 fix).
+- Full regression suite re-run fresh for this verification: `npx vitest run` (567/567), `npx playwright test` (12/12), `npm run build` (success) — no regressions introduced by the gap-closure fix.
+- The one code-review warning (WR-01) that remains structurally present in the code was evaluated on its merits (see Anti-Patterns Found) and correctly dispositioned as an accepted, on-device-verified-absent risk rather than a functional gap.
+
+Phase 11 goal is achieved: the spectator display matches the DS spec and is confirmed working on the real Chromecast device, with all sync and behavior unchanged.
 
 ---
 
-_Verified: 2026-07-14T06:45:00Z_
+_Verified: 2026-07-14T17:50:00Z_
 _Verifier: Claude (gsd-verifier)_

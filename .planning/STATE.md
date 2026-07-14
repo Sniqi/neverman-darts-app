@@ -5,15 +5,15 @@ milestone_name: Restyling
 current_phase: 11
 current_phase_name: Spectator Display
 status: executing
-stopped_at: Completed 10-05-PLAN.md (SCOR-04 gap closure)
-last_updated: "2026-07-14T03:56:38.510Z"
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-07-14T04:08:28.196Z"
 last_activity: 2026-07-14
-last_activity_desc: Phase 10 complete, transitioned to Phase 11
+last_activity_desc: Phase 11 execution started
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 21
+  completed_plans: 19
   percent: 60
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 
 ## Current Position
 
-Phase: 11 — Spectator Display
-Plan: Not started
+Phase: 11 (Spectator Display) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-07-14 — Phase 10 complete, transitioned to Phase 11
+Last activity: 2026-07-14 — Phase 11 execution started
 
 ## Performance Metrics
 
@@ -107,6 +107,7 @@ Last activity: 2026-07-14 — Phase 10 complete, transitioned to Phase 11
 | Phase 10-scoring-surface P03 | 10min | 3 tasks | 5 files |
 | Phase 10 P04 | 8min | - tasks | - files |
 | Phase 10-scoring-surface P05 | 25min | 2 tasks | 3 files |
+| Phase 11 P01 | 7min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -144,6 +145,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: [Phase 10-04]: Landscape @media typography overrides removed entirely (not scaled down) per RESEARCH.md Pitfall 4 -- DS ScoreCard.jsx has no orientation-specific scale
 - [Phase ?]: [Phase 10-04]: CheckoutSuggestion's box-shadow: var(--glow-accent) added as CONTEXT.md's explicit Claude's Discretion extension beyond the literal DS sample
 - [Phase 10-05]: Font-size clamp() alone was insufficient; combined a lower clamp floor (4vw/22px) with a compact-mode player-card padding reduction (10px 4px) to eliminate 3-4 player landscape score clipping, per plan's explicit secondary-lever guidance
+- [Phase ?]: formatDartShort outer-bull string is 'Outer' (matching DartPill.jsx literally), not 'Bull' or 'Outer Bull' -- per CONTEXT.md Q1 resolution
 
 ### Quick Tasks Completed
 
@@ -170,8 +172,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14
-Stopped at: Phase 10 complete (verified 7/7 after gap closure), ready to plan Phase 11 (autonomous run --from 8 in progress)
+Last session: 2026-07-14T04:08:28.189Z
+Stopped at: Completed 11-01-PLAN.md
 Resume file: None
 
 ## Operator Next Steps

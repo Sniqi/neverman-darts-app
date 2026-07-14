@@ -118,12 +118,12 @@ Plans:
   3. The visit strip shows pill-shaped dart notation (`T20`, `D16`, `Bull (50)`, `✕`) with the triple-flash color on triple hits.
   4. The score panel shows the active player in the large amber-edged treatment, inactive players smaller, checkout suggestions with an amber glow, and a red BUST flash — all matching current scoring behavior exactly.
 
-**Plans**: 1/4 plans executed
+**Plans**: 2/4 plans executed
 Plans:
 **Wave 1**
 
 - [x] 10-01-PLAN.md — Numpad restyle to DS 76px/40px values + ⌫ aria-label (SCOR-01)
-- [ ] 10-02-PLAN.md — Dartboard flash/float literal-value gaps closed, hit-detection byte-identical (SCOR-02)
+- [x] 10-02-PLAN.md — Dartboard flash/float literal-value gaps closed, hit-detection byte-identical (SCOR-02)
 - [ ] 10-03-PLAN.md — Live /match dart-pill notation + DartPill states via shared dart-notation.ts (SCOR-03)
 - [ ] 10-04-PLAN.md — ScorePanel/CheckoutSuggestion restyle to DS 96px/44px, amber glow, landscape overflow fix (SCOR-04)
 
@@ -172,6 +172,6 @@ Plans:
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
 | 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
 | 9. Core Components | v1.2 | 7/7 | Complete    | 2026-07-14 |
-| 10. Scoring Surface | v1.2 | 1/4 | In Progress|  |
+| 10. Scoring Surface | v1.2 | 2/4 | In Progress|  |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |
 | 12. Pages & Overlays | v1.2 | 0/TBD | Not started | - |

@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: complete
 phase: 11-spectator-display
 source: [11-VERIFICATION.md]
 started: 2026-07-14T06:30:00Z
-updated: 2026-07-14T13:12:00Z
+updated: 2026-07-14T15:04:09Z
 ---
 
 ## Current Test
@@ -30,9 +30,11 @@ result: pass
 
 ### 5. Pause-Countdown (DISP-04)
 expected: Auto-Pause zeigt den synchronisierten Countdown auf dem TV; „Weiter" beendet ihn beidseitig. ZUSATZ (Phase 12 WR-02): Der neue Blur-Scrim (backdrop-filter 12px) muss auf dem Receiver flüssig rendern (Chrome 90 unterstützt blur; prüfe Performance des Vollbild-Blurs)
-result: issue
-reported: "pass, aber der chromecast zeigt die Pause nicht an"
-severity: major
+result: pass
+prior_result: issue
+prior_reported: "pass, aber der chromecast zeigt die Pause nicht an"
+prior_severity: major
+retest_note: "Re-verified on real Chromecast after gap-closure fix b1a6e19 (#broadcastPause now publishes to Cast). Pause overlay now appears on the receiver. WR-01 stale-flash NOT observed on-device."
 
 ### 6. Auto-Rejoin (DISP-04)
 expected: Cast trennen/neu verbinden → Receiver stellt den Match-Stand wieder her (ORIGIN_SCOPED Rejoin)
@@ -41,8 +43,8 @@ result: pass
 ## Summary
 
 total: 6
-passed: 5
-issues: 1
+passed: 6
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
@@ -50,7 +52,8 @@ blocked: 0
 ## Gaps
 
 - truth: "Auto-Pause zeigt den synchronisierten Countdown auf dem Chromecast-Receiver (Pause-Overlay + Blur-Scrim sichtbar)"
-  status: failed
+  status: resolved
+  resolution: "Fixed in gap-closure Plan 11-04 (commit b1a6e19): #broadcastPause() now calls #publishToCast() on every trigger/tick/resume. Re-verified on real Chromecast 2026-07-14 — pause overlay now appears on the receiver. WR-01 stale-flash not observed on-device."
   reason: "User reported: pass, aber der chromecast zeigt die Pause nicht an"
   severity: major
   test: 5

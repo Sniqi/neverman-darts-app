@@ -68,7 +68,7 @@
 		{/each}
 		<button class="key clear-key" onclick={pressClear}>C</button>
 		<button class="key digit-key" onclick={() => pressDigit('0')}>0</button>
-		<button class="key backspace-key" onclick={pressBackspace}>⌫</button>
+		<button class="key backspace-key" onclick={pressBackspace} aria-label="Letzte Ziffer löschen">⌫</button>
 	</div>
 
 	<!-- Confirm button: full width, accent -->
@@ -94,15 +94,15 @@
 	}
 
 	.input-display {
-		height: 56px;
-		background: var(--surface);
+		height: var(--key-h);
+		background: var(--bg-deep);
 		border: 2px solid var(--line-strong);
 		border-radius: var(--radius-sm);
 		color: var(--text);
 		font-family: var(--font-score);
 		font-variant-numeric: tabular-nums;
-		font-size: 28px;
-		font-weight: 600;
+		font-size: var(--text-3xl);
+		font-weight: 700;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -129,7 +129,7 @@
 	}
 
 	.error-msg {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		color: var(--destructive);
 		text-align: center;
 	}
@@ -141,14 +141,15 @@
 	}
 
 	.key {
-		height: 64px;
+		height: var(--key-h);
 		min-width: 64px;
 		background: var(--surface);
 		border: 1px solid var(--line-strong);
 		border-radius: var(--radius-sm);
+		box-shadow: var(--edge-highlight);
 		color: var(--text);
-		font-size: 24px;
-		font-weight: 400;
+		font-size: var(--text-2xl);
+		font-weight: 500;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -157,7 +158,7 @@
 	}
 
 	.digit-key {
-		font-family: var(--font-score);
+		font-family: var(--font-ui);
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -168,21 +169,26 @@
 
 	.clear-key {
 		color: var(--destructive);
+		font-size: var(--text-xl);
+		font-weight: 600;
 	}
 
 	.backspace-key {
 		color: var(--text);
+		font-size: var(--text-xl);
 	}
 
 	.confirm-key {
-		height: 64px;
+		height: var(--key-h);
 		width: 100%;
-		background: var(--accent);
+		background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 45%, var(--accent-deep) 130%);
 		border: none;
 		border-radius: var(--radius-sm);
+		box-shadow: var(--shadow-raise), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 		color: var(--on-accent);
-		font-size: 18px;
-		font-weight: 600;
+		font-size: var(--text-lg);
+		font-weight: 700;
+		letter-spacing: 0.01em;
 		cursor: pointer;
 		transition: opacity var(--dur-base) var(--ease);
 	}

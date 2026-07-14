@@ -1,6 +1,12 @@
+---
+status: resolved
+---
+
 # GSD Debug Knowledge Base
 
 Resolved debug sessions. Used by `gsd-debugger` to surface known-pattern hypotheses at the start of new investigations.
+
+> Note: `status: resolved` above is intentional — this is a permanent reference file of only-resolved patterns, not an open investigation. It keeps the milestone-close open-artifact audit from flagging the knowledge base as an open session.
 
 ---
 

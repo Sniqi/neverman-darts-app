@@ -8,20 +8,13 @@ A touch-optimized darts scoring web app (PWA) for home play with steel darts. Pl
 
 A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
 
-## Current Milestone: v1.2 Restyling
+## Current State
 
-**Goal:** Die gesamte App-UI auf den Ziel-Zustand des Design-Systems (`design/`) bringen — Barlow-Typografie, geschichtete dunkle Surfaces mit Amber-Akzent `#f0a424`, neue Radien/Elevation/Motion — auf beiden Surfaces (Scoring-App + Spectator-Display inkl. Cast-Receiver), ohne Funktionalität zu ändern.
+**Shipped:** v1.2 Restyling (2026-07-14) — the entire app UI now matches the `design/` design system on both surfaces (scoring app + spectator display incl. the Chromecast receiver): Barlow typography, layered dark surfaces with the amber `#f0a424` accent, DS radii/elevation/motion. A pure restyle — no functionality changed, ~535 tests green, verified closeout (Phase 11 on-device Chromecast UAT 6/6; Phase 12 UAT 15/15, 7 human + 8 automated, 0 issues).
 
-**Target features:**
-- Design-Tokens app-weit übernommen (Farben, Spacing, Radien, Elevation, Typo-Skalen)
-- Barlow + Barlow Semi Condensed self-hosted (OFL), offline via PWA-Precache
-- Core-Komponenten nach DS-Spec (Buttons, Chips, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog)
-- Scoring-Surface nach DS-Spec (Numpad, Dartboard-Farben, VisitStrip, ScoreCards)
-- Display-Surface nach DS-Spec (cqw-Display-Skala, Active-Player-Treatment) — Chrome-90-sicher via `@supports` für den Cast-Receiver
-- Alle Seiten restyled (Hub, Setup, History, Stats, Daten/Backup) + Overlays/Toasts
-- Motion-System nach DS (100–300ms, reduced-motion-Collapse)
+**Live:** PWA at https://sniqi.github.io/neverman-darts-app (GitHub Pages). Full milestone history in `.planning/MILESTONES.md`; retrospective in `.planning/RETROSPECTIVE.md`.
 
-**Prior state:** v1.1 shipped 2026-07-13 (Chromecast, UAT 5/5); PWA live at https://sniqi.github.io/neverman-darts-app — full history in `.planning/MILESTONES.md`.
+**Next milestone:** none defined yet — start with `/gsd-new-milestone` (questioning → research → requirements → roadmap).
 
 ## Requirements
 
@@ -44,15 +37,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 ### Active
 
-**Restyling (v1.2)** — pure visual adoption of the design system in `design/`; no functional changes, all existing tests stay green.
-
-- [x] Foundation: DS color/spacing/radius/elevation tokens replace the provisional styling app-wide *(Phase 8 ✓)*
-- [x] Typography: Barlow (UI) + Barlow Semi Condensed (score numerals), self-hosted, offline-precached, tabular-nums on score surfaces *(Phase 8 ✓)*
-- [x] Core components restyled to DS specs (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) *(Phase 9 ✓)*
-- [x] Scoring surface restyled (Numpad, Dartboard colors, VisitStrip, ScoreCard, active-score 96px treatment; 3-4-player landscape compact clamp) *(Phase 10 ✓)*
-- [x] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver *(Phase 11 ✓, on-device UAT 6/6)*
-- [x] All pages restyled (Hub, Setup, History, Stats, Daten/Backup) incl. overlays/toasts *(Phase 12 ✓)*
-- [x] Motion system per DS (100–300ms + DS-documented exceptions, standard/spring easing, `prefers-reduced-motion` collapse) *(Phase 8 ✓)*
+_None — v1.2 Restyling is fully shipped and validated (all seven items moved to Validated above). The next milestone's requirements will be defined via `/gsd-new-milestone`._
 
 ### Out of Scope
 
@@ -63,9 +48,9 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 
 ## Context
 
-- Live PWA at https://sniqi.github.io/neverman-darts-app (GitHub Pages, GitHub Actions deploy); SvelteKit 2 + Svelte 5 runes, Dexie, vite-plugin-pwa; ~511 tests (unit + browser + E2E).
+- Live PWA at https://sniqi.github.io/neverman-darts-app (GitHub Pages, GitHub Actions deploy); SvelteKit 2 + Svelte 5 runes, Dexie, vite-plugin-pwa; ~535 tests (unit + browser + E2E), incl. a permanent no-provisional-color file-scanner guard (`src/lib/design-tokens.test.ts`).
 - Primary input device is an Android tablet (touch); the spectator display runs as a PC second window (27" at ~3 m), tablet fullscreen, or on a Chromecast TV (Custom Web Receiver — the Cast device runs **Chrome 90 @ 1280×720**: no container queries, no dvh, no subgrid; modern CSS must be gated behind `@supports`).
-- A complete Claude Design system lives in `design/` (synced 2026-07-13 from the claude.ai/design project): Barlow typefaces, amber `#f0a424` accent on blue-tinted charcoal surfaces, tokens/guidelines/components/templates. It is the **target visual state** — the app still shows the provisional v1.0 styling.
+- The Claude Design system in `design/` (synced 2026-07-13 from the claude.ai/design project): Barlow typefaces, amber `#f0a424` accent on blue-tinted charcoal surfaces, tokens/guidelines/components/templates. As of **v1.2 it is the app's live visual state** (fully adopted across both surfaces); it remains the source of truth for any future UI work. The provisional v1.0 styling is gone, enforced by a grep-gated regression test.
 - Common reference apps in this space: DartCounter, Russ Bray Scorer, autodarts (for feature expectations, not for camera detection).
 
 ## Constraints
@@ -93,6 +78,12 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 | Absolute asset paths (`kit.paths.relative=false`) | Relative `../_app` paths 404 at the domain root when the Cast receiver (or a manual reload) loads `/display` without a trailing slash — absolute paths resolve at any route depth | ✓ Good (v1.1 UAT fix, 5b333e9) |
 | Modern CSS gated behind `@supports` for the receiver | The Cast device runs Chrome 90 (no container queries/dvh/subgrid); duplicate-property fallbacks don't survive the CSS minifier's dedup — `@supports` blocks do | ✓ Good (v1.1 UAT fix) |
 | Cast messages carry a `type` discriminant + sender→receiver contract test | Receiver routes only `data.type === 'snapshot'`; isolated unit tests missed the untagged-payload mismatch — the contract test guards the wire format | ✓ Good (v1.1 UAT fix, 3f028f2) |
+| Restyle to the `design/` DS as a pure, non-functional milestone (v1.2) | Adopt the whole design system without risking the shipped game engine/stores/sync; nearest-DS-token mapping, dartboard geometry kept byte-identical, all existing tests stay green | ✓ Good (v1.2 — 20/20 reqs, verified closeout) |
+| Precompute DS `color-mix()`/derived tokens to static `rgba()` | The Chrome-90 Cast receiver has no `color-mix()`; static values render identically everywhere and survive the CSS minifier | ✓ Good (v1.2, project-wide rule) |
+| Self-host Barlow + Barlow Semi Condensed as WOFF2, PWA-precached | Fonts must load while fully offline; no external CDN on GitHub Pages; tabular-nums needed on score surfaces | ✓ Good (v1.2, Phase 8) |
+| Shared `.btn`/`.switch` primitives in `src/styles/components.css` | One DS source for buttons/toggles across every route instead of per-file duplication | ✓ Good (v1.2, Phase 9) |
+| Permanent no-provisional-color guard (`design-tokens.test.ts` file-scanner) | Makes the restyle durable — any reintroduced old hex fails CI, so the DS can't silently drift back | ✓ Good (v1.2, Phase 8) |
+| Publish pause state to Cast on every pause tick (`#broadcastPause()` → `#publishToCast()`) | Pause ticks were BroadcastChannel-only (same-machine) and never reached the real Chromecast; now every trigger/decrement/resume republishes to the Cast session | ✓ Good (v1.2, Phase 11 gap closure, on-device UAT 6/6) |
 
 ## Evolution
 
@@ -112,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-14 after Phase 12 (Pages & Overlays) UAT — all v1.2 phases (8–12) complete; milestone ready for `/gsd-complete-milestone v1.2`*
+*Last updated: 2026-07-14 after v1.2 Restyling milestone — full evolution review complete; next: `/gsd-new-milestone`*

@@ -1,5 +1,24 @@
 # Milestones
 
+## v1.2 Restyling (Shipped: 2026-07-14)
+
+**Phases completed:** 5 phases (Phases 8–12), 27 plans, 60 tasks
+**Requirements:** 20/20 complete (FOUND 4, COMP 4, SCOR 4, DISP 4, PAGE 4) — verified_closeout
+**Character:** pure restyle to the `design/` system — zero functional/engine/store/sync/route changes; ~535 tests green through close
+**Code:** src/ 75 files changed (+2 417 / −1 312) across 197 commits (46 feat), 2026-07-13 → 2026-07-14
+**Verification:** all 5 phases verified + secured (threats_open 0); Phase 11 on-device Chromecast UAT 6/6, Phase 12 UAT 15/15 (7 human + 8 automated), 0 issues
+
+**Key accomplishments:**
+
+- **Phase 8 — Design Foundation:** DS color/spacing/radius/elevation tokens replace all provisional v1.0 styling app-wide (precomputed static, Chrome-90-safe values); Barlow + Barlow Semi Condensed self-hosted as WOFF2 and offline-precached (tabular-nums on score surfaces); DS motion with full `prefers-reduced-motion` collapse — zero provisional colors, durably grep-gated by a `design-tokens.test.ts` file-scanner.
+- **Phase 9 — Core Components:** shared `.btn` (5 DS variants + 4 extensions) and `.switch` primitives in a new `src/styles/components.css`; ConfirmDialog / DartsAtDouble / ResumePrompt on the DS dialog spec (blur scrim, scale-in .94, 420px, stacked full-width buttons); chips, segmented control, steppers and toggle rows at DS sizes with spring switch thumbs; StatCard at 40px / Barlow Semi Condensed.
+- **Phase 10 — Scoring Surface:** Numpad at DS 76px keys / 40px entry with an amber-gradient "Bestätigen" + ⌫ aria-label; Dartboard recolored with the last flash/float literals closed while polar hit-detection stays byte-identical; a shared `dart-notation.ts` powers the DS DartPill visit strip; ScoreCard at 96px/800 amber-edge active with a 3–4-player landscape compact clamp (E2E-regression-guarded).
+- **Phase 11 — Spectator Display:** `/display` restyled to DS on all three surfaces (PC window, tablet fullscreen, Cast receiver) — cqw display-scale typography, amber active-player edge/inner-glow/tint, inactive panels at 55%, header gradients + amber bloom, every modern CSS feature gated behind `@supports` for Chrome 90 — plus the pause-on-Chromecast delivery gap closed (`#broadcastPause()` → `#publishToCast()`); on-device UAT 6/6.
+- **Phase 12 — Pages & Overlays:** Hub/Setup (centered 520px column, DS list boxes, collapsible "Profile verwalten"), History list+detail (boxed DS HistoryRow), Stats dashboard (DS type/colors; bespoke SVG charts recolored, not rebuilt), Data/backup page, and every global overlay/toast (Pause/Record/MatchWin blur-scrim panels + shared `.btn--cta`, ReloadPrompt + Cast ResumeToast) brought onto DS specs.
+- **Milestone character held:** a pure visual adoption of the design system — dartboard geometry byte-identical, all existing E2E flows green, and the app permanently guarded against provisional-color regressions by the token file-scanner.
+
+---
+
 ## v1.1 Chromecast-Integration (Shipped: 2026-07-13)
 
 **Phases completed:** 1 phase (Phase 7), 6 plans, 19 tasks

@@ -71,9 +71,48 @@ Google Cast integration on top of the shipped PWA: `/match` acts as Cast sender 
 
 ---
 
+## Milestone: v1.2 — Restyling
+
+**Shipped:** 2026-07-14 (verified closeout)
+**Phases:** 5 (Phases 8–12) | **Plans:** 27
+
+### What Was Built
+A pure, full-app restyle onto the `design/` design system — no functional change. DS color/spacing/radius/elevation tokens replace all provisional v1.0 styling app-wide (as precomputed, Chrome-90-safe static values); Barlow + Barlow Semi Condensed self-hosted as WOFF2 and offline-precached with tabular-nums on score surfaces; a shared `.btn`/`.switch` component layer; the scoring surface (Numpad, Dartboard colors, DartPill visit strip, 96px amber-edge ScoreCard) and the spectator display on all three surfaces (PC window, tablet fullscreen, Chromecast receiver) brought to spec; every remaining page (Hub, Setup, History, Stats, Data/backup) and every global overlay/toast restyled; DS motion with a full `prefers-reduced-motion` collapse.
+
+### What Worked
+- Wave-based parallel sweeps handled breadth cheaply: independent component/file groups (Phase 8's three parallel sweeps, Phase 9's seven plans) ran without contention because each plan owned disjoint files.
+- Scoped grep gates + nearest-DS-token mapping kept a 75-file color migration mechanical and auditable — each plan proved its own scope (e.g. "chart recolor limited to the exact 2 flagged `@const` fill lines").
+- A permanent no-provisional-color file-scanner test (`design-tokens.test.ts`) turned "did we miss a color anywhere?" into a CI invariant — the restyle can't silently drift back.
+- Computed-style browser tests (Numpad, StatCard, etc.) locked literal DS values rather than trusting the eye; dartboard hit-detection was asserted byte-identical.
+- On-device Chromecast UAT again earned its cost: it surfaced the pause-not-shown-on-receiver gap that every green unit test missed.
+
+### What Was Inefficient
+- The pause-on-Chromecast gap was only observable on real hardware — a Phase-12 pause blur-scrim addendum drew attention to a delivery path (`#broadcastPause()` never reached the Cast channel) that a "pure restyle" wasn't expected to touch. Same environment-boundary lesson as v1.1.
+- Precomputing `color-mix()`/derived DS colors to static `rgba()` for Chrome 90 was repeated by hand per file — a recurring manual chore that a shared build step could have absorbed.
+- The diagnosed pause debug session (fix already shipped in Phase 11) stayed `diagnosed` on disk until milestone close and had to be retro-resolved — the exact "close planning-artifact loops promptly" miss from v1.1, repeated.
+
+### Patterns Established
+- Precompute every DS `color-mix()`/derived color to a static `rgba()` — the Chrome-90 Cast receiver has neither `color-mix()` nor surviving minified fallbacks; now a project-wide rule.
+- One shared `.btn`/`.switch` layer in `src/styles/components.css` instead of per-route button CSS.
+- Ship a durable regression guard with a large sweep (`design-tokens.test.ts` file-scanner) so the change stays enforced, not just done once.
+- Restyle discipline: byte-identical geometry/logic, nearest-token mapping, and a per-plan scoped grep gate that fails on out-of-scope edits.
+- Live/pause state must be published to the Cast session on every relevant tick, not only inside `dispatch()`.
+
+### Key Lessons
+- Even a "pure restyle" can cross a delivery boundary: the one UAT failure was again environment-shaped (real Chromecast pause delivery), not logic. Invest verification at integration boundaries even when the diff looks cosmetic.
+- Resolve diagnosed debug sessions and stale statuses at phase end, not at milestone close — the fix landing in code and the artifact saying so are two separate steps.
+- A grep-gated invariant is a better deliverable than a clean sweep: it converts one-time correctness into a permanent property.
+
+### Cost Observations
+- Model mix: planning on opus, execution/review/verify on sonnet (unchanged from v1.0/v1.1).
+- Fixes were tiny (a 1-line `#publishToCast()` call); cost was breadth (75 src files swept, +2 417 / −1 312) plus on-device UAT round-trips, not diagnosis difficulty.
+
+---
+
 ## Cross-Milestone Trends
 
 | Milestone | Phases | Plans | Tests at close | Shipped |
 |-----------|--------|-------|----------------|---------|
 | v1.0 MVP | 6 | 33 | 430 | 2026-06-13 |
 | v1.1 Chromecast-Integration | 1 | 6 | 511 | 2026-07-13 |
+| v1.2 Restyling | 5 | 27 | ~535 | 2026-07-14 |

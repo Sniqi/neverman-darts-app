@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "pause-not-shown-on-receiver"
 created: 2026-07-14T00:00:00Z
 updated: 2026-07-14T00:00:00Z
@@ -71,6 +71,25 @@ root_cause: |
   on the TV — while the local PC two-window preview works because both windows share one
   BroadcastChannel namespace on the same machine, which `displayStore.connect()` subscribes to
   directly.
-fix:
-verification:
-files_changed: []
+fix: |
+  #broadcastPause() in src/stores/match.svelte.ts now unconditionally calls
+  #publishToCast() after its BroadcastChannel post (match.svelte.ts:462). Because the
+  pause trigger (#checkAutoPause), the per-second decrement (decrementPause) and resume
+  (resumePause) all route through #broadcastPause(), this single added call closes the
+  gap for all three pause-tick paths at once — every pause state change now republishes
+  the current match snapshot (carrying pauseActive/pauseRemainingSeconds) over the Cast
+  custom-message channel (CAST_NS) to the real receiver. #publishToCast() no-ops when
+  there is no active Cast session and swallows its own throws, so the added call is safe
+  regardless of Cast/BroadcastChannel state. dispatch()'s existing Cast publish (~line 126)
+  was deliberately NOT reordered: the later #broadcastPause()->#publishToCast() call
+  naturally supersedes the one stale pauseActive:false snapshot.
+verification: |
+  Landed in Phase 11 (plan 11-04 gap closure). Confirmed on the real Chromecast device
+  during /gsd-verify-work 11: on-device UAT 6/6 passed, incl. the explicit
+  pause-on-Chromecast re-verify (11-UAT Test 5) — the pause overlay + synced countdown
+  now appear on the TV and "Weiter" ends the pause on both surfaces. The accepted
+  low-severity residual (WR-01: the pause-*trigger* dispatch briefly carries a stale
+  snapshot before the fresh one) was watched on-device and produced NO visible flash;
+  left as-is per 11-SECURITY.md T-11-04-01.
+files_changed:
+  - src/stores/match.svelte.ts

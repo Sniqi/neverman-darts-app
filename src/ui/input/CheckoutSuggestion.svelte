@@ -11,10 +11,17 @@
 
 <style>
 	.suggestion {
-		font-size: 14px;
-		font-weight: 400;
+		font-size: var(--text-base);
+		font-weight: 700;
 		color: var(--accent);
+		background: var(--accent-soft);
+		border: 1px solid var(--accent-line);
+		border-radius: var(--radius-pill);
+		padding: 4px 14px;
 		line-height: 1.4;
 		white-space: nowrap;
+		letter-spacing: 0.02em;
+		font-variant-numeric: tabular-nums;
+		box-shadow: var(--glow-accent);
 	}
 </style>

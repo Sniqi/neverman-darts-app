@@ -21,10 +21,10 @@
 			</div>
 			<div class="legs-info">
 				{#if matchStore.state.config.setsEnabled}
-					<span>Sets: {player.setsWon}</span>
-					<span> Leg: {player.legsWon}</span>
+					<span>Sets: <span class="legs-value">{player.setsWon}</span></span>
+					<span> Leg: <span class="legs-value">{player.legsWon}</span></span>
 				{:else}
-					<span>Leg: {player.legsWon}</span>
+					<span>Leg: <span class="legs-value">{player.legsWon}</span></span>
 				{/if}
 			</div>
 		</div>
@@ -46,24 +46,35 @@
 		flex-direction: column;
 		background: var(--surface);
 		border: 1px solid var(--line);
-		border-left: 3px solid transparent;
 		border-radius: var(--radius-md);
-		padding: var(--space-md);
+		padding: var(--space-md) var(--space-lg);
+		box-shadow: var(--edge-highlight);
 	}
 
 	.player-card.active {
-		border-color: var(--accent-line);
-		border-left-color: var(--accent);
+		border: 1px solid var(--accent-line);
+		box-shadow: inset 4px 0 0 var(--accent), var(--glow-accent), var(--edge-highlight);
 		background:
 			linear-gradient(var(--accent-soft), var(--accent-soft)),
-			var(--surface);
+			var(--surface-2);
+		transition:
+			background var(--dur-slow) var(--ease),
+			box-shadow var(--dur-slow) var(--ease),
+			border-color var(--dur-slow) var(--ease);
 	}
 
 	.player-name {
-		font-size: 26px;
+		font-size: var(--text-lg);
 		font-weight: 600;
 		color: var(--text);
 		margin-bottom: 4px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.player-card:not(.active) .player-name {
+		color: var(--text-soft);
 	}
 
 	.score-row {
@@ -75,23 +86,33 @@
 	.remaining {
 		font-family: var(--font-score);
 		font-variant-numeric: tabular-nums;
-		font-weight: 600;
 		line-height: 1;
 		color: var(--text);
+		letter-spacing: var(--tracking-tight);
+		transition: font-size var(--dur-med) var(--ease);
 	}
 
 	.remaining-active {
-		font-size: 64px;
+		font-size: var(--text-score-active);
+		font-weight: var(--weight-heavy);
+		text-shadow: 0 0 40px rgba(240, 164, 36, 0.35);
 	}
 
 	.remaining-inactive {
-		font-size: 32px;
+		font-size: var(--text-score-inactive);
+		font-weight: 700;
 	}
 
 	.legs-info {
-		font-size: 18px;
-		color: var(--text);
+		font-size: var(--text-base);
+		font-weight: 500;
+		color: var(--text-muted);
 		margin-top: 4px;
+	}
+
+	.legs-value {
+		color: var(--text);
+		font-weight: 700;
 	}
 
 	/* Landscape: natural height at the top of the panel column so the big score
@@ -107,22 +128,6 @@
 			justify-content: center;
 			padding: 20px;
 			min-width: 0;
-		}
-
-		.player-name {
-			font-size: 32px;
-		}
-
-		.remaining-active {
-			font-size: 80px;
-		}
-
-		.remaining-inactive {
-			font-size: 52px;
-		}
-
-		.legs-info {
-			font-size: 22px;
 		}
 	}
 </style>

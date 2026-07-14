@@ -196,4 +196,4 @@ Plans:
 | 9. Core Components | v1.2 | 7/7 | Complete    | 2026-07-14 |
 | 10. Scoring Surface | v1.2 | 5/5 | Complete    | 2026-07-14 |
 | 11. Spectator Display | v1.2 | 3/3 | Complete   | 2026-07-14 |
-| 12. Pages & Overlays | v1.2 | 5/5 | Complete   | 2026-07-14 |
+| 12. Pages & Overlays | v1.2 | 5/5 | Complete    | 2026-07-14 |

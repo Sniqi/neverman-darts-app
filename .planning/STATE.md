@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
 current_phase: 12
-current_phase_name: Pages & Overlays
 status: verifying
-stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-07-14T05:37:39.045Z"
+stopped_at: "Phase 11 executed (human_needed: on-device UAT deferred), continuing with Phase 12 (autonomous --from 8)"
+last_updated: "2026-07-14T05:56:06.248Z"
 last_activity: 2026-07-14
-last_activity_desc: Phase 12 execution started
+last_activity_desc: Phase 12 complete
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 26
   completed_plans: 26
   percent: 100
+current_phase_name: Pages & Overlays
 ---
 
 # Project State
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 12 — Pages & Overlays
+**Current focus:** Milestone-Endgame — Phase 11 On-Device-UAT (/gsd-verify-work 11), dann Audit/Complete
 
 ## Current Position
 
-Phase: 12 (Pages & Overlays) — EXECUTING
-Plan: 5 of 5
+Phase: 12
+Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-07-14 — Phase 12 execution started
+Last activity: 2026-07-14 — Phase 12 complete
 
 ## Performance Metrics
 
 **Velocity (v1.0 reference):**
 
-- Total plans completed: 51
+- Total plans completed: 56
 - Average duration: ~6 min/plan
 - Total execution time: estimated ~3.5 hours
 
@@ -54,6 +54,7 @@ Last activity: 2026-07-14 — Phase 12 execution started
 | 08 | 6 | - | - |
 | 09 | 7 | - | - |
 | 10 | 5 | - | - |
+| 12 | 5 | - | - |
 
 **v1.1 (final):** 1 phase, 6 plans, ~6 min/plan; 3 on-device UAT passes (2026-06-18/19)
 
@@ -193,8 +194,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T05:36:55.354Z
-Stopped at: Phase 11 executed (human_needed: on-device UAT deferred), continuing with Phase 12 (autonomous --from 8)
+Last session: 2026-07-14
+Stopped at: Phases 8/9/10/12 complete+verified; Phase 11 executed, awaiting on-device Chromecast UAT (11-UAT.md, 6 items) — autonomous run paused at the designed human gate
 Resume file: None
 
 ## Operator Next Steps

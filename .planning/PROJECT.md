@@ -48,8 +48,8 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - [x] Typography: Barlow (UI) + Barlow Semi Condensed (score numerals), self-hosted, offline-precached, tabular-nums on score surfaces *(Phase 8 ✓)*
 - [x] Core components restyled to DS specs (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) *(Phase 9 ✓)*
 - [x] Scoring surface restyled (Numpad, Dartboard colors, VisitStrip, ScoreCard, active-score 96px treatment; 3-4-player landscape compact clamp) *(Phase 10 ✓)*
-- [ ] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver
-- [ ] All pages restyled (Hub, Setup, History, Stats, Daten/Backup) incl. overlays/toasts
+- [~] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver *(Phase 11 implementiert + automatisiert verifiziert; On-Device-UAT ausstehend → /gsd-verify-work 11)*
+- [x] All pages restyled (Hub, Setup, History, Stats, Daten/Backup) incl. overlays/toasts *(Phase 12 ✓)*
 - [x] Motion system per DS (100–300ms + DS-documented exceptions, standard/spring easing, `prefers-reduced-motion` collapse) *(Phase 8 ✓)*
 
 ### Out of Scope
@@ -110,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-14 after Phase 10 (Scoring Surface) completion*
+*Last updated: 2026-07-14 after Phase 12 (Pages & Overlays) completion — milestone awaits Phase 11 on-device UAT*

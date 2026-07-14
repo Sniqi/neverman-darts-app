@@ -128,16 +128,17 @@
 
 <style>
 	.start-screen {
-		max-width: 480px;
+		max-width: 520px;
 		margin: 0 auto;
-		padding: var(--space-2xl) var(--space-md);
+		padding: var(--space-3xl) var(--space-lg);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-xl);
 	}
 
 	.app-title {
-		font-size: 20px;
+		font-size: var(--text-xl);
+		letter-spacing: -0.01em;
 		font-weight: 600;
 		margin: 0;
 		color: var(--text);
@@ -146,7 +147,7 @@
 	.menu {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-lg);
+		gap: var(--space-md);
 	}
 
 	.toggle-arrow {
@@ -159,6 +160,9 @@
 	}
 
 	.profiles-panel {
-		padding: 0 var(--space-xs);
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
+		padding: var(--space-md);
 	}
 </style>

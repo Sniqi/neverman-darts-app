@@ -39,7 +39,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
 - [x] **Phase 9: Core Components** - Shared UI primitives (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) match their DS specs everywhere they're used (completed 2026-07-14)
 - [x] **Phase 10: Scoring Surface** - `/match` restyled to DS specs (Numpad, Dartboard colors, VisitStrip/DartPill, ScoreCard) with all scoring logic and behavior unchanged (completed 2026-07-14)
 - [x] **Phase 11: Spectator Display** - `/display` restyled to DS specs (PC window, tablet fullscreen, Cast receiver) and verified on the real Chromecast device (Chrome 90 @ 1280×720) (completed 2026-07-14)
-- [ ] **Phase 12: Pages & Overlays** - Start hub, setup, history, stats, and data/backup pages plus all global overlays/toasts restyled to DS specs
+- [x] **Phase 12: Pages & Overlays** - Start hub, setup, history, stats, and data/backup pages plus all global overlays/toasts restyled to DS specs (completed 2026-07-14)
 
 ## Phase Details
 
@@ -169,7 +169,7 @@ Plans:
   3. The statistics dashboard shows DS typography/colors, with the existing bespoke SVG charts recolored to the DS palette (not rebuilt).
   4. The data/backup page and global overlays/toasts (PWA update toast, resume prompt, pause overlay, record celebrations) all match their DS specs.
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans complete
 Plans:
 **Wave 1**
 
@@ -177,7 +177,7 @@ Plans:
 - [x] 12-02-PLAN.md — History list + detail restyle to DS HistoryRow spec (PAGE-02)
 - [x] 12-03-PLAN.md — Stats dashboard restyle + 2-line chart recolor fix (PAGE-03)
 - [x] 12-04-PLAN.md — Overlay restyle: Pause/Record/MatchWin panel treatment + button swap (PAGE-04)
-- [ ] 12-05-PLAN.md — Toast restyle (ReloadPrompt + coupled test/ResumeToast) + Data/backup page (PAGE-04)
+- [x] 12-05-PLAN.md — Toast restyle (ReloadPrompt + coupled test/ResumeToast) + Data/backup page (PAGE-04)
 
 **UI hint**: yes
 
@@ -196,4 +196,4 @@ Plans:
 | 9. Core Components | v1.2 | 7/7 | Complete    | 2026-07-14 |
 | 10. Scoring Surface | v1.2 | 5/5 | Complete    | 2026-07-14 |
 | 11. Spectator Display | v1.2 | 3/3 | Complete   | 2026-07-14 |
-| 12. Pages & Overlays | v1.2 | 4/5 | In Progress|  |
+| 12. Pages & Overlays | v1.2 | 5/5 | Complete   | 2026-07-14 |

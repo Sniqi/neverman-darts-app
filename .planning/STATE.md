@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Restyling
 current_phase: 12
 current_phase_name: Pages & Overlays
-status: executing
+status: verifying
 stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-07-14T05:32:45.321Z"
+last_updated: "2026-07-14T05:37:39.045Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 12 execution started
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 26
-  completed_plans: 25
-  percent: 80
+  completed_plans: 26
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 
 Phase: 12 (Pages & Overlays) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-14 — Phase 12 execution started
 
 ## Performance Metrics
@@ -114,6 +114,7 @@ Last activity: 2026-07-14 — Phase 12 execution started
 | Phase 12 P02 | 8min | 2 tasks | 5 files |
 | Phase 12-pages-overlays P03 | 10min | 2 tasks | 4 files |
 | Phase 12 P04 | 12min | 2 tasks | 3 files |
+| Phase 12 P05 | 8min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -158,6 +159,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: [Phase 11-03]: .dart-pill font-size switched to relative 0.82em off .h-darts's --display-body, matching DS DartPill size=0.82em pattern
 - [Phase ?]: Chart recolor limited to the exact 2 flagged @const fill lines — enforced via scoped grep gate, not just instruction
 - [Phase ?]: RecordOverlay panel treatment applied for visual consistency across all 3 overlays (discretionary per UI-SPEC)
+- [Phase ?]: ReloadPrompt border-color test updated in same commit as CSS change (--line-strong) per RESEARCH Pitfall 1
+- [Phase ?]: ResumeToast text token swap applied as optional discretionary consistency pass, radius/shadow/accent-stripe/animation untouched
 
 ### Quick Tasks Completed
 
@@ -190,7 +193,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T05:32:07.469Z
+Last session: 2026-07-14T05:36:55.354Z
 Stopped at: Phase 11 executed (human_needed: on-device UAT deferred), continuing with Phase 12 (autonomous --from 8)
 Resume file: None
 

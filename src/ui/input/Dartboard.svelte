@@ -121,11 +121,11 @@
 				multiplier: 1
 			});
 
-			// Triple ring (green or alternate)
+			// Triple ring — must match this segment's double ring color (real board)
 			regions.push({
 				key: `tr-${seg}`,
 				path: describeAnnularSlice(R_INNER_SINGLE, R_TRIPLE_END, startAngle, endAngle),
-				fill: isAlt ? 'var(--board-red)' : 'var(--board-green)',
+				fill: isAlt ? 'var(--board-green)' : 'var(--board-red)',
 				segment: seg,
 				multiplier: 3
 			});

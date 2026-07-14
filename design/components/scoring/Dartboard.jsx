@@ -18,7 +18,7 @@ function buildRegions() {
   for (let i = 0; i < 20; i++) {
     const seg = SEGMENT_ORDER[i], a1 = startAngle(i), a2 = a1 + 18, alt = i % 2 === 1;
     regions.push({ key: 'is-' + seg, path: slice(R_OUTER_BULL, R_INNER_SINGLE, a1, a2), fill: 'var(--board-single)', segment: seg, multiplier: 1 });
-    regions.push({ key: 'tr-' + seg, path: slice(R_INNER_SINGLE, R_TRIPLE_END, a1, a2), fill: alt ? 'var(--board-red)' : 'var(--board-green)', segment: seg, multiplier: 3 });
+    regions.push({ key: 'tr-' + seg, path: slice(R_INNER_SINGLE, R_TRIPLE_END, a1, a2), fill: alt ? 'var(--board-green)' : 'var(--board-red)', segment: seg, multiplier: 3 });
     regions.push({ key: 'os-' + seg, path: slice(R_TRIPLE_END, R_OUTER_SINGLE, a1, a2), fill: 'var(--board-single)', segment: seg, multiplier: 1 });
     regions.push({ key: 'db-' + seg, path: slice(R_OUTER_SINGLE, R_DOUBLE_END, a1, a2), fill: alt ? 'var(--board-green)' : 'var(--board-red)', segment: seg, multiplier: 2 });
   }

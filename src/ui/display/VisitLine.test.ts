@@ -87,26 +87,26 @@ test('formatDart: inner bull {multiplier:2, segment:25} → "Bull"', async () =>
 		completedTotal: null,
 	});
 	expect(screen.container.textContent).toContain('Bull');
-	// Should not contain "Outer Bull" prefix
-	expect(screen.container.textContent).not.toContain('Outer Bull');
+	// Should not contain "Outer" prefix
+	expect(screen.container.textContent).not.toContain('Outer');
 });
 
-test('formatDart: miss {segment:0} → "0 (Daneben)"', async () => {
+test('formatDart: miss {segment:0} → "✕"', async () => {
 	const screen = render(VisitLine, {
 		currentVisit: [dart(1, 0)],
 		lastCompletedVisit: null,
 		completedTotal: null,
 	});
-	expect(screen.container.textContent).toContain('0 (Daneben)');
+	expect(screen.container.textContent).toContain('✕');
 });
 
-test('formatDart: outer bull {multiplier:1, segment:25} → "Outer Bull"', async () => {
+test('formatDart: outer bull {multiplier:1, segment:25} → "Outer"', async () => {
 	const screen = render(VisitLine, {
 		currentVisit: [dart(1, 25)],
 		lastCompletedVisit: null,
 		completedTotal: null,
 	});
-	expect(screen.container.textContent).toContain('Outer Bull');
+	expect(screen.container.textContent).toContain('Outer');
 });
 
 test('formatDart: double {multiplier:2, segment:16} → "D16"', async () => {

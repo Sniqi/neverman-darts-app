@@ -4,6 +4,7 @@
 	// NO undo buttons — pure presentation component.
 	// Player name rendered via Svelte {interpolation} only (T-03-04: no {@html}).
 	import type { DartScore, Visit } from '../../engine/types.js';
+	import { formatDartShort } from '../input/dart-notation.js';
 
 	interface Props {
 		currentVisit: DartScore[];
@@ -13,19 +14,10 @@
 
 	let { currentVisit, lastCompletedVisit, completedTotal }: Props = $props();
 
-	// formatDart copied verbatim from src/ui/input/VisitStrip.svelte (lines 9-15)
-	function formatDart(dart: DartScore): string {
-		if (dart.segment === 0) return '0 (Daneben)';
-		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';        // inner bull: { multiplier: 2, segment: 25 }
-		if (dart.multiplier === 1 && dart.segment === 25) return 'Outer Bull';  // outer bull: { multiplier: 1, segment: 25 }
-		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
-		return `${prefix}${dart.segment}`;
-	}
-
 	// Live mid-visit: fill 3 slots with darts or en-dash placeholders, middle-dot separators
 	let liveSlotText = $derived.by(() => {
 		return [0, 1, 2]
-			.map(i => currentVisit[i] ? formatDart(currentVisit[i]) : '–') // U+2013 en-dash
+			.map(i => currentVisit[i] ? formatDartShort(currentVisit[i]) : '–') // U+2013 en-dash
 			.join(' · '); // U+00B7 middle-dot separator
 	});
 
@@ -39,7 +31,7 @@
 	// Completed dart breakdown text: "T20 · 20 · 20"
 	let completedBreakdown = $derived.by(() => {
 		if (!lastCompletedVisit || lastCompletedVisit.darts.length === 0) return null;
-		return lastCompletedVisit.darts.map(formatDart).join(' · '); // middle-dot U+00B7
+		return lastCompletedVisit.darts.map(formatDartShort).join(' · '); // middle-dot U+00B7
 	});
 
 	// Which mode to show:

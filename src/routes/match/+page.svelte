@@ -290,14 +290,15 @@
 			<div class="audio-bar">
 				<div class="audio-row">
 					<label class="audio-label" for="match-caller-toggle">Caller</label>
-					<input
+					<button
 						id="match-caller-toggle"
-						type="checkbox"
+						type="button"
 						role="switch"
-						checked={callerEnabled}
-						onchange={(e) => { callerEnabled = e.currentTarget.checked; saveAudioPref('callerEnabled', callerEnabled); }}
-						class="audio-check"
-					/>
+						aria-checked={callerEnabled}
+						class="switch"
+						class:on={callerEnabled}
+						onclick={() => { callerEnabled = !callerEnabled; saveAudioPref('callerEnabled', callerEnabled); }}
+					><span class="thumb" aria-hidden="true"></span></button>
 					<input
 						type="range"
 						min="0"
@@ -313,14 +314,15 @@
 				</div>
 				<div class="audio-row">
 					<label class="audio-label" for="match-sfx-toggle">Musik</label>
-					<input
+					<button
 						id="match-sfx-toggle"
-						type="checkbox"
+						type="button"
 						role="switch"
-						checked={sfxEnabled}
-						onchange={(e) => { sfxEnabled = e.currentTarget.checked; saveAudioPref('sfxEnabled', sfxEnabled); }}
-						class="audio-check"
-					/>
+						aria-checked={sfxEnabled}
+						class="switch"
+						class:on={sfxEnabled}
+						onclick={() => { sfxEnabled = !sfxEnabled; saveAudioPref('sfxEnabled', sfxEnabled); }}
+					><span class="thumb" aria-hidden="true"></span></button>
 					<input
 						type="range"
 						min="0"
@@ -540,7 +542,7 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-xs);
-		height: 36px;
+		height: var(--hit-min);
 	}
 
 	.audio-label {
@@ -548,14 +550,6 @@
 		color: var(--text-muted);
 		width: 42px;
 		flex-shrink: 0;
-	}
-
-	.audio-check {
-		width: 36px;
-		height: 20px;
-		flex-shrink: 0;
-		cursor: pointer;
-		accent-color: var(--accent);
 	}
 
 	.audio-slider {

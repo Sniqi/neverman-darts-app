@@ -47,8 +47,8 @@ created: 2026-07-14
 | 10-03-T3 | 10-03 | 1 | SCOR-03 | T-10-03-02 | Live board-tap → pill-text wiring proof | E2E | `npx playwright test dart-notation` | ❌ → created this task | ⬜ pending |
 | 10-04-T1 | 10-04 | 1 | SCOR-04 | T-10-04-01 | Store-read logic (isActive/suggestion guard) untouched | unit (browser) | `npm run test:browser -- src/ui/input/ScorePanel.test.ts src/ui/input/CheckoutSuggestion.test.ts` | ❌ → created this task | ⬜ pending |
 | 10-04-T2 | 10-04 | 1 | SCOR-04 | T-10-04-01, T-10-04-02 | 96px/44px DS values; zero new bust code in ScorePanel | unit (browser) | `npm run test:browser -- src/ui/input/ScorePanel.test.ts src/ui/input/CheckoutSuggestion.test.ts` | ✅ (created by T1) | ⬜ pending |
-| 10-05-T1 | 10-05 | 1 | SCOR-04 (gap closure) | T-10-05-02 | Reproduces 10-VERIFICATION.md's 3-4 player landscape score-panel overflow at 1024x768 | E2E | `npx playwright test score-panel-landscape` | ❌ → created this task | ⬜ pending |
-| 10-05-T2 | 10-05 | 1 | SCOR-04 (gap closure) | T-10-05-01, T-10-05-02 | `.compact` clamp() fix eliminates overflow; 2-player landscape/all portrait stay at 96px/44px | unit (browser) + E2E | `npx playwright test score-panel-landscape && npm run test:browser -- src/ui/input/ScorePanel.test.ts` | ✅ (created by T1) | ⬜ pending |
+| 10-05-T1 | 10-05 | 1 | SCOR-04 (gap closure) | T-10-05-02 | Reproduces 10-VERIFICATION.md's 3-4 player landscape score-panel overflow at 1024x768 | E2E | `npx playwright test score-panel-landscape` | ✅ created this task | ✅ done |
+| 10-05-T2 | 10-05 | 1 | SCOR-04 (gap closure) | T-10-05-01, T-10-05-02 | `.compact` clamp() fix eliminates overflow; 2-player landscape/all portrait stay at 96px/44px | unit (browser) + E2E | `npx playwright test score-panel-landscape && npm run test:browser -- src/ui/input/ScorePanel.test.ts` | ✅ (created by T1) | ✅ done |
 
 **Phase gate (all plans, after Wave 1 completes):**
 

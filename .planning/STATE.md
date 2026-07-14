@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Phase 11 — Spectator Display
+**Current focus:** Phase 12 — Pages & Overlays (Phase 11 UAT deferred → /gsd-verify-work 11)
 
 ## Current Position
 
@@ -168,6 +168,12 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 - (Carried, low priority) Android Chrome backgrounding during a Cast session: sender session lifecycle when the tablet screen locks was never explicitly UAT'd — no issues reported through 3 on-device UAT passes and real use; revisit only if disconnects are observed. (Screen wake lock on /match makes locking rare in practice.)
 
+## Deferred Verification
+
+| Phase | State | Resume |
+|-------|-------|--------|
+| 11 | verification_deferred_human (on-device Chromecast UAT, 6 items in 11-UAT.md) | /gsd-verify-work 11 |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At |
@@ -178,8 +184,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T04:20:29.402Z
-Stopped at: Completed 11-01-PLAN.md
+Last session: 2026-07-14
+Stopped at: Phase 11 executed (human_needed: on-device UAT deferred), continuing with Phase 12 (autonomous --from 8)
 Resume file: None
 
 ## Operator Next Steps

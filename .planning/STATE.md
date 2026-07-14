@@ -131,6 +131,7 @@ Cleared at v1.2 milestone close (2026-07-14). The durable log lives in PROJECT.m
 |---|-------------|------|--------|-----------|
 | 260614-q01 | Profile management on landing page, back button on /setup | 2026-06-14 | b9e4ef4 | [260614-q01-profile-on-landing](./quick/260614-q01-profile-on-landing/) |
 | 260614-q02 | Setup page: rename Legs/Sätze labels to "First to" format, default legs 2 | 2026-06-14 | 877828b | — |
+| 260714-q01 | Dartboard: match triple ring color to double ring per segment (fixes inverted triples) | 2026-07-14 | 02c72ce | — |
 
 ### Pending Todos
 

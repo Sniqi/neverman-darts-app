@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
-current_phase: 11
-current_phase_name: spectator-display
+current_phase: 12
+current_phase_name: Pages & Overlays
 status: verifying
-stopped_at: Phase 11 gap-closure plan 11-04 executed (pause-not-shown-on-Chromecast fix); Phase 11 now fully complete (4/4 plans) pending on-device UAT re-verification
-last_updated: "2026-07-14T13:39:11.463Z"
+stopped_at: Phase 11 COMPLETE — on-device UAT 6/6 (Test 5 pause-on-Chromecast re-verified after fix b1a6e19), verification passed, security verified. Phase 12 executed+verified+secured but still needs UAT.
+last_updated: "2026-07-14T15:54:39.749Z"
 last_activity: 2026-07-14
-last_activity_desc: Phase 11 gap-closure plan 11-04 executed
+last_activity_desc: Phase 11 complete (UAT 6/6, verification+security gates closed), transitioned to Phase 12
 progress:
   total_phases: 5
   completed_phases: 5
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Milestone-Endgame — Phase 11 On-Device-UAT re-verification (/gsd-verify-work 11, Test 5), dann Audit/Complete
+**Current focus:** Milestone-Endgame — Phase 12 (Pages & Overlays) needs on-device UAT (/gsd-verify-work 12); it is the last remaining v1.2 gate before milestone completion.
 
 ## Current Position
 
-Phase: 11 (spectator-display) — COMPLETE (4/4 plans)
-Plan: 4 of 4 (gap-closure)
-Status: Phase complete — ready for on-device UAT re-verification (Test 5)
-Last activity: 2026-07-14 — Phase 11 gap-closure plan 11-04 executed
+Phase: 12 — Pages & Overlays
+Plan: 5/5 executed (verification passed, security verified); UAT not yet run
+Status: Ready for UAT — /gsd-verify-work 12 is the only remaining v1.2 gate
+Last activity: 2026-07-14 — Phase 11 complete (UAT 6/6), transitioned to Phase 12
 
 ## Performance Metrics
 
 **Velocity (v1.0 reference):**
 
-- Total plans completed: 56
+- Total plans completed: 60
 - Average duration: ~6 min/plan
 - Total execution time: estimated ~3.5 hours
 
@@ -55,6 +55,7 @@ Last activity: 2026-07-14 — Phase 11 gap-closure plan 11-04 executed
 | 09 | 7 | - | - |
 | 10 | 5 | - | - |
 | 12 | 5 | - | - |
+| 11 | 4 | - | - |
 
 **v1.1 (final):** 1 phase, 6 plans, ~6 min/plan; 3 on-device UAT passes (2026-06-18/19)
 
@@ -179,13 +180,15 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 ### Blockers/Concerns
 
 - (Carried, low priority) Android Chrome backgrounding during a Cast session: sender session lifecycle when the tablet screen locks was never explicitly UAT'd — no issues reported through 3 on-device UAT passes and real use; revisit only if disconnects are observed. (Screen wake lock on /match makes locking rare in practice.)
-- (New, advisory — WR-01 from 11-04-REVIEW.md) On the pause-*trigger* dispatch only, `dispatch()` sends a stale Cast snapshot (`pauseActive:false`) at match.svelte.ts:126 before `#checkAutoPause` (:146) sends the fresh one, so the real receiver could briefly flash "leg won, no pause overlay" before self-correcting. Deliberately left as-is per Plan 11-04's decision not to reorder `dispatch()`; self-heals within ≤1s via the next countdown tick. **Watch for this during /gsd-verify-work 11 Test 5** — if a visible flash appears on-device, reorder dispatch() (move the unconditional `#publishToCast()` after `#checkAutoPause`) + add a regression test.
+- (Resolved / observed-clear — WR-01 from 11-04-REVIEW.md) On the pause-*trigger* dispatch only, `dispatch()` sends a stale Cast snapshot (`pauseActive:false`) at match.svelte.ts:126 before `#checkAutoPause` (:146) sends the fresh one. **Watched on-device during /gsd-verify-work 11 Test 5 (2026-07-14): NO visible flash observed** — the fresh snapshot supersedes within the same tick in practice. Left as-is (accepted low-severity risk, see 11-SECURITY.md T-11-04-01); no `dispatch()` reorder or extra regression test needed. Re-open only if a flash is ever seen on-device.
 
 ## Deferred Verification
 
 | Phase | State | Resume |
 |-------|-------|--------|
-| 11 | verification_deferred_human (on-device Chromecast UAT, 6 items in 11-UAT.md) | /gsd-verify-work 11 |
+| 12 | UAT not yet run — 5/5 executed, verification + security passed | /gsd-verify-work 12 |
+
+*Phase 11 cleared 2026-07-14: on-device UAT 6/6 passed, 11-VERIFICATION.md status=passed, 11-SECURITY.md verified.*
 
 ## Deferred Items
 
@@ -197,10 +200,10 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T13:39:11.455Z
-Stopped at: Phase 11 gap-closure plan 11-04 executed (pause-not-shown-on-Chromecast fix); Phase 11 now fully complete (4/4 plans) pending on-device UAT re-verification
+Last session: 2026-07-14
+Stopped at: Phase 11 complete — UAT 6/6 (Test 5 pause-on-Chromecast re-verified after fix b1a6e19), verification passed, security verified. Transitioned to Phase 12.
 Resume file: None
 
 ## Operator Next Steps
 
-- Autonomous run active (/gsd-autonomous --from 8): Phase 9 discuss→plan→execute is next
+- v1.2 milestone: the only remaining gate is Phase 12 (Pages & Overlays) on-device UAT → `/gsd-verify-work 12`. After it passes, run `/gsd-complete-milestone v1.2`.

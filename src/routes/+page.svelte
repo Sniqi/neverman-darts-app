@@ -86,21 +86,21 @@
 		</button>
 		<button class="btn btn--menu" onclick={() => goto(`${base}/history`)}>
 			Match-Verlauf
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
 		<button class="btn btn--menu" onclick={() => goto(`${base}/stats`)}>
 			Statistik
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M9 18l6-6-6-6" />
 			</svg>
 		</button>
 		<button class="btn btn--menu" onclick={() => goto(`${base}/data`)}>
 			Daten / Backup
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 				stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M9 18l6-6-6-6" />
 			</svg>

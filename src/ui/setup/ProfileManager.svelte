@@ -92,13 +92,13 @@
 							if (e.key === 'Escape') cancelEdit();
 						}}
 					/>
-					<button onclick={saveEdit}>Speichern</button>
-					<button onclick={cancelEdit}>Abbrechen</button>
+					<button class="btn btn--surface edit-action" onclick={saveEdit}>Speichern</button>
+					<button class="btn btn--ghost edit-action" onclick={cancelEdit}>Abbrechen</button>
 				{:else}
 					<span class="avatar">{profile.initial}</span>
 					<span class="name">{profile.name}</span>
-					<button class="icon-btn" onclick={() => startEdit(profile.id!, profile.name)} aria-label="Bearbeiten">✏️</button>
-					<button class="icon-btn destructive" onclick={() => openDeleteSheet(profile.id!, profile.name)} aria-label="Profil löschen">🗑️</button>
+					<button class="btn btn--ghost btn--icon icon-btn" onclick={() => startEdit(profile.id!, profile.name)} aria-label="Bearbeiten">✏️</button>
+					<button class="btn btn--ghost btn--icon icon-btn destructive" onclick={() => openDeleteSheet(profile.id!, profile.name)} aria-label="Profil löschen">🗑️</button>
 				{/if}
 			</li>
 		{/each}
@@ -127,8 +127,8 @@
 		<h3 id="delete-heading">Profil löschen?</h3>
 		<p>Alle gespeicherten Daten für diesen Spieler gehen verloren.</p>
 		<div class="sheet-actions">
-			<button class="delete-btn" data-testid="confirm-delete" onclick={confirmDelete}>Löschen</button>
-			<button class="cancel-btn" onclick={cancelDelete}>Abbrechen</button>
+			<button class="btn btn--destructive" data-testid="confirm-delete" onclick={confirmDelete}>Löschen</button>
+			<button class="btn btn--cancel" onclick={cancelDelete}>Abbrechen</button>
 		</div>
 	</div>
 {/if}
@@ -184,17 +184,7 @@
 	}
 
 	.icon-btn {
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: var(--space-xs);
-		min-width: 44px;
-		min-height: 44px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
 		font-size: 16px;
-		color: var(--text);
 	}
 
 	.icon-btn.destructive {
@@ -223,9 +213,20 @@
 		border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md);
 		font-size: 20px;
-		min-width: 44px;
-		min-height: 44px;
+		min-width: var(--hit-min);
+		min-height: var(--hit-min);
 		cursor: pointer;
+	}
+
+	.add-btn:active {
+		transform: scale(var(--press-scale));
+	}
+
+	.edit-action {
+		width: auto;
+		height: 36px;
+		padding: 0 var(--space-sm);
+		font-size: var(--text-sm);
 	}
 
 	.error {
@@ -249,6 +250,8 @@
 		position: fixed;
 		inset: 0;
 		background: var(--backdrop);
+		backdrop-filter: blur(var(--blur-backdrop));
+		-webkit-backdrop-filter: blur(var(--blur-backdrop));
 		z-index: 100;
 	}
 
@@ -267,13 +270,13 @@
 	}
 
 	.bottom-sheet h3 {
-		font-size: 20px;
+		font-size: var(--text-xl);
 		font-weight: 600;
 		margin: 0;
 	}
 
 	.bottom-sheet p {
-		font-size: 16px;
+		font-size: var(--text-base);
 		margin: 0;
 		color: var(--text);
 	}
@@ -282,28 +285,5 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm);
-	}
-
-	.delete-btn {
-		background: var(--destructive);
-		color: var(--text);
-		border: none;
-		border-radius: var(--radius-sm);
-		padding: var(--space-sm) var(--space-md);
-		font-size: 16px;
-		font-weight: 600;
-		min-height: 48px;
-		cursor: pointer;
-	}
-
-	.cancel-btn {
-		background: var(--surface-3);
-		color: var(--text);
-		border: none;
-		border-radius: var(--radius-sm);
-		padding: var(--space-sm) var(--space-md);
-		font-size: 16px;
-		min-height: 48px;
-		cursor: pointer;
 	}
 </style>

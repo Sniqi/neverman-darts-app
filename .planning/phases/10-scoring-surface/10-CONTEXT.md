@@ -40,6 +40,11 @@ The touch-scoring screen (`/match`) visually matches the DS scoring specs while 
 - BUST flash in semantic red (`--destructive`); existing keyframes keep token durations.
 - Gate: 535 vitest + 9/9 Playwright stay green; scoring behavior EXACTLY unchanged (criterion 4); dev-server visual spot-check supplementary.
 
+### Research Open Questions — Resolved (post-research, 2026-07-14)
+- **Q1 Orphaned `VisitStrip.svelte`:** the live pill strip is inline in `match/+page.svelte` (`.dart-column`/`.dart-pill`) — SCOR-03 targets THAT. The orphaned component stays untouched (CLAUDE.md: don't delete pre-existing dead code); note it for the milestone audit as cleanup candidate.
+- **Q2 BUST treatment:** the DS defines bust ONLY on DartPill (struck-through, `--destructive-soft` bg, `--destructive-line` border, brightened destructive text — DartPill.jsx uses color-mix: precompute static per the global Chrome-90 decision). `/match` already renders bust via `.dart-column.bust .dart-pill` — restyle it to those DS values. Do NOT invent a ScoreCard bust state (ScoreCard.jsx has none); criterion 4's "red BUST flash" is satisfied by the DS pill bust treatment driven by the existing `isBust` state. Engine/behavior untouched.
+- **Notation correction:** `src/ui/display/VisitLine.test.ts` DOES assert the old strings — it is Phase 11 scope (display surface) and stays untouched in Phase 10; Phase 11 aligns VisitLine + its test to DS notation. Phase 10 changes only the scoring-surface helpers (match/+page.svelte; the orphaned VisitStrip keeps old strings, invisible).
+
 ### Claude's Discretion
 - Exact flash/glow implementation details (box-shadow vs filter) — match DS .jsx values.
 - Whether the two duplicated notation helpers (VisitStrip.svelte, match/+page.svelte) get consolidated into one shared helper — allowed if it stays a pure refactor with identical output (prefer smallest safe diff).

@@ -457,8 +457,11 @@
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid var(--line);
 		border-radius: var(--radius-pill);
-		font-size: 16px;
-		font-weight: 400;
+		font-size: 18px;
+		font-weight: 600;
+		line-height: 1.1;
+		letter-spacing: 0.01em;
+		font-variant-numeric: tabular-nums;
 		color: var(--text-soft);
 		cursor: pointer;
 		transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);

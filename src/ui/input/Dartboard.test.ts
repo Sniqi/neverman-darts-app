@@ -6,6 +6,7 @@
 
 import { render } from 'vitest-browser-svelte';
 import { expect, test, vi, beforeEach, afterEach } from 'vitest';
+import { flushSync } from 'svelte';
 import Dartboard from './Dartboard.svelte';
 import { matchStore } from '../../stores/match.svelte.js';
 
@@ -123,4 +124,80 @@ test('triple-20 tap dispatches {multiplier:3, segment:20}', async () => {
 		expect(action.dart.multiplier).toBe(3);
 		expect(action.dart.segment).toBe(20);
 	}
+});
+
+test('center tap flashes inner bull with DS flash opacity 0.35', async () => {
+	const screen = render(Dartboard);
+
+	const svg = screen.container.querySelector('svg')!;
+	const rect = svg.getBoundingClientRect();
+	const centerX = rect.left + rect.width / 2;
+	const centerY = rect.top + rect.height / 2;
+
+	flushSync(() => {
+		svg.dispatchEvent(
+			new PointerEvent('pointerdown', {
+				clientX: centerX,
+				clientY: centerY,
+				bubbles: true,
+				cancelable: true,
+				pointerId: 1
+			})
+		);
+	});
+
+	const innerBull = svg.querySelector('[data-segment-key="inner-bull"]');
+	expect(innerBull?.getAttribute('fill')).toBe('rgba(255,255,255,0.35)');
+});
+
+test('miss-zone tap flashes with dimmer DS flash opacity 0.15', async () => {
+	const screen = render(Dartboard);
+
+	const svg = screen.container.querySelector('svg')!;
+	const rect = svg.getBoundingClientRect();
+	const centerX = rect.left + rect.width / 2;
+	const centerY = rect.top + rect.height / 2;
+	const scale = rect.width / 800;
+	const missX = centerX + 350 * scale;
+	const missY = centerY;
+
+	flushSync(() => {
+		svg.dispatchEvent(
+			new PointerEvent('pointerdown', {
+				clientX: missX,
+				clientY: missY,
+				bubbles: true,
+				cancelable: true,
+				pointerId: 1
+			})
+		);
+	});
+
+	const missZone = svg.querySelector('.miss-zone');
+	expect(missZone?.getAttribute('fill')).toBe('rgba(255,255,255,0.15)');
+});
+
+test('center tap floating label uses DS font-size 56 and stroke halo rgba(0,0,0,.75)', async () => {
+	const screen = render(Dartboard);
+
+	const svg = screen.container.querySelector('svg')!;
+	const rect = svg.getBoundingClientRect();
+	const centerX = rect.left + rect.width / 2;
+	const centerY = rect.top + rect.height / 2;
+
+	flushSync(() => {
+		svg.dispatchEvent(
+			new PointerEvent('pointerdown', {
+				clientX: centerX,
+				clientY: centerY,
+				bubbles: true,
+				cancelable: true,
+				pointerId: 1
+			})
+		);
+	});
+
+	const floatLabel = svg.querySelector('text.score-float');
+	expect(floatLabel?.getAttribute('font-size')).toBe('56');
+	expect(floatLabel?.getAttribute('stroke')).toBe('rgba(0,0,0,.75)');
 });

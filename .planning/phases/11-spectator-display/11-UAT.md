@@ -1,54 +1,60 @@
 ---
-status: testing
+status: complete
 phase: 11-spectator-display
 source: [11-VERIFICATION.md]
 started: 2026-07-14T06:30:00Z
-updated: 2026-07-14T06:30:00Z
+updated: 2026-07-14T13:04:04Z
 ---
 
 ## Current Test
 
-number: 1
-name: Restyled Display rendert korrekt auf dem echten Chromecast (Chrome 90 @ 1280×720)
-expected: |
-  Cast von /match starten. Auf dem TV: Player-Panels mit DS-Gradients, Amber-Edge/Glow beim aktiven Spieler,
-  inaktive Panels gedimmt (55%), Header mit Amber-Rule + Bloom + ●-Separatoren, History-Zeilen mit korrektem
-  Spacing (kein kollabiertes Layout), Riesen-Score lesbar. Kein Layout-Bruch.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
 ### 1. Receiver-Rendering (DISP-03)
 expected: Panels/Header/Typo wie oben; History-Zeilen-Spacing intakt (CR-01-Fix); nichts unter ~34px; keine kaputten Klammern/Umbrüche bei 1280×720
-result: [pending]
+result: pass
 
 ### 2. Live-Sync während des Spiels (DISP-04)
 expected: Score-Updates erscheinen live auf dem TV nach jeder Aufnahme; aktiver Spieler wechselt korrekt (Amber-Treatment folgt)
-result: [pending]
+result: pass
 
 ### 3. Idle-Screen (DISP-04)
 expected: Vor Match-Start / nach Match-Ende zeigt der Receiver den Idle-Screen wie zuvor (dvh-Fix aus Phase 8 aktiv)
-result: [pending]
+result: pass
 
 ### 4. Leg-/Set-Banner + Win-Overlay (DISP-04)
 expected: Leg-Gewinn-Banner und Match-Win-Anzeige erscheinen und verschwinden wie vor dem Restyle
-result: [pending]
+result: pass
 
 ### 5. Pause-Countdown (DISP-04)
 expected: Auto-Pause zeigt den synchronisierten Countdown auf dem TV; „Weiter" beendet ihn beidseitig. ZUSATZ (Phase 12 WR-02): Der neue Blur-Scrim (backdrop-filter 12px) muss auf dem Receiver flüssig rendern (Chrome 90 unterstützt blur; prüfe Performance des Vollbild-Blurs)
-result: [pending]
+result: issue
+reported: "pass, aber der chromecast zeigt die Pause nicht an"
+severity: major
 
 ### 6. Auto-Rejoin (DISP-04)
 expected: Cast trennen/neu verbinden → Receiver stellt den Match-Stand wieder her (ORIGIN_SCOPED Rejoin)
-result: [pending]
+result: pass
 
 ## Summary
 
 total: 6
-passed: 0
-issues: 0
-pending: 6
+passed: 5
+issues: 1
+pending: 0
 skipped: 0
 blocked: 0
 
 ## Gaps
+
+- truth: "Auto-Pause zeigt den synchronisierten Countdown auf dem Chromecast-Receiver (Pause-Overlay + Blur-Scrim sichtbar)"
+  status: failed
+  reason: "User reported: pass, aber der chromecast zeigt die Pause nicht an"
+  severity: major
+  test: 5
+  root_cause: ""     # Filled by diagnosis
+  artifacts: []      # Filled by diagnosis
+  missing: []        # Filled by diagnosis
+  debug_session: ""  # Filled by diagnosis

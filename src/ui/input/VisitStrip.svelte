@@ -4,15 +4,7 @@
 	// Tapping a slot dispatches UNDO (removes last dart; tapping earlier slot undoes back to it).
 	// On bust, strip background animates to destructive red.
 	import { matchStore } from '../../stores/match.svelte.js';
-	import type { DartScore } from '../../engine/types.js';
-
-	function formatDart(dart: DartScore): string {
-		if (dart.segment === 0) return '0 (Daneben)';
-		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';        // inner bull: { multiplier: 2, segment: 25 }
-		if (dart.multiplier === 1 && dart.segment === 25) return 'Outer Bull';  // outer bull: { multiplier: 1, segment: 25 }
-		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
-		return `${prefix}${dart.segment}`;
-	}
+	import { formatDart } from './dart-notation.js';
 
 	// Slots: always show 3 slots
 	const SLOTS = [0, 1, 2];

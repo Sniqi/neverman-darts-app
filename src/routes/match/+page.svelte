@@ -23,7 +23,7 @@
 	import SpectatorChooser from '../../ui/display/SpectatorChooser.svelte';
 	import ResumeToast from '../../ui/cast/ResumeToast.svelte';
 	import { castSenderManager } from '../../lib/cast-sender.svelte.js';
-	import type { DartScore } from '../../engine/types.js';
+	import { formatDart } from '../../ui/input/dart-notation.js';
 
 	// ── Audio prefs — enabled flags + volumes are $state so the in-match audio bar updates live ──
 	const prefs = loadAudioPrefs();
@@ -205,14 +205,6 @@
 		}
 	});
 
-	function formatDart(dart: DartScore): string {
-		if (dart.segment === 0) return '0';
-		if (dart.multiplier === 2 && dart.segment === 25) return 'Bull';
-		if (dart.multiplier === 1 && dart.segment === 25) return 'Bull 25';
-		const prefix = dart.multiplier === 3 ? 'T' : dart.multiplier === 2 ? 'D' : '';
-		return `${prefix}${dart.segment}`;
-	}
-
 	// ── Darts-at-double dialog (D-08, INP-03) ─────────────────────────────
 	// Show after a numpad visit that wins a leg.
 	// We detect this by watching for phase 'leg-complete' after a NUMPAD_VISIT.
@@ -347,7 +339,9 @@
 				{@const dart = displayDarts[slotIdx]}
 				<button
 					class="dart-pill"
-					class:filled={!!dart}
+					class:dart-pill--triple={!!dart && (dart.multiplier === 3 || dart.segment === 25)}
+					class:dart-pill--double={!!dart && dart.multiplier === 2 && dart.segment !== 25}
+					class:dart-pill--miss={!!dart && dart.segment === 0}
 					onclick={undo}
 					disabled={matchStore.currentVisit.length === 0}
 					aria-label={dart ? `Rückgängig: ${formatDart(dart)}` : 'Leerer Slot'}
@@ -444,9 +438,14 @@
 		flex-shrink: 0;
 	}
 
+	/* color below is the precomputed static value for color-mix(in oklab, var(--destructive) 75%, white)
+	   -- Chrome-90 (Cast receiver) forbids runtime color-mix(); this rule never runs there anyway
+	   (/match only), but the project-wide rule is to precompute rather than ship a live expression. */
 	.dart-column.bust .dart-pill {
+		color: #f27c79;
+		background: var(--destructive-soft);
 		border-color: var(--destructive-line);
-		color: var(--destructive);
+		text-decoration: line-through;
 	}
 
 	.dart-pill {
@@ -455,19 +454,33 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--surface);
-		border: 1px solid var(--line-strong);
-		border-radius: var(--radius-sm);
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-pill);
 		font-size: 16px;
 		font-weight: 400;
-		color: var(--text-muted);
+		color: var(--text-soft);
 		cursor: pointer;
 		transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 	}
 
-	.dart-pill.filled {
-		border-color: var(--accent);
-		color: var(--text);
+	.dart-pill--triple {
+		color: var(--accent);
+		background: var(--accent-soft);
+		border-color: var(--accent-line);
+		font-weight: 600;
+	}
+
+	.dart-pill--double {
+		color: var(--accent-double);
+		background: rgba(240, 164, 36, 0.07);
+		border-color: rgba(240, 164, 36, 0.30);
+		font-weight: 600;
+	}
+
+	.dart-pill--miss {
+		color: var(--text-faint);
+		border: 1px dashed var(--line-strong);
 		font-weight: 600;
 	}
 

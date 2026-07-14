@@ -64,7 +64,7 @@
 		{#each bands as band, i}
 			{@const barW = maxCount > 0 ? (band.count / maxCount) * BAR_WIDTH : 0}
 			{@const y = i * ROW_HEIGHT + 5}
-			{@const fill = i === highlightIdx ? 'var(--accent)' : 'var(--line-strong)'}
+			{@const fill = i === highlightIdx ? 'var(--accent)' : 'var(--surface-3)'}
 			<!-- Bar -->
 			<rect
 				x={BAR_X + 2}

@@ -78,7 +78,7 @@
 					{@const bh = barHeight(val)}
 					{@const bx = barX(i)}
 					{@const by = barY(val)}
-					{@const fill = i === bestIdx ? 'var(--accent)' : 'var(--line-strong)'}
+					{@const fill = i === bestIdx ? 'var(--accent)' : 'var(--surface-3)'}
 					<!-- Bar -->
 					<rect
 						x={bx}

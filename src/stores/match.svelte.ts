@@ -430,11 +430,22 @@ export class MatchStore {
 	}
 
 	/**
-	 * Broadcast current pause state to the spectator display via BC_CHANNEL.
+	 * Broadcast current pause state to the spectator display via BC_CHANNEL, then
+	 * republish the current match snapshot to the active Cast session.
 	 * Uses the same open-post-close pattern as the match-state broadcast.
 	 * Non-fatal: wrapped in try/catch so pause logic never interrupts scoring.
 	 * Type discriminant MSG_PAUSE_TICK prevents isValidMatchState from processing
 	 * this message as a match-state snapshot (RESEARCH Pitfall 3).
+	 *
+	 * The BroadcastChannel post above only reaches same-machine contexts (e.g. the
+	 * local /match + /display two-window preview) — it cannot reach a real
+	 * Chromecast receiver. Every pause mutator (trigger, per-second tick, resume)
+	 * calls this method, so the unconditional #publishToCast() call below closes
+	 * UAT Test 5 / DISP-04's gap for all three at once (diagnosed in
+	 * .planning/debug/pause-not-shown-on-receiver.md). #publishToCast() already
+	 * no-ops when there is no active Cast session and swallows its own throws, so
+	 * it is safe to call regardless of whether the BroadcastChannel post above
+	 * succeeded or failed.
 	 */
 	#broadcastPause(): void {
 		try {
@@ -448,6 +459,7 @@ export class MatchStore {
 		} catch {
 			// Silently ignore — pause sync is best-effort; play continues
 		}
+		this.#publishToCast();
 	}
 
 	/** Monotonic counter for record-event payloads (WR-05). */

@@ -37,7 +37,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
 
 - [x] **Phase 8: Design Foundation** - DS color/spacing/radius/elevation tokens, self-hosted Barlow fonts, and the DS motion system replace all provisional v1.0 styling app-wide (completed 2026-07-13)
 - [x] **Phase 9: Core Components** - Shared UI primitives (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) match their DS specs everywhere they're used (completed 2026-07-14)
-- [ ] **Phase 10: Scoring Surface** - `/match` restyled to DS specs (Numpad, Dartboard colors, VisitStrip/DartPill, ScoreCard) with all scoring logic and behavior unchanged
+- [x] **Phase 10: Scoring Surface** - `/match` restyled to DS specs (Numpad, Dartboard colors, VisitStrip/DartPill, ScoreCard) with all scoring logic and behavior unchanged (completed 2026-07-14)
 - [ ] **Phase 11: Spectator Display** - `/display` restyled to DS specs (PC window, tablet fullscreen, Cast receiver) and verified on the real Chromecast device (Chrome 90 @ 1280×720)
 - [ ] **Phase 12: Pages & Overlays** - Start hub, setup, history, stats, and data/backup pages plus all global overlays/toasts restyled to DS specs
 
@@ -118,14 +118,14 @@ Plans:
   3. The visit strip shows pill-shaped dart notation (`T20`, `D16`, `Bull (50)`, `✕`) with the triple-flash color on triple hits.
   4. The score panel shows the active player in the large amber-edged treatment, inactive players smaller, checkout suggestions with an amber glow, and a red BUST flash — all matching current scoring behavior exactly.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 Plans:
 **Wave 1**
 
 - [x] 10-01-PLAN.md — Numpad restyle to DS 76px/40px values + ⌫ aria-label (SCOR-01)
 - [x] 10-02-PLAN.md — Dartboard flash/float literal-value gaps closed, hit-detection byte-identical (SCOR-02)
 - [x] 10-03-PLAN.md — Live /match dart-pill notation + DartPill states via shared dart-notation.ts (SCOR-03)
-- [ ] 10-04-PLAN.md — ScorePanel/CheckoutSuggestion restyle to DS 96px/44px, amber glow, landscape overflow fix (SCOR-04)
+- [x] 10-04-PLAN.md — ScorePanel/CheckoutSuggestion restyle to DS 96px/44px, amber glow, landscape overflow fix (SCOR-04)
 
 **UI hint**: yes
 
@@ -172,6 +172,6 @@ Plans:
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
 | 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
 | 9. Core Components | v1.2 | 7/7 | Complete    | 2026-07-14 |
-| 10. Scoring Surface | v1.2 | 3/4 | In Progress|  |
+| 10. Scoring Surface | v1.2 | 4/4 | Complete   | 2026-07-14 |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |
 | 12. Pages & Overlays | v1.2 | 0/TBD | Not started | - |

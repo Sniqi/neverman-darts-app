@@ -1,7 +1,8 @@
 ---
 phase: 12
 slug: pages-overlays
-status: draft
+status: approved
+reviewed_at: 2026-07-14
 shadcn_initialized: false
 preset: none
 created: 2026-07-14
@@ -142,7 +143,7 @@ Everything else (axis `stroke: var(--line-strong)`, highlighted bar `fill: var(-
 
 | Element | Copy |
 |---------|------|
-| Setup page title | **`"Neues Spiel"`** (DS literal — currently shipped as `"Neverman Darts"`, must change; see Typography table) |
+| Setup page title (Verified: no vitest/Playwright test asserts the old `Neverman Darts` MatchSetup h1 — safe) | **`"Neues Spiel"`** (DS literal — currently shipped as `"Neverman Darts"`, must change; see Typography table) |
 | Hub page title | `"Neverman Darts"` (unchanged — DS `StartScreen` literal) |
 | Primary CTA (setup) | `"Spiel starten"` (unchanged) |
 | Primary CTA (data export) | `"Exportieren"` / busy: `"Exportiere…"` (unchanged) |

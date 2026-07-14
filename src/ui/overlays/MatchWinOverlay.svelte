@@ -50,7 +50,7 @@
 			{#if displayBadge}
 				<p class="record-badge">{displayBadge}</p>
 			{/if}
-			<button class="new-game-btn" onclick={newGame}>
+			<button class="btn btn--cta" onclick={newGame}>
 				Neues Spiel
 			</button>
 		</div>
@@ -104,34 +104,15 @@
 	}
 
 	.win-body {
-		font-size: 16px;
+		font-size: var(--text-base);
 		color: var(--text);
 		margin: 0;
 	}
 
 	.record-badge {
 		margin: var(--space-sm) 0 0;
-		font-size: 16px;
+		font-size: var(--text-base);
 		font-weight: 400;
 		color: var(--accent);
-	}
-
-	.new-game-btn {
-		height: 56px;
-		padding: 0 var(--space-xl);
-		background: var(--accent);
-		border: none;
-		border-radius: var(--radius-sm);
-		color: var(--on-accent);
-		font-size: 18px;
-		font-weight: 600;
-		cursor: pointer;
-		min-width: 200px;
-		transition: opacity var(--dur-base) var(--ease);
-	}
-
-	.new-game-btn:active {
-		opacity: var(--press-opacity);
-		transform: scale(var(--press-scale));
 	}
 </style>

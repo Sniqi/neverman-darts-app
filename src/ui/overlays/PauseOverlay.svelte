@@ -66,7 +66,7 @@
 			<!-- UI-2: visually hidden aria-live element, updated only at coarse intervals -->
 			<span class="sr-only" aria-live="polite" aria-atomic="true">{ariaAnnouncement}</span>
 			{#if showResume}
-				<button class="weiter-btn" onclick={onresume}>Weiter</button>
+				<button class="btn btn--cta" onclick={onresume}>Weiter</button>
 			{/if}
 		</div>
 	</div>
@@ -137,26 +137,6 @@
 	@keyframes zeroFlashFade {
 		from { opacity: 1; }
 		to   { opacity: 0; }
-	}
-
-	/* "Weiter" button — exact copy of MatchWinOverlay .new-game-btn (PATTERNS analog) */
-	.weiter-btn {
-		height: 56px;
-		padding: 0 var(--space-xl);
-		background: var(--accent);
-		border: none;
-		border-radius: var(--radius-sm);
-		color: var(--on-accent);
-		font-size: 18px;
-		font-weight: 600;
-		cursor: pointer;
-		min-width: 200px;
-		transition: opacity var(--dur-base) var(--ease);
-	}
-
-	.weiter-btn:active {
-		opacity: var(--press-opacity);
-		transform: scale(var(--press-scale));
 	}
 
 	/* UI-2: visually hidden but readable by screen readers */

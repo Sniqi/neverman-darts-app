@@ -98,6 +98,7 @@
 		background: var(--bg-deep);
 		border: 2px solid var(--line-strong);
 		border-radius: var(--radius-sm);
+		box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
 		color: var(--text);
 		font-family: var(--font-score);
 		font-variant-numeric: tabular-nums;

@@ -175,7 +175,7 @@
 		{/each}
 	</div>
 
-	<button class="confirm-btn" onclick={confirmOrder} disabled={order.length === 0}>
+	<button class="btn btn--cta confirm-btn" onclick={confirmOrder} disabled={order.length === 0}>
 		Spielreihenfolge bestätigen
 	</button>
 </div>
@@ -291,16 +291,6 @@
 	}
 
 	.confirm-btn {
-		width: 100%;
-		background: var(--accent);
-		color: var(--on-accent);
-		border: none;
-		border-radius: var(--radius-sm);
-		padding: var(--space-sm) var(--space-md);
-		font-size: 18px;
-		font-weight: 600;
-		min-height: 56px;
-		cursor: pointer;
 		margin-top: auto;
 	}
 </style>

@@ -36,7 +36,7 @@ Full phase details, success criteria, and milestone summary: [`milestones/v1.1-R
 **Milestone Goal:** Bring the entire app UI to the target state of the design system in `design/` — Barlow typography, layered dark surfaces with amber `#f0a424` accent, new radii/elevation/motion — on both surfaces (scoring app + spectator display incl. Cast receiver), without changing any functionality. Pure restyle; all ~511 existing tests stay green.
 
 - [x] **Phase 8: Design Foundation** - DS color/spacing/radius/elevation tokens, self-hosted Barlow fonts, and the DS motion system replace all provisional v1.0 styling app-wide (completed 2026-07-13)
-- [ ] **Phase 9: Core Components** - Shared UI primitives (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) match their DS specs everywhere they're used
+- [x] **Phase 9: Core Components** - Shared UI primitives (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) match their DS specs everywhere they're used (completed 2026-07-14)
 - [ ] **Phase 10: Scoring Surface** - `/match` restyled to DS specs (Numpad, Dartboard colors, VisitStrip/DartPill, ScoreCard) with all scoring logic and behavior unchanged
 - [ ] **Phase 11: Spectator Display** - `/display` restyled to DS specs (PC window, tablet fullscreen, Cast receiver) and verified on the real Chromecast device (Chrome 90 @ 1280×720)
 - [ ] **Phase 12: Pages & Overlays** - Start hub, setup, history, stats, and data/backup pages plus all global overlays/toasts restyled to DS specs
@@ -89,7 +89,7 @@ Plans:
   3. Every confirmation dialog opens with a blurred scrim and a scale-in animation, and shows stacked full-width buttons with an explicit destructive action plus "Abbrechen".
   4. Stat cards (e.g. on the stats dashboard) show large DS-sized values with the DS caption styling.
 
-**Plans**: 6/7 plans executed
+**Plans**: 7/7 plans complete
 Plans:
 **Wave 1**
 
@@ -102,7 +102,7 @@ Plans:
 - [x] 09-03-PLAN.md — Dialog restyle (ConfirmDialog/DartsAtDoubleDialog/ResumePrompt)
 - [x] 09-05-PLAN.md — MatchSetup chips/segmented control/steppers/toggle rows
 - [x] 09-06-PLAN.md — PlayerPicker/ProfileManager/BullOffOrder button sweep
-- [ ] 09-07-PLAN.md — `/match` audio toggle rows
+- [x] 09-07-PLAN.md — `/match` audio toggle rows
 
 **UI hint**: yes
 
@@ -163,7 +163,7 @@ Plans:
 | 6. PWA & Deployment | v1.0 | 3/3 | Complete | 2026-06-13 |
 | 7. Chromecast Integration | v1.1 | 6/6 | Complete | 2026-06-18 |
 | 8. Design Foundation | v1.2 | 6/6 | Complete    | 2026-07-13 |
-| 9. Core Components | v1.2 | 6/7 | In Progress|  |
+| 9. Core Components | v1.2 | 7/7 | Complete   | 2026-07-14 |
 | 10. Scoring Surface | v1.2 | 0/TBD | Not started | - |
 | 11. Spectator Display | v1.2 | 0/TBD | Not started | - |
 | 12. Pages & Overlays | v1.2 | 0/TBD | Not started | - |

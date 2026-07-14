@@ -6,14 +6,14 @@ current_phase: 12
 current_phase_name: Pages & Overlays
 status: executing
 stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-07-14T05:24:51.906Z"
+last_updated: "2026-07-14T05:28:38.965Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 12 execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 26
-  completed_plans: 23
+  completed_plans: 24
   percent: 80
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 ## Current Position
 
 Phase: 12 (Pages & Overlays) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-07-14 — Phase 12 execution started
 
@@ -112,6 +112,7 @@ Last activity: 2026-07-14 — Phase 12 execution started
 | Phase 11-spectator-display P03 | 12min | 3 tasks | 1 files |
 | Phase 12 P01 | 5min | 2 tasks | 3 files |
 | Phase 12 P02 | 8min | 2 tasks | 5 files |
+| Phase 12-pages-overlays P03 | 10min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -154,6 +155,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase 11]: Bloom's color-mix(in oklab, var(--accent) 28%, transparent) precomputed to static rgba(240, 164, 36, 0.28) per project-wide Chrome-90 rule
 - [Phase ?]: [Phase 11-03]: Active box-shadow amber mixes precomputed to static 7%/22% rgba(); comment describes as translucent-accent mix, avoiding literal color-mix( string per phase-wide grep gate
 - [Phase ?]: [Phase 11-03]: .dart-pill font-size switched to relative 0.82em off .h-darts's --display-body, matching DS DartPill size=0.82em pattern
+- [Phase ?]: Chart recolor limited to the exact 2 flagged @const fill lines — enforced via scoped grep gate, not just instruction
 
 ### Quick Tasks Completed
 
@@ -186,7 +188,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T05:24:15.277Z
+Last session: 2026-07-14T05:28:06.538Z
 Stopped at: Phase 11 executed (human_needed: on-device UAT deferred), continuing with Phase 12 (autonomous --from 8)
 Resume file: None
 

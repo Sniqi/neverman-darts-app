@@ -566,6 +566,14 @@
 		.checkout-route { font-size: clamp(2.5rem, calc(6.5vw / var(--player-count, 2)), 8rem); }
 		.stats-line     { font-size: clamp(1.75rem, calc(4vw  / var(--player-count, 2)), 5rem); }
 		.history-row.bust-row .h-total { font-size: clamp(2rem, calc(5vw / var(--player-count, 2)), 6.5rem); }
+		.history-box    { padding: clamp(5px, calc(1vw / var(--player-count, 2)), 12px); }
+		.history-section { row-gap: clamp(4px, calc(0.8vw / var(--player-count, 2)), 10px); }
+		.history-row {
+			column-gap: clamp(0.4em, calc(1.5vw / var(--player-count, 2)), 1em);
+			padding: clamp(4px, calc(0.9vw / var(--player-count, 2)), 10px)
+				clamp(8px, calc(1.6vw / var(--player-count, 2)), 16px);
+		}
+		.h-darts        { gap: clamp(0.2em, calc(0.8vw / var(--player-count, 2)), 0.5em); }
 	}
 
 	/* The Chromecast's Chrome 90 also lacks `subgrid` (Chrome 117+). The history rows normally

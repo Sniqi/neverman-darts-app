@@ -27,7 +27,7 @@
 
 - [x] **SCOR-01**: Numpad matches the DS Numpad spec — 76px keys, 32px digits, surface-step press states, ⌫ backspace
 - [x] **SCOR-02**: Dartboard uses the DS board colors and active-touch highlight while polar hit detection, enlarged rings and segment geometry stay unchanged
-- [ ] **SCOR-03**: Visit strip and dart pills match the DS specs — pill radius 999, dart notation (`T20`, `D16`, `Bull (50)`, `✕`), triple flash color
+- [x] **SCOR-03**: Visit strip and dart pills match the DS specs — pill radius 999, dart notation (`T20`, `D16`, `Bull (50)`, `✕`), triple flash color
 - [ ] **SCOR-04**: Score panel matches the DS ScoreCard spec — active player at 96px/800 with amber edge treatment, inactive at 44px, checkout route callout with amber glow, BUST flash in semantic red
 
 ### DISP — Spectator display (`/display`: PC window, tablet fullscreen, Cast receiver)
@@ -82,7 +82,7 @@ Which phase covers which requirement. Filled during roadmap creation.
 | COMP-04 | Phase 9 | Complete |
 | SCOR-01 | Phase 10 | Complete |
 | SCOR-02 | Phase 10 | Complete |
-| SCOR-03 | Phase 10 | Pending |
+| SCOR-03 | Phase 10 | Complete |
 | SCOR-04 | Phase 10 | Pending |
 | DISP-01 | Phase 11 | Pending |
 | DISP-02 | Phase 11 | Pending |

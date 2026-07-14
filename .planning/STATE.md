@@ -6,14 +6,14 @@ current_phase: 10
 current_phase_name: Scoring Surface
 status: executing
 stopped_at: Completed 09-04-PLAN.md
-last_updated: "2026-07-14T01:45:49.629Z"
+last_updated: "2026-07-14T01:55:21.873Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 10 execution started
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 17
-  completed_plans: 15
+  completed_plans: 16
   percent: 40
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-14)
 ## Current Position
 
 Phase: 10 (Scoring Surface) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-07-14 — Phase 10 execution started
 
@@ -103,6 +103,7 @@ Last activity: 2026-07-14 — Phase 10 execution started
 | Phase 09-core-components P07 | 6min | 2 tasks | 2 files |
 | Phase 10-scoring-surface P01 | 12min | 2 tasks | 2 files |
 | Phase 10 P02 | 6min | 2 tasks | 2 files |
+| Phase 10-scoring-surface P03 | 10min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,8 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 - [Phase ?]: ProfileManager's .add-btn kept as fully local/unshared styling; only touch target and press-state added
 - [Phase 09-07]: .audio-row height raised 36px -> var(--hit-min) (48px), not var(--row-h) (64px), per 09-CONTEXT.md Q2 resolution
 - [Phase 10-scoring-surface]: digit-key font-family corrected --font-score -> --font-ui per UI-SPEC type-scale table + literal DS Numpad.jsx source, overriding PATTERNS.md's general summary row
+- [Phase 10-scoring-surface]: Consolidated match/+page.svelte + VisitStrip.svelte duplicate formatDart helpers into shared src/ui/input/dart-notation.ts
+- [Phase 10-scoring-surface]: Bust text color shipped as precomputed static #f27c79 rather than live color-mix(), per project-wide Chrome-90 rule
 
 ### Quick Tasks Completed
 
@@ -161,7 +164,7 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 ## Session Continuity
 
-Last session: 2026-07-14T01:45:23.173Z
+Last session: 2026-07-14T01:52:26.543Z
 Stopped at: Phase 9 complete (verified 15/15), ready to plan Phase 10 (autonomous run --from 8 in progress)
 Resume file: None
 

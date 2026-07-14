@@ -100,8 +100,8 @@
 }
 
 .btn--destructive:active {
-	opacity: var(--press-opacity);
 	transform: scale(var(--press-scale));
+	filter: brightness(1.1);
 }
 
 /* .btn--cancel — bordered neutral cancel/secondary action */
@@ -116,8 +116,8 @@
 }
 
 .btn--cancel:active {
-	background: var(--surface-3);
 	transform: scale(var(--press-scale));
+	filter: brightness(1.1);
 }
 
 /* --- Discretionary extensions (non-DS shapes, per CONTEXT.md "Claude's Discretion") --- */

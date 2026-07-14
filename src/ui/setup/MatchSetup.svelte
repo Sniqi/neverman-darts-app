@@ -495,9 +495,11 @@
 		height: var(--hit-min);
 		background: var(--surface-3);
 		color: var(--text);
-		border: none;
+		border: 1px solid var(--line-strong);
 		border-radius: var(--radius-sm);
-		font-size: 20px;
+		font-size: var(--text-xl);
+		font-weight: 500;
+		line-height: 1;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -518,8 +520,9 @@
 	.stepper-value {
 		font-size: var(--text-xl);
 		font-weight: 700;
-		min-width: 24px;
+		min-width: 32px;
 		text-align: center;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.stepper-unit {

@@ -608,6 +608,14 @@ describe('MatchStore', () => {
 			return new MatchStore();
 		}
 
+		/** Build a fake CastSenderManager with an active session (mirrors makeFakeManager below). */
+		function makeFakeCastManager() {
+			return {
+				activeSession: {} as cast.framework.CastSession,
+				sendSnapshot: vi.fn(),
+			};
+		}
+
 		beforeEach(() => {
 			vi.stubGlobal('BroadcastChannel', class {
 				name: string;
@@ -766,6 +774,63 @@ describe('MatchStore', () => {
 			expect(s.pauseSetCount).toBe(2);
 			expect(s.pauseActive).toBe(true);
 			expect(s.pauseRemainingSeconds).toBe(480); // 8 * 60
+		});
+
+		it('Gap Test 5: #checkAutoPause trigger publishes fresh pauseActive:true to Cast', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 2 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
+			const mgr = makeFakeCastManager();
+			s.setCastManager(mgr);
+
+			completeLeg(s);
+
+			expect(s.pauseActive).toBe(true);
+			const lastCall = mgr.sendSnapshot.mock.calls[mgr.sendSnapshot.mock.calls.length - 1];
+			const arg = lastCall[0] as { pauseActive: boolean; pauseRemainingSeconds: number };
+			expect(arg.pauseActive).toBe(true);
+			expect(arg.pauseRemainingSeconds).toBe(120);
+		});
+
+		it('Gap Test 5: decrementPause publishes the updated countdown to Cast', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
+			const mgr = makeFakeCastManager();
+			s.setCastManager(mgr);
+			completeLeg(s);
+			expect(s.pauseRemainingSeconds).toBe(60);
+			mgr.sendSnapshot.mockClear();
+
+			s.decrementPause();
+
+			expect(mgr.sendSnapshot).toHaveBeenCalledTimes(1);
+			const arg = mgr.sendSnapshot.mock.calls[0][0] as { pauseActive: boolean; pauseRemainingSeconds: number };
+			expect(arg.pauseActive).toBe(true);
+			expect(arg.pauseRemainingSeconds).toBe(59);
+		});
+
+		it('Gap Test 5: resumePause publishes pauseActive:false to Cast', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 5 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
+			const mgr = makeFakeCastManager();
+			s.setCastManager(mgr);
+			completeLeg(s);
+			mgr.sendSnapshot.mockClear();
+
+			s.resumePause();
+
+			expect(mgr.sendSnapshot).toHaveBeenCalledTimes(1);
+			const arg = mgr.sendSnapshot.mock.calls[0][0] as { pauseActive: boolean; pauseRemainingSeconds: number };
+			expect(arg.pauseActive).toBe(false);
+			expect(arg.pauseRemainingSeconds).toBe(0);
+		});
+
+		it('Gap Test 5: pause cycle does not throw when no Cast manager is set (SYNC-04 preserved)', () => {
+			const s = makeStoreWithPrefs({ pauseEnabled: true, pauseSets: 1, pauseMinutes: 1 });
+			s.dispatch({ type: 'START_MATCH', config: configSets1Leg, players: [player1], order: ['p1'] });
+
+			expect(() => completeLeg(s)).not.toThrow();
+			expect(() => s.decrementPause()).not.toThrow();
+			expect(() => s.resumePause()).not.toThrow();
 		});
 	});
 

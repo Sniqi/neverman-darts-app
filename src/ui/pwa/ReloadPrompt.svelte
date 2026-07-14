@@ -84,5 +84,8 @@
 	.pwa-toast-actions .btn {
 		flex: 1;
 		width: auto;
+		min-height: var(--hit-min);
+		padding: var(--space-xs) var(--space-sm);
+		font-size: var(--text-base);
 	}
 </style>

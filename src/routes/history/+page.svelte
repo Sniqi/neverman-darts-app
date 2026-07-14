@@ -41,7 +41,7 @@
 
 <style>
 	.screen {
-		max-width: 480px;
+		max-width: 520px;
 		margin: 0 auto;
 		min-height: 100dvh;
 		background: var(--bg);
@@ -63,7 +63,7 @@
 	}
 
 	.screen-title {
-		font-size: 20px;
+		font-size: var(--text-xl);
 		font-weight: 600;
 		margin: 0;
 		color: var(--text);
@@ -104,5 +104,9 @@
 		list-style: none;
 		margin: 0;
 		padding: 0;
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		box-shadow: var(--edge-highlight);
 	}
 </style>

@@ -46,7 +46,10 @@
 			</div>
 			<div class="row-format">{row.format}</div>
 		</div>
-		<span class="chevron" aria-hidden="true">›</span>
+		<svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M9 18l6-6-6-6" />
+		</svg>
 	</button>
 </li>
 
@@ -55,7 +58,7 @@
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		border-bottom: 1px solid var(--line-strong);
+		border-bottom: 1px solid var(--line);
 	}
 
 	.row-item:last-child {
@@ -66,14 +69,14 @@
 		display: flex;
 		align-items: center;
 		width: 100%;
-		min-height: 64px;
+		min-height: var(--row-h);
 		padding: var(--space-sm) var(--space-md);
 		background: var(--surface);
 		border: none;
 		color: var(--text);
 		cursor: pointer;
 		text-align: left;
-		gap: var(--space-sm);
+		gap: var(--space-md);
 	}
 
 	.row:active {
@@ -94,20 +97,22 @@
 	}
 
 	.date {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--text-muted);
 	}
 
 	.result {
-		font-size: 16px;
-		font-weight: 600;
+		font-family: var(--font-score);
+		font-size: var(--text-md);
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
 		color: var(--text);
 	}
 
 	.row-names {
-		font-size: 16px;
-		line-height: 1.5;
+		font-size: var(--text-md);
+		line-height: 1.4;
 	}
 
 	.winner-name {
@@ -126,13 +131,12 @@
 	}
 
 	.row-format {
-		font-size: 14px;
+		font-size: var(--text-sm);
 		font-weight: 400;
 		color: var(--text-muted);
 	}
 
 	.chevron {
-		font-size: 14px;
 		color: var(--text-muted);
 		flex-shrink: 0;
 	}

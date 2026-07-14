@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Restyling
 current_phase: 12
-current_phase_name: Pages & Overlays
-status: verifying
-stopped_at: Phase 11 COMPLETE — on-device UAT 6/6 (Test 5 pause-on-Chromecast re-verified after fix b1a6e19), verification passed, security verified. Phase 12 executed+verified+secured but still needs UAT.
-last_updated: "2026-07-14T15:54:39.749Z"
+status: milestone-ready
+stopped_at: Phase 12 complete — UAT 15/15 (7 human checkpoints + 8 automated), 0 issues; verification + security passed. All v1.2 phases (8–12) complete; milestone ready for /gsd-complete-milestone v1.2.
+last_updated: "2026-07-14T20:10:11.088Z"
 last_activity: 2026-07-14
-last_activity_desc: Phase 11 complete (UAT 6/6, verification+security gates closed), transitioned to Phase 12
+last_activity_desc: Phase 12 complete
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 27
   completed_plans: 27
   percent: 100
+current_phase_name: Pages & Overlays
 ---
 
 # Project State
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-14)
 
 **Core value:** A full X01 darts match can be scored quickly and accurately by touch, with a large, readable live display for everyone in the room.
-**Current focus:** Milestone-Endgame — Phase 12 (Pages & Overlays) needs on-device UAT (/gsd-verify-work 12); it is the last remaining v1.2 gate before milestone completion.
+**Current focus:** v1.2 Restyling complete — all 5 phases (8–12) executed, verified, secured, and UAT-passed. Next: `/gsd-complete-milestone v1.2`.
 
 ## Current Position
 
-Phase: 12 — Pages & Overlays
-Plan: 5/5 executed (verification passed, security verified); UAT not yet run
-Status: Ready for UAT — /gsd-verify-work 12 is the only remaining v1.2 gate
-Last activity: 2026-07-14 — Phase 11 complete (UAT 6/6), transitioned to Phase 12
+Phase: 12 — Pages & Overlays (COMPLETE, final v1.2 phase)
+Plan: 5/5 executed; verification + security + UAT all passed
+Status: v1.2 milestone 100% — ready for `/gsd-complete-milestone v1.2`
+Last activity: 2026-07-14 — Phase 12 UAT 15/15 (7 human + 8 automated), 0 issues
 
 ## Performance Metrics
 
@@ -186,8 +186,9 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 
 | Phase | State | Resume |
 |-------|-------|--------|
-| 12 | UAT not yet run — 5/5 executed, verification + security passed | /gsd-verify-work 12 |
+| — | None outstanding — all v1.2 phases UAT-passed | — |
 
+*Phase 12 cleared 2026-07-14: UAT 15/15 (7 human checkpoints + 8 automated), 0 issues, 12-VERIFICATION.md status=passed, 12-SECURITY.md status=secured (threats_open: 0).*
 *Phase 11 cleared 2026-07-14: on-device UAT 6/6 passed, 11-VERIFICATION.md status=passed, 11-SECURITY.md verified.*
 
 ## Deferred Items
@@ -201,9 +202,9 @@ Cleared at v1.1 milestone close (2026-07-13). The durable log lives in PROJECT.m
 ## Session Continuity
 
 Last session: 2026-07-14
-Stopped at: Phase 11 complete — UAT 6/6 (Test 5 pause-on-Chromecast re-verified after fix b1a6e19), verification passed, security verified. Transitioned to Phase 12.
+Stopped at: Phase 12 complete — UAT 15/15 (7 human checkpoints + 8 automated), 0 issues; verification + security passed. All v1.2 phases (8–12) complete.
 Resume file: None
 
 ## Operator Next Steps
 
-- v1.2 milestone: the only remaining gate is Phase 12 (Pages & Overlays) on-device UAT → `/gsd-verify-work 12`. After it passes, run `/gsd-complete-milestone v1.2`.
+- v1.2 milestone is 100% complete (all phases executed, verified, secured, UAT-passed). Next: `/clear` then `/gsd-complete-milestone v1.2` to archive the milestone and prepare for the next.

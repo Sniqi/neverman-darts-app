@@ -39,6 +39,8 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - ✓ **Design foundation (v1.2)** — DS tokens app-wide (colors/spacing/radii/elevation as static Chrome-90-safe values), Barlow + Barlow Semi Condensed self-hosted as WOFF2 (offline-precached, tabular-nums on score surfaces), DS motion tokens with reduced-motion collapse, zero provisional colors (grep-gated by `src/lib/design-tokens.test.ts`) — v1.2 (Phase 8, verified 8/8 must-haves)
 - ✓ **Scoring surface (v1.2)** — Numpad 76px/DS gradient confirm + ⌫ aria-label, Dartboard DS flash/float literals (geometry byte-identical), shared `dart-notation.ts` with DS strings (`Bull (50)`/`✕`), DS DartPill states + bust treatment, ScoreCard 96px/800 amber-edge active (compact clamp for 3-4 players landscape, E2E-regression-guarded) — v1.2 (Phase 10, verified 7/7 after gap closure)
 - ✓ **Core components (v1.2)** — shared `.btn` (5 DS variants + 4 extensions) & `.switch` primitives in `src/styles/components.css`; dialogs on DS spec (blur scrim, scale-in .94, 420px, stacked buttons); chips/segmented/steppers/toggles at DS sizes with spring thumbs; StatCard 40px/BSC — v1.2 (Phase 9, verified 15/15 must-haves, 535 tests + 9/9 E2E)
+- ✓ **Spectator display (v1.2)** — `/display` restyled to DS specs on all three surfaces (PC second window, tablet fullscreen, Cast receiver): cqw display-scale typography, amber active-player edge/inner-glow/tint, inactive panels at 55% opacity, DS header gradients + amber bloom, Chrome-90-safe via `@supports` — v1.2 (Phase 11, on-device UAT 6/6 incl. pause-on-Chromecast re-verify)
+- ✓ **Pages & overlays (v1.2)** — Hub/Setup (centered 520px column, DS list boxes, collapsible "Profile verwalten"), History list+detail (boxed DS HistoryRow, inline SVG chevron, Barlow Semi Condensed tabular result, DS type scale), Stats dashboard (DS type scale + 2-line SVG chart recolor — recolored, not rebuilt), Data/backup page + all global overlays/toasts (Pause/Record/MatchWin blur-scrim panels with shared `.btn--cta`, ReloadPrompt + Cast ResumeToast on DS surface-2) — v1.2 (Phase 12, verified 15/15 must-haves; UAT 7/7 human checkpoints + 8 automated, 0 issues)
 
 ### Active
 
@@ -48,7 +50,7 @@ A full X01 darts match can be scored quickly and accurately by touch, with a lar
 - [x] Typography: Barlow (UI) + Barlow Semi Condensed (score numerals), self-hosted, offline-precached, tabular-nums on score surfaces *(Phase 8 ✓)*
 - [x] Core components restyled to DS specs (Button, Chip, SegmentedControl, Stepper, ToggleRow, StatCard, ConfirmDialog) *(Phase 9 ✓)*
 - [x] Scoring surface restyled (Numpad, Dartboard colors, VisitStrip, ScoreCard, active-score 96px treatment; 3-4-player landscape compact clamp) *(Phase 10 ✓)*
-- [~] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver *(Phase 11 implementiert + automatisiert verifiziert; On-Device-UAT ausstehend → /gsd-verify-work 11)*
+- [x] Spectator display restyled (cqw display scale, amber active-player edge/glow, header + gradients) — Chrome-90-safe on the Cast receiver *(Phase 11 ✓, on-device UAT 6/6)*
 - [x] All pages restyled (Hub, Setup, History, Stats, Daten/Backup) incl. overlays/toasts *(Phase 12 ✓)*
 - [x] Motion system per DS (100–300ms + DS-documented exceptions, standard/spring easing, `prefers-reduced-motion` collapse) *(Phase 8 ✓)*
 
@@ -110,4 +112,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-14 after Phase 12 (Pages & Overlays) completion — milestone awaits Phase 11 on-device UAT*
+*Last updated: 2026-07-14 after Phase 12 (Pages & Overlays) UAT — all v1.2 phases (8–12) complete; milestone ready for `/gsd-complete-milestone v1.2`*

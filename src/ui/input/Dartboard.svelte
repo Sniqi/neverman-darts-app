@@ -276,8 +276,9 @@
 			y={pos.y}
 			text-anchor="middle"
 			dominant-baseline="central"
-			font-size="28"
+			font-size="32"
 			font-weight="600"
+			font-family="var(--font-score)"
 			fill="var(--text-soft)"
 			pointer-events="none"
 		>{seg}</text>

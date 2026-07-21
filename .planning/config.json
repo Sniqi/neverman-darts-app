@@ -65,5 +65,12 @@
     "source_grounding_authority": "grep"
   },
   "mode": "yolo",
-  "granularity": "standard"
+  "granularity": "standard",
+  "claude_orchestration": {
+    "enabled": true
+  },
+  "statusline": {
+    "show_context_tokens": true,
+    "show_git": false
+  }
 }

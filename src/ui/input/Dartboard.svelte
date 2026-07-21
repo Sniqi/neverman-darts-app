@@ -116,7 +116,7 @@
 			regions.push({
 				key: `is-${seg}`,
 				path: describeAnnularSlice(R_OUTER_BULL, R_INNER_SINGLE, startAngle, endAngle),
-				fill: 'var(--board-single)', // all singles same dark color
+				fill: isAlt ? 'var(--board-single-light)' : 'var(--board-single)',
 				segment: seg,
 				multiplier: 1
 			});
@@ -134,7 +134,7 @@
 			regions.push({
 				key: `os-${seg}`,
 				path: describeAnnularSlice(R_TRIPLE_END, R_OUTER_SINGLE, startAngle, endAngle),
-				fill: 'var(--board-single)',
+				fill: isAlt ? 'var(--board-single-light)' : 'var(--board-single)',
 				segment: seg,
 				multiplier: 1
 			});

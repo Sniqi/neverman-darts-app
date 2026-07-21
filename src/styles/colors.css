@@ -42,6 +42,7 @@
 
 	/* Dartboard segment fills */
 	--board-single: #222835;
+	--board-single-light: #b8a877;
 	--board-red: #ab2430;
 	--board-green: #1d7a46;
 	--board-stroke: #39404f;
